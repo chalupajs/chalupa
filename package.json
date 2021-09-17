@@ -1,0 +1,19 @@
+{
+  "name": "@dwmt/catamaran",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dwmt/Catamaran.git"
+  },
+  "author": "Lajos Kovács <lajoskvcs@icloud.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dwmt/Catamaran/issues"
+  },
+  "homepage": "https://github.com/dwmt/Catamaran#readme"
+}
