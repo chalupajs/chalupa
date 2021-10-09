@@ -1,0 +1,42 @@
+{
+	"name": "@catamaranjs/interface",
+	"version": "1.0.0",
+	"description": "Service framework",
+	"main": "dist/src/index.js",
+	"types": "dist/src/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"engines": {
+		"node": ">=16"
+	},
+	"scripts": {
+		"clean": "rimraf ./dist ./coverage ./generated-docs ./junit.xml",
+		"compile": "tsc -p tsconfig.build.json",
+		"compile:watch": "tsc -p tsconfig.build.json --watch",
+		"docs": "typedoc --out generated-docs src",
+		"lint": "xo",
+		"lint:fix": "xo --fix",
+		"prepublishOnly": "npm run clean && npm run compile"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:dwmt/Catamaran.git"
+	},
+	"license": "MIT",
+	"devDependencies": {
+		"@types/convict": "6.1.1",
+		"@types/js-yaml": "4.0.3",
+		"@types/uuid": "8.3.1",
+		"rimraf": "3.0.2",
+		"typedoc": "0.21.0",
+		"typescript": "4.3.3"
+	},
+	"dependencies": {
+		"inversify": "5.1.1",
+		"js-yaml": "4.0.0",
+		"konvenient": "2.3.2",
+		"reflect-metadata": "0.1.13",
+		"uuid": "8.3.2"
+	}
+}

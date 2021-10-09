@@ -1,0 +1,34 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "commonjs",
+		"incremental": true,
+		"declaration": true,
+		"lib": [
+			"es2015"
+		],
+		"composite": true,
+		"sourceMap": true,
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"esModuleInterop": true,
+		"strict": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"noImplicitThis": true,
+		"alwaysStrict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": false,
+		"removeComments": false,
+		"preserveConstEnums": true
+	},
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
+}

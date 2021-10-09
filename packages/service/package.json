@@ -1,0 +1,39 @@
+{
+	"name": "@catamaranjs/service",
+	"version": "1.0.0",
+	"description": "Service framework",
+	"main": "dist/src/index.js",
+	"types": "dist/src/index.d.ts",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"clean": "rimraf ./dist ./coverage ./generated-docs ./junit.xml",
+		"compile": "tsc -p tsconfig.build.json",
+		"compile:watch": "tsc -p tsconfig.build.json --watch",
+		"docs": "typedoc --out generated-docs src",
+		"lint": "xo",
+		"lint:fix": "xo --fix",
+		"prepublishOnly": "npm run clean && npm run compile"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@gitlab.perfinal.com:perfinal/tools/entity-framework.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"rimraf": "3.0.2",
+		"typedoc": "0.21.0",
+		"typescript": "4.3.3"
+	},
+	"engines": {
+		"node": ">=16"
+	},
+	"dependencies": {
+		"@catamaranjs/interface": "workspace:*",
+		"reflect-metadata": "0.1.13",
+		"konvenient": "2.3.2"
+	}
+}

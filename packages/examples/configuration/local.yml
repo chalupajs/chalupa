@@ -1,0 +1,7 @@
+pizza:
+  bakingTime: 269
+
+# Let's configure logging as well.
+log:
+  level: info
+  pretty: true
