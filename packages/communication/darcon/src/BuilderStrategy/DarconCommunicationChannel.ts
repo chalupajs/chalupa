@@ -1,4 +1,4 @@
-import { ICommunicationChannel, Inject, Injectable } from "@catamaranjs/interface";
+import { ContainerConstant, ICommunicationChannel, Inject, Injectable } from "@catamaranjs/interface";
 import Darcon = darcon.Darcon;
 import { newUID } from "../util";
 
@@ -9,10 +9,15 @@ const DarconCommunication = Object.freeze({
 
 @Injectable()
 export class DarconCommunicationChannel implements ICommunicationChannel {
-	private readonly _darcon: Darcon
+	private _darcon: Darcon
+	private _serviceName: string
 
-	constructor(@Inject('darcon') darcon: darcon.Darcon) {
+	constructor(
+		@Inject('darcon') darcon: darcon.Darcon,
+		@Inject(ContainerConstant.SERVICE_NAME) serviceName: string
+	) {
 		this._darcon = darcon;
+		this._serviceName = serviceName
 	}
 
 	emit(serviceName: string, eventName: any, parameters: any[], terms: Record<string, any>): void {
@@ -58,6 +63,10 @@ export class DarconCommunicationChannel implements ICommunicationChannel {
 			[],
 			{}
 		)
+	}
+
+	broadcast(eventName: string, _parameters: any[], _terms: Record<string, any>) {
+		this._darcon.proclaim(this._serviceName, eventName, _terms)
 	}
 
 }

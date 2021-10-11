@@ -33,7 +33,8 @@
 	},
 	"dependencies": {
 		"@catamaranjs/interface": "workspace:*",
+		"konvenient": "2.3.2",
 		"reflect-metadata": "0.1.13",
-		"konvenient": "2.3.2"
+		"tiny-emitter": "^2.1.0"
 	}
 }

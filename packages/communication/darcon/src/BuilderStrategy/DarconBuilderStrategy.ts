@@ -11,7 +11,6 @@ import {
 
 import { ConstructedService } from './ConstructedService'
 import { DarconConfig } from "../Config/DarconConfig";
-import { timeout } from "../util";
 import { DarconCommunicationChannel } from "./DarconCommunicationChannel";
 
 /**
@@ -140,7 +139,7 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 			while (depends.length > 0 && !darcon.finalised) {
 				darconLogger.info(`Waiting for ${depends.join(', ')} to be present!`)
 				// eslint-disable-next-line no-await-in-loop
-				await timeout(2000)
+				await intermediateService.timeout(2000)
 			}
 
 			await serviceBridge.respectDelayedStart()

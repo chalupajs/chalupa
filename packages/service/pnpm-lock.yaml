@@ -5,6 +5,7 @@ specifiers:
   konvenient: 2.3.2
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
+  tiny-emitter: ^2.1.0
   typedoc: 0.21.0
   typescript: 4.3.3
 
@@ -12,6 +13,7 @@ dependencies:
   '@catamaranjs/interface': link:../interface
   konvenient: 2.3.2
   reflect-metadata: 0.1.13
+  tiny-emitter: 2.1.0
 
 devDependencies:
   rimraf: 3.0.2
@@ -202,6 +204,10 @@ packages:
     resolution: {integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /tiny-emitter/2.1.0:
+    resolution: {integrity: sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==}
+    dev: false
 
   /typedoc-default-themes/0.12.10:
     resolution: {integrity: sha512-fIS001cAYHkyQPidWXmHuhs8usjP5XVJjWB8oZGqkTowZaz3v7g3KDZeeqE82FBrmkAnIBOY3jgy7lnPnqATbA==}

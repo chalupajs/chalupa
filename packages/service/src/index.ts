@@ -11,6 +11,8 @@ export {
 	SystemUnderTest,
 } from './Interpretation/Strategy/IntegrationTest/IntegrationTestArrangement'
 
+export {InMemoryStrategy} from './Communication/InMemory/InMemoryStrategy'
+
 // ----------- Logging -----------//
 export {ConsoleLoggerProvider} from './Log/console-logger/ConsoleLoggerProvider'
 export {ConsoleLogger} from './Log/console-logger/ConsoleLogger'

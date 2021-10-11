@@ -33,6 +33,12 @@ export class IntermediateService implements IIntermediateService {
 		this._logger = logger
 	}
 
+	async timeout(ms: number): Promise<void> {
+		return new Promise(resolve => {
+			setTimeout(resolve, ms)
+		})
+	}
+
 	bridge(): IServiceBridge {
 		if (typeof this._serviceBridgeSingleton === 'undefined') {
 			this._serviceBridgeSingleton = new ServiceBridge(

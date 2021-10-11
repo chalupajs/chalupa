@@ -27,5 +27,6 @@ declare namespace darcon {
 			terms: any
 		): Promise<any>
 		publish(entity: any, options: any): Promise<any>
+		proclaim(serviceName: string, eventName: string, terms: Record<string, any>): Promise<any>
 	}
 }

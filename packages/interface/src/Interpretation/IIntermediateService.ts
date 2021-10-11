@@ -9,6 +9,7 @@ export interface IIntermediateService {
 	serviceConstructor: Constructor
 	serviceOptions: ServiceOptions
 	bindLogger(logger: ILogger): void
+	timeout(ms: number): Promise<void>
 	getServiceFromContainer (): any
 	bridge(): IServiceBridge
 }

@@ -4,8 +4,8 @@ import { Injectable } from '../Container/decorators'
 import { Metadata } from '../metadata/Metadata'
 import { ExternalServiceCall, ExternalServiceEmit } from './ExternalServiceTemplate'
 
-const externalServiceMethodMetadataKey = Symbol('esm')
-const externalServiceEventMetadataKey = Symbol('ese')
+const externalServiceMethodMetadataKey = 'Catamaran_Metadata_ExternalServiceMethod'
+const externalServiceEventMetadataKey = 'Catamaran_Metadata_ExternalServiceEvent'
 
 /**
  * Options for the `ExternalService` decorator.

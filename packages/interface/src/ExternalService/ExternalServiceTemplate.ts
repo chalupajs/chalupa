@@ -10,7 +10,7 @@ import { ContainerConstant } from "../constants";
 export class ExternalServiceTemplate {
 	private readonly serviceName!: string
 
-	private readonly communicationChannel: ICommunicationChannel
+	private communicationChannel: ICommunicationChannel
 
 	constructor(@Inject(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE) communicationChannel: ICommunicationChannel) {
 		this.communicationChannel = communicationChannel
