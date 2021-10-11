@@ -87,6 +87,7 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 				if (isItMe(name)) return 'OK'
 				await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityAppeared, [name])
 				depends = depends.filter(depend => depend !== name)
+				darconLogger.info(`'${name}' appeared on the network`)
 				await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityLinked, [name])
 				return 'OK'
 			},

@@ -1,11 +1,18 @@
-import { Constructor, IBuilderStrategy } from '@catamaranjs/interface'
+import { Constructor, IBuilderStrategy, ILogProvider } from '@catamaranjs/interface'
 import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
+import { ConsoleLoggerProvider } from "../Log/console-logger/ConsoleLoggerProvider";
 
 /**
  * The entrypoint of the framework. Use this object to construct
  * some representation of your service.
  */
-export const Catamaran = {
+export class Catamaran {
+	static logProvider?: Constructor<ILogProvider> = ConsoleLoggerProvider
+
+	static useLogger(logProvider: Constructor<ILogProvider>) {
+		this.logProvider = logProvider
+	}
+
 	/**
 	 * Loads, wires up and creates some representation of specified
 	 * service entrypoint (which is a classed, decorated with the `Service` decorator).
@@ -14,12 +21,12 @@ export const Catamaran = {
 	 * @param serviceEntrypoint A `Service` decorated class.
 	 * @param builder A strategy that determines what is created from the passed structure.
 	 */
-	async createServiceWithStrategy<T>(
+	static async createServiceWithStrategy<T>(
 		serviceEntrypoint: Constructor,
 		builder: Constructor<IBuilderStrategy<T>>
 	): Promise<T> {
-		const intermediateService = buildIntermediateService(serviceEntrypoint)
+		const intermediateService = buildIntermediateService(serviceEntrypoint, this.logProvider)
 		const builderInstance = new builder()
 		return builderInstance.build(intermediateService)
-	},
+	}
 }

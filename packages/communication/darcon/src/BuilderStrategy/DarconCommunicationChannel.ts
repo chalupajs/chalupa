@@ -1,4 +1,4 @@
-import { ICommunicationChannel, Inject } from "@catamaranjs/interface";
+import { ICommunicationChannel, Inject, Injectable } from "@catamaranjs/interface";
 import Darcon = darcon.Darcon;
 import { newUID } from "../util";
 
@@ -7,6 +7,7 @@ const DarconCommunication = Object.freeze({
 	Inform: 'I',
 })
 
+@Injectable()
 export class DarconCommunicationChannel implements ICommunicationChannel {
 	private readonly _darcon: Darcon
 

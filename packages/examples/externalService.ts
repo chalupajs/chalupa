@@ -1,21 +1,21 @@
 import {
 	Catamaran,
-	Service,
-	DarconBuilderStrategy,
-	ExternalServiceTemplate,
-	serviceMethodPlaceholder,
-	ExternalService,
-	ExternalServiceMethod,
-	ILogger,
-	LoggerFactory,
-	Inject,
-	PostInit,
-	IExternalServiceCall,
-	IExternalServiceEmit,
-	serviceEventPlaceholder,
-	ExternalServiceEvent,
 } from '@catamaranjs/service'
 import {PinoLogProvider} from '@catamaranjs/logger-pino'
+import {
+	ExternalService,
+	ExternalServiceEvent,
+	ExternalServiceMethod,
+	ExternalServiceTemplate,
+	IExternalServiceCall,
+	IExternalServiceEmit,
+	ILogger, Inject,
+	LoggerFactory, PostInit,
+	Service,
+	serviceEventPlaceholder,
+	serviceMethodPlaceholder
+} from "@catamaranjs/interface";
+import { DarconBuilderStrategy } from "@catamaranjs/communication-darcon";
 
 @ExternalService()
 class TestIniterService extends ExternalServiceTemplate {

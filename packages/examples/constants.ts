@@ -1,6 +1,7 @@
-import { Catamaran, DarconBuilderStrategy } from '@catamaranjs/service'
+import { Catamaran } from '@catamaranjs/service'
+import {DarconBuilderStrategy} from '@catamaranjs/communication-darcon'
 import { Service, Module, Inject } from '@catamaranjs/interface'
-import {PinoLogProvider} from '@catamaranjs/logger-pino'
+import { PinoLogProvider } from '@catamaranjs/logger-pino'
 
 @Module({
 	constants: [['kekw', true]],

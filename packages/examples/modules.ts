@@ -1,19 +1,17 @@
 import {
 	Catamaran,
-	Service,
-	DarconBuilderStrategy,
-	ILogger,
-	LoggerFactory,
-	Inject,
-	PostInit,
-	ServiceMethod,
-	Module,
-	PreDestroy,
-	PreServiceInit,
-	PostServiceDestroy,
-	Injectable,
 } from '@catamaranjs/service'
 import {PinoLogProvider} from '@catamaranjs/logger-pino'
+import {
+	ILogger,
+	Inject,
+	Injectable,
+	LoggerFactory,
+	Module, PostInit, PostServiceDestroy, PreDestroy,
+	PreServiceInit, Service,
+	ServiceMethod
+} from "@catamaranjs/interface";
+import { DarconBuilderStrategy } from "@catamaranjs/communication-darcon";
 
 @Injectable()
 class SubclassOne {}

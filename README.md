@@ -50,5 +50,5 @@ npm init @catamaran/app
 If you want to write your own Catamaran services, then make sure to check out
 
 TODO:
-* [the documentation aka The Handbook](docs/README.md),
+* [the documentation aka The Cruising Sailors Handbook](docs/README.md),
 * [the examples](packages/examples).

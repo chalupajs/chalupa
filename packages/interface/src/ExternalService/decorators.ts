@@ -1,5 +1,5 @@
 import { Constructor } from '../types'
-import { AlreadyDecoratedError } from '../error/AlreadyDecoratedError'
+import { Errors } from '../error'
 import { Injectable } from '../Container/decorators'
 import { Metadata } from '../metadata/Metadata'
 import { ExternalServiceCall, ExternalServiceEmit } from './ExternalServiceTemplate'
@@ -81,7 +81,7 @@ export function ExternalServiceEvent(options: Partial<ExternalServiceEventOption
 
 function guardAlreadyDecorated(constructor: Constructor) {
 	if (Reflect.hasOwnMetadata(Metadata.METADATA_EXTERNAL_SERVICE_INJECTED, constructor)) {
-		throw new AlreadyDecoratedError(constructor.name, ExternalService.name)
+		throw new Errors.AlreadyDecoratedError(constructor.name, ExternalService.name)
 	}
 }
 

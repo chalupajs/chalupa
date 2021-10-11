@@ -1,15 +1,15 @@
+import "reflect-metadata"
+
+import { Service } from '@catamaranjs/interface'
 import { Catamaran } from '@catamaranjs/service'
 import {DarconBuilderStrategy} from '@catamaranjs/communication-darcon'
-import {PinoLogProvider} from '@catamaranjs/logger-pino'
-import { Service } from "@catamaranjs/interface";
+import { TSLogProvider } from "../logger/tslog";
 
-@Service({
-	delayStart: 5000,
-	logProvider: PinoLogProvider
-})
+@Service()
 class TestService {}
 
 async function start() {
+	Catamaran.useLogger(TSLogProvider)
 	const service = await Catamaran.createServiceWithStrategy(TestService, DarconBuilderStrategy)
 	await service.start()
 }

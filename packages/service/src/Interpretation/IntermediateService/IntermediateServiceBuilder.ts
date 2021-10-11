@@ -13,7 +13,7 @@ import {
 	LogConfig,
 	ILogProvider,
 	LoggerFactory,
-	MissingServiceDecoratorError,
+	Errors,
 	Metadata, reconfigureToEnvPrefix
 } from '@catamaranjs/interface'
 
@@ -26,10 +26,11 @@ import { IntermediateService } from "./IntermediateService";
 
 
 export function buildIntermediateService<T = any>(
-	constructor: Constructor<T>
+	constructor: Constructor<T>,
+	logProvider?: Constructor<ILogProvider>
 ): IIntermediateService {
 	if (!Reflect.hasOwnMetadata(Metadata.SERVICE_OPTIONS, constructor)) {
-		throw new MissingServiceDecoratorError(constructor.name)
+		throw new Errors.MissingServiceDecoratorError(constructor.name)
 	}
 
 	const serviceOptions = extractServiceOptions(constructor)
@@ -61,14 +62,14 @@ export function buildIntermediateService<T = any>(
 		konvenient.configurator.withSources(serviceOptions.configSources)
 	}
 
-	if(serviceOptions.logProvider) {
+	if(logProvider) {
 		// Bind logProvider
 		const isLogProviderDecorated = Reflect.hasOwnMetadata(
 			InversifyMetadata.PARAM_TYPES,
-			serviceOptions.logProvider
+			logProvider
 		)
 		const injectableLogProvider = (
-			isLogProviderDecorated ? serviceOptions.logProvider : Injectable()(serviceOptions.logProvider)
+			isLogProviderDecorated ? logProvider : Injectable()(logProvider)
 		) as Constructor<ILogProvider>
 		container.bind<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE).to(injectableLogProvider)
 	} else {

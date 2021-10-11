@@ -73,7 +73,6 @@ export {LogFunction} from './Log/LogFunction'
 export {ILogger} from './Log/ILogger'
 export { LogConfig } from './Log/Configuration'
 
-export {MissingServiceDecoratorError} from './error/MissingServiceDecoratorError'
-export {AlreadyDecoratedError} from './error/AlreadyDecoratedError'
+export {Errors} from './error'
 
 export {reconfigureToEnvPrefix} from './annotation_utils'

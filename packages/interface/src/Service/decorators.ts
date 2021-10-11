@@ -1,9 +1,8 @@
 import { Constructor } from '../types'
-import { AlreadyDecoratedError } from '../error/AlreadyDecoratedError'
+import { Errors } from '../error'
 import { Injectable } from '../Container/decorators'
 import { Metadata } from '../metadata/Metadata'
 import { IContextContainer } from "../Container/IContextContainer";
-import { ILogProvider } from "../Log/ILogProvider";
 
 /**
  * Options for the `Service` decorator.
@@ -61,11 +60,6 @@ export interface ServiceOptions {
 	envPrefix: string
 
 	/**
-	 * A log provider type which plugs a log backend into the Catamaran Log API.
-	 */
-	logProvider: Constructor<ILogProvider>
-
-	/**
 	 * The directory where the service class is located.
 	 */
 	serviceDirectory: string
@@ -119,6 +113,6 @@ export function PreDestroy() {
 
 function guardAlreadyDecorated<T>(constructor: Constructor<T>) {
 	if (Reflect.hasOwnMetadata(Metadata.SERVICE_INJECTED, constructor)) {
-		throw new AlreadyDecoratedError(constructor.name, Service.name)
+		throw new Errors.AlreadyDecoratedError(constructor.name, Service.name)
 	}
 }

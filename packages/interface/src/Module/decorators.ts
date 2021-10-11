@@ -1,5 +1,5 @@
 import { Constructor } from '../types'
-import { AlreadyDecoratedError } from '../error/AlreadyDecoratedError'
+import { Errors } from '../error'
 import { Injectable } from '../Container/decorators'
 import {Metadata} from '../metadata/Metadata'
 import { IContextContainer } from "../Container/IContextContainer";
@@ -97,6 +97,6 @@ export function PostServiceDestroy() {
 
 function guardAlreadyDecorated(constructor: Constructor) {
 	if (Reflect.hasOwnMetadata(Metadata.METADATA_MODULE_INJECTED, constructor)) {
-		throw new AlreadyDecoratedError(constructor.name, Module.name)
+		throw new Errors.AlreadyDecoratedError(constructor.name, Module.name)
 	}
 }

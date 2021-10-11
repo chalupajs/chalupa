@@ -15,6 +15,7 @@
 		"compile": "tsc -p tsconfig.build.json",
 		"compile:watch": "tsc -p tsconfig.build.json --watch",
 		"docs": "typedoc --out generated-docs src",
+		"test": "jest --coverage",
 		"lint": "xo",
 		"lint:fix": "xo --fix",
 		"prepublishOnly": "npm run clean && npm run compile"
