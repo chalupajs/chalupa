@@ -28,7 +28,6 @@ export class MemoryService implements IMemoryService{
 
 	link(): void {
 		this._isLinked = true
-		this._messageBus.emit('entityLinked', this._serviceName)
 	}
 
 	get methods (): string[] {
@@ -72,7 +71,6 @@ export interface IInMemoryOrchestrator {
 	broadcast(eventName: string, parameters: any[], terms: Record<string, any>): void
 	createService(serviceName: string): IMemoryService
 	onEntityAppeared(cb: CallableFunction): void
-	onEntityLinked(cb: CallableFunction): void
 	onEntityUpdated(cb: CallableFunction): void
 	onEntityDisappeared(cb: CallableFunction): void
 	close(): void
@@ -95,9 +93,6 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 
 	onEntityAppeared(cb: CallableFunction): void {
 		this._messageBus.on('entityAppeared', cb)
-	}
-	onEntityLinked(cb: CallableFunction): void {
-		this._messageBus.on('entityLinked', cb)
 	}
 	onEntityUpdated(cb: CallableFunction): void {
 		this._messageBus.on('entityUpdated', cb)

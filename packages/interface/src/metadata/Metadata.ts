@@ -13,7 +13,6 @@ namespace Metadata {
 	export enum NetworkEvent {
 		EntityAppeared = 'Catamaran_Symbol_MetadataNetworkEventEntityAppeared',
 		EntityDisappeared = 'Catamaran_Symbol_MetadataNetworkEventEntityDisappeared',
-		EntityLinked = 'Catamaran_Symbol_MetadataNetworkEventEntityLinked',
 		EntityUpdated = 'Catamaran_Symbol_MetadataNetworkEventEntityUpdated'
 	}
 

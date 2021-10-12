@@ -46,13 +46,9 @@ export class InMemoryStrategy implements IBuilderStrategy<ConstructedService> {
 			depends = depends.filter(depend => depend !== serviceName)
 			MemoryService.link()
 		})
-		InMemoryOrchestrator.onEntityLinked(async (serviceName: string) => {
-			if (isItMe(serviceName)) return
-			await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityLinked, [serviceName])
-		})
 		InMemoryOrchestrator.onEntityDisappeared(async (serviceName: string) => {
 			if (isItMe(serviceName)) return
-			await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityLinked, [serviceName])
+			await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityDisappeared, [serviceName])
 		})
 
 		container.bind<ICommunicationChannel>(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE)
