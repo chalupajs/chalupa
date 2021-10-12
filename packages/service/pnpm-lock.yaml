@@ -2,6 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@catamaranjs/interface': workspace:*
+  '@types/node': 16.10.3
   konvenient: 2.3.2
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
@@ -16,11 +17,16 @@ dependencies:
   tiny-emitter: 2.1.0
 
 devDependencies:
+  '@types/node': 16.10.3
   rimraf: 3.0.2
   typedoc: 0.21.0_typescript@4.3.3
   typescript: 4.3.3
 
 packages:
+
+  /@types/node/16.10.3:
+    resolution: {integrity: sha512-ho3Ruq+fFnBrZhUYI46n/bV2GjwzSkwuT4dTf0GkuNFmnb8nq4ny2z9JEVemFi6bdEJanHLlYfy9c6FN9B9McQ==}
+    dev: true
 
   /balanced-match/1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}

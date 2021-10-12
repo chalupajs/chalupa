@@ -13,21 +13,18 @@ export interface NetworkEventOptions {
 
 export type NetworkEventTypes =
 	| 'entityAppeared'
-	| 'entityLinked'
 	| 'entityDisappeared'
 	| 'entityUpdated'
 
 const NetworkMetadataMap: Record<NetworkEventTypes, string> = {
 	entityAppeared: Metadata.NetworkEvent.EntityAppeared,
 	entityDisappeared: Metadata.NetworkEvent.EntityDisappeared,
-	entityLinked: Metadata.NetworkEvent.EntityLinked,
 	entityUpdated: Metadata.NetworkEvent.EntityUpdated,
 }
 
 /**
  * Marks a method as a network event listener. Possible event names are as follows:
  *   * entityAppeared,
- *   * entityLinked,
  *   * entityDisappeared,
  *   * entityUpdated,
  *   * entityPublished.
