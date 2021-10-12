@@ -14,7 +14,9 @@
 		"docs": "typedoc --out generated-docs src",
 		"lint": "xo",
 		"lint:fix": "xo --fix",
-		"prepublishOnly": "npm run clean && npm run compile"
+		"prepublishOnly": "npm run clean && npm run compile",
+	    "test": "jest --coverage",
+	    "test:watch": "jest --watch"
 	},
 	"repository": {
 		"type": "git",

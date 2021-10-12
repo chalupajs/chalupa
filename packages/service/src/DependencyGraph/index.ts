@@ -184,9 +184,8 @@ export class DependencyGraph<T = any> implements IDependencyGraph<T> {
 	 */
 	addNode (nodeName: string, data?: T): void {
 		if (!this.hasNode(nodeName)) {
-			// Checking the arguments length allows the user to add a node with undefined data
 			// @ts-ignore
-			this.nodes[nodeName] = data ?? nodeName
+			this.nodes[nodeName] = data ?? nodeName;
 			this.outgoingEdges[nodeName] = [];
 			this.incomingEdges[nodeName] = [];
 		}
@@ -259,7 +258,7 @@ export class DependencyGraph<T = any> implements IDependencyGraph<T> {
 	 * Remove a dependency between two nodes.
 	 */
 	removeDependency (from: string, to: string) {
-		var idx;
+		let idx;
 		if (this.hasNode(from)) {
 			idx = this.outgoingEdges[from].indexOf(to);
 			if (idx >= 0) {
@@ -323,15 +322,15 @@ export class DependencyGraph<T = any> implements IDependencyGraph<T> {
 	 */
 	dependenciesOf (nodeName: string, leavesOnly?: boolean) {
 		if (this.hasNode(nodeName)) {
-			var result = [];
-			var DFS = createDFS(
+			const result: string[] = [];
+			const DFS = createDFS(
 				this.outgoingEdges,
 				leavesOnly,
 				result,
 				false
 			);
 			DFS(nodeName);
-			var idx = result.indexOf(nodeName);
+			const idx = result.indexOf(nodeName);
 			if (idx >= 0) {
 				result.splice(idx, 1);
 			}
@@ -382,12 +381,12 @@ export class DependencyGraph<T = any> implements IDependencyGraph<T> {
 		} else {
 			// Look for cycles - we run the DFS starting at all the nodes in case there
 			// are several disconnected subgraphs inside this dependency graph.
-			var CycleDFS = createDFS(this.outgoingEdges, false, [], false);
+			const CycleDFS = createDFS(this.outgoingEdges, false, [], false);
 			keys.forEach(function (n) {
 				CycleDFS(n);
 			});
 
-			var DFS = createDFS(
+			const DFS = createDFS(
 				this.outgoingEdges,
 				leavesOnly,
 				result,
@@ -423,7 +422,7 @@ export class DependencyGraph<T = any> implements IDependencyGraph<T> {
 	/**
 	 * Get an array of nodes that have no dependants (i.e. nothing depends on them).
 	 */
-	entryNodes(): boolean {
+	entryNodes(): string[] {
 		return Object.keys(this.nodes).filter((nodeName) => {
 			return this.incomingEdges[nodeName].length === 0;
 		})

@@ -1,4 +1,5 @@
-import {DependencyGraph} from '../index'
+import 'jest'
+import { DependencyGraph, DepGraphCycleError } from '../index'
 
 describe("DepGraph", function () {
 	it("should be able to add/remove nodes", function () {
@@ -7,13 +8,13 @@ describe("DepGraph", function () {
 		graph.addNode("Foo");
 		graph.addNode("Bar");
 
-		expect(graph.hasNode("Foo")).toBeTrue();
-		expect(graph.hasNode("Bar")).toBeTrue();
-		expect(graph.hasNode("NotThere")).toBeFalse();
+		expect(graph.hasNode("Foo")).toBeTruthy();
+		expect(graph.hasNode("Bar")).toBeTruthy();
+		expect(graph.hasNode("NotThere")).toBeFalsy();
 
 		graph.removeNode("Bar");
 
-		expect(graph.hasNode("Bar")).toBeFalse();
+		expect(graph.hasNode("Bar")).toBeFalsy();
 	});
 
 	it("should calculate its size", function () {
@@ -47,14 +48,6 @@ describe("DepGraph", function () {
 		expect(graph.getNodeData("Foo")).toBe("data");
 	});
 
-	it("should be able to add undefined as node data", function () {
-		var graph = new DependencyGraph();
-
-		graph.addNode("Foo", undefined);
-
-		expect(graph.getNodeData("Foo")).toBeUndefined();
-	});
-
 	it("should return true when using hasNode with a node which has falsy data", function () {
 		var graph = new DependencyGraph();
 
@@ -64,7 +57,7 @@ describe("DepGraph", function () {
 		falsyData.forEach(function (data) {
 			graph.setNodeData("Foo", data);
 
-			expect(graph.hasNode("Foo")).toBeTrue();
+			expect(graph.hasNode("Foo")).toBeTruthy();
 
 			// Just an extra check to make sure that the saved data is correct
 			expect(graph.getNodeData("Foo")).toBe(data);
@@ -97,7 +90,7 @@ describe("DepGraph", function () {
 	});
 
 	it("should do nothing if creating a node that already exists", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -110,20 +103,20 @@ describe("DepGraph", function () {
 	});
 
 	it("should do nothing if removing a node that does not exist", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
-		expect(graph.hasNode("a")).toBeTrue();
+		expect(graph.hasNode("a")).toBeTruthy();
 
 		graph.removeNode("a");
-		expect(graph.hasNode("Foo")).toBeFalse();
+		expect(graph.hasNode("Foo")).toBeFalsy();
 
 		graph.removeNode("a");
-		expect(graph.hasNode("Foo")).toBeFalse();
+		expect(graph.hasNode("Foo")).toBeFalsy();
 	});
 
 	it("should be able to add dependencies between nodes", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -136,7 +129,7 @@ describe("DepGraph", function () {
 	});
 
 	it("should find entry nodes", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -149,7 +142,7 @@ describe("DepGraph", function () {
 	});
 
 	it("should throw an error if a node does not exist and a dependency is added", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 
@@ -159,7 +152,7 @@ describe("DepGraph", function () {
 	});
 
 	it("should detect cycles", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -173,65 +166,12 @@ describe("DepGraph", function () {
 
 		expect(function () {
 			graph.dependenciesOf("b");
-		}).toThrow(new dep_graph.DepGraphCycleError(["b", "c", "a", "b"]));
+		}).toThrow(new DepGraphCycleError(["b", "c", "a", "b"]));
 	});
 
-	it("should allow cycles when configured", function () {
-		var graph = new DepGraph({ circular: true });
-
-		graph.addNode("a");
-		graph.addNode("b");
-		graph.addNode("c");
-		graph.addNode("d");
-
-		graph.addDependency("a", "b");
-		graph.addDependency("b", "c");
-		graph.addDependency("c", "a");
-		graph.addDependency("d", "a");
-
-		expect(graph.dependenciesOf("b")).toEqual(["a", "c"]);
-		expect(graph.overallOrder()).toEqual(["c", "b", "a", "d"]);
-	});
-
-	it(
-		"should include all nodes in overall order even from " +
-		"cycles in disconnected subgraphs when circular is true",
-		function () {
-			var graph = new DepGraph({ circular: true });
-
-			graph.addNode("2a");
-			graph.addNode("2b");
-			graph.addNode("2c");
-			graph.addDependency("2a", "2b");
-			graph.addDependency("2b", "2c");
-			graph.addDependency("2c", "2a");
-
-			graph.addNode("1a");
-			graph.addNode("1b");
-			graph.addNode("1c");
-			graph.addNode("1d");
-			graph.addNode("1e");
-
-			graph.addDependency("1a", "1b");
-			graph.addDependency("1a", "1c");
-			graph.addDependency("1b", "1c");
-			graph.addDependency("1c", "1d");
-
-			expect(graph.overallOrder()).toEqual([
-				"1d",
-				"1c",
-				"1b",
-				"1a",
-				"1e",
-				"2c",
-				"2b",
-				"2a"
-			]);
-		}
-	);
 
 	it("should detect cycles in overall order", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -245,11 +185,11 @@ describe("DepGraph", function () {
 
 		expect(function () {
 			graph.overallOrder();
-		}).toThrow(new dep_graph.DepGraphCycleError(["a", "b", "c", "a"]));
+		}).toThrow(new DepGraphCycleError(["a", "b", "c", "a"]));
 	});
 
 	it("should detect cycles in overall order when all nodes have dependants (incoming edges)", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -261,14 +201,14 @@ describe("DepGraph", function () {
 
 		expect(function () {
 			graph.overallOrder();
-		}).toThrow(new dep_graph.DepGraphCycleError(["a", "b", "c", "a"]));
+		}).toThrow(new DepGraphCycleError(["a", "b", "c", "a"]));
 	});
 
 	it(
 		"should detect cycles in overall order when there are several " +
 		"disconnected subgraphs (with one that does not have a cycle",
 		function () {
-			var graph = new DepGraph();
+			var graph = new DependencyGraph();
 
 			graph.addNode("a_1");
 			graph.addNode("a_2");
@@ -284,13 +224,13 @@ describe("DepGraph", function () {
 			expect(function () {
 				graph.overallOrder();
 			}).toThrow(
-				new dep_graph.DepGraphCycleError(["b_1", "b_2", "b_3", "b_1"])
+				new DepGraphCycleError(["b_1", "b_2", "b_3", "b_1"])
 			);
 		}
 	);
 
 	it("should retrieve dependencies and dependants in the correct order", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -311,16 +251,10 @@ describe("DepGraph", function () {
 		expect(graph.dependantsOf("b")).toEqual(["a", "d"]);
 		expect(graph.dependantsOf("c")).toEqual(["a", "d", "b"]);
 		expect(graph.dependantsOf("d")).toEqual(["a"]);
-
-		// check the alias "dependentsOf"
-		expect(graph.dependentsOf("a")).toEqual([]);
-		expect(graph.dependentsOf("b")).toEqual(["a", "d"]);
-		expect(graph.dependentsOf("c")).toEqual(["a", "d", "b"]);
-		expect(graph.dependentsOf("d")).toEqual(["a"]);
 	});
 
 	it("should be able to retrieve direct dependencies/dependants", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -341,16 +275,10 @@ describe("DepGraph", function () {
 		expect(graph.directDependantsOf("b")).toEqual(["a", "d"]);
 		expect(graph.directDependantsOf("c")).toEqual(["b"]);
 		expect(graph.directDependantsOf("d")).toEqual(["a"]);
-
-		// check the alias "directDependentsOf"
-		expect(graph.directDependentsOf("a")).toEqual([]);
-		expect(graph.directDependentsOf("b")).toEqual(["a", "d"]);
-		expect(graph.directDependentsOf("c")).toEqual(["b"]);
-		expect(graph.directDependentsOf("d")).toEqual(["a"]);
 	});
 
 	it("should be able to resolve the overall order of things", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -367,7 +295,7 @@ describe("DepGraph", function () {
 	});
 
 	it('should be able to only retrieve the "leaves" in the overall order', function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -384,7 +312,7 @@ describe("DepGraph", function () {
 	});
 
 	it("should be able to give the overall order for a graph with several disconnected subgraphs", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a_1");
 		graph.addNode("a_2");
@@ -400,13 +328,13 @@ describe("DepGraph", function () {
 	});
 
 	it("should give an empty overall order for an empty graph", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		expect(graph.overallOrder()).toEqual([]);
 	});
 
 	it("should still work after nodes are removed", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -422,16 +350,16 @@ describe("DepGraph", function () {
 	});
 
 	it("should clone an empty graph", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 		expect(graph.size()).toEqual(0);
 		var cloned = graph.clone();
 		expect(cloned.size()).toEqual(0);
 
-		expect(graph === cloned).toBeFalse();
+		expect(graph === cloned).toBeFalsy();
 	});
 
 	it("should clone a non-empty graph", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		graph.addNode("a");
 		graph.addNode("b");
@@ -441,10 +369,10 @@ describe("DepGraph", function () {
 
 		var cloned = graph.clone();
 
-		expect(graph === cloned).toBeFalse();
-		expect(cloned.hasNode("a")).toBeTrue();
-		expect(cloned.hasNode("b")).toBeTrue();
-		expect(cloned.hasNode("c")).toBeTrue();
+		expect(graph === cloned).toBeFalsy();
+		expect(cloned.hasNode("a")).toBeTruthy();
+		expect(cloned.hasNode("b")).toBeTruthy();
+		expect(cloned.hasNode("c")).toBeTruthy();
 		expect(cloned.dependenciesOf("a")).toEqual(["c", "b"]);
 		expect(cloned.dependantsOf("c")).toEqual(["a", "b"]);
 
@@ -460,27 +388,27 @@ describe("DepGraph", function () {
 	});
 
 	it("should only be a shallow clone", function () {
-		var graph = new DepGraph();
+		var graph = new DependencyGraph();
 
 		var data = { a: 42 };
 		graph.addNode("a", data);
 
 		var cloned = graph.clone();
-		expect(graph === cloned).toBeFalse();
-		expect(graph.getNodeData("a") === cloned.getNodeData("a")).toBeTrue();
+		expect(graph === cloned).toBeFalsy();
+		expect(graph.getNodeData("a") === cloned.getNodeData("a")).toBeTruthy();
 
 		graph.getNodeData("a").a = 43;
 		expect(cloned.getNodeData("a").a).toBe(43);
 
 		cloned.setNodeData("a", { a: 42 });
 		expect(cloned.getNodeData("a").a).toBe(42);
-		expect(graph.getNodeData("a") === cloned.getNodeData("a")).toBeFalse();
+		expect(graph.getNodeData("a") === cloned.getNodeData("a")).toBeFalsy();
 	});
 });
 
 describe("DepGraph Performance", function () {
 	it("should not exceed max call stack with a very deep graph", function () {
-		var g = new DepGraph();
+		var g = new DependencyGraph();
 		var expected = [];
 		for (var i = 0; i < 100000; i++) {
 			var istr = i.toString();
@@ -495,10 +423,10 @@ describe("DepGraph Performance", function () {
 	});
 
 	it("should run an a reasonable amount of time for a very large graph", function () {
-		var randInt = function (min, max) {
+		var randInt = function (min: number, max: number) {
 			return Math.floor(Math.random() * (max - min + 1)) + min;
 		};
-		var g = new DepGraph();
+		var g = new DependencyGraph();
 		var nodes = [];
 		// Create a graph with 100000 nodes in it with 10 random connections to
 		// lower numbered nodes
@@ -520,22 +448,14 @@ describe("DepGraph Performance", function () {
 });
 
 describe("DepGraphCycleError", function () {
-	var DepGraphCycleError = dep_graph.DepGraphCycleError;
-
 	it("should have a message", function () {
-		var err = new DepGraphCycleError(["a", "b", "c", "a"]);
+		const err = new DepGraphCycleError(["a", "b", "c", "a"]);
 		expect(err.message).toEqual("Dependency Cycle Found: a -> b -> c -> a");
 	});
 
-	it("should be an instanceof DepGraphCycleError", function () {
-		var err = new DepGraphCycleError(["a", "b", "c", "a"]);
-		expect(err instanceof DepGraphCycleError).toBeTrue();
-		expect(err instanceof Error).toBeTrue();
-	});
-
 	it("should have a cyclePath", function () {
-		var cyclePath = ["a", "b", "c", "a"];
-		var err = new DepGraphCycleError(cyclePath);
+		const cyclePath = ["a", "b", "c", "a"];
+		const err = new DepGraphCycleError(cyclePath);
 		expect(err.cyclePath).toEqual(cyclePath);
 	});
 });
