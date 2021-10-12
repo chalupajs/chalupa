@@ -9,6 +9,7 @@ import {
 import { extractServiceOptions } from "../annotation_utils";
 import { IServiceBridge } from "@catamaranjs/interface/src/Interpretation/IServiceBridge";
 import { ServiceBridge } from "../ServiceBridge";
+import {IDependencyGraph} from "../../DependencyGraph";
 
 export class IntermediateService implements IIntermediateService {
 	container: InversifyContainer
@@ -20,8 +21,11 @@ export class IntermediateService implements IIntermediateService {
 
 	private _serviceBridgeSingleton?: IServiceBridge
 
-
-	constructor(container: InversifyContainer, serviceConstructor: Constructor) {
+	constructor(
+		container: InversifyContainer,
+		serviceConstructor: Constructor,
+		public readonly moduleDependencyGraph: IDependencyGraph<Constructor>
+	) {
 		this.container = container;
 		this.serviceConstructor = serviceConstructor;
 		this.serviceOptions = extractServiceOptions(serviceConstructor)
@@ -45,7 +49,8 @@ export class IntermediateService implements IIntermediateService {
 				this.container,
 				this.serviceConstructor,
 				this.serviceOptions,
-				this._logger
+				this._logger,
+				this.moduleDependencyGraph
 			)
 		}
 		return this._serviceBridgeSingleton

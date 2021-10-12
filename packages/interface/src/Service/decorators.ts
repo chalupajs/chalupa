@@ -22,11 +22,6 @@ export interface ServiceOptions {
 	name: string
 
 	/**
-	 * An array of modules to be loaded and instrumented by Catamaran as part of this service.
-	 */
-	modules: Constructor[]
-
-	/**
 	 * An array of external service classes to be loaded and instrumented by Catamaran. The
 	 * service will automatically depend on these external services (wait for them to show up
 	 * before starting as if they were in the `dependsOn` array).

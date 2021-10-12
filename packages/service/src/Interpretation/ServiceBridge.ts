@@ -1,6 +1,7 @@
 import { IServiceBridge } from "@catamaranjs/interface/src/Interpretation/IServiceBridge";
 import { Constructor, ILogger, InversifyContainer, Metadata, ServiceOptions } from "@catamaranjs/interface";
 import { timeout } from "../util";
+import {IDependencyGraph} from "../DependencyGraph";
 
 export class ServiceBridge implements IServiceBridge {
 	private _container: InversifyContainer
@@ -22,7 +23,13 @@ export class ServiceBridge implements IServiceBridge {
 	private _suppressMissingEventHandlerWarning: boolean = false
 	private _suppressMissingMethodHandlerWarning: boolean = false
 
-	constructor(container: InversifyContainer, serviceConstructor: Constructor, serviceOptions: ServiceOptions, logger: ILogger) {
+	constructor(
+		container: InversifyContainer,
+		serviceConstructor: Constructor,
+		serviceOptions: ServiceOptions,
+		logger: ILogger,
+		private readonly moduleDependencyGraph: IDependencyGraph<Constructor>
+	) {
 		this._container = container;
 		this._serviceConstructor = serviceConstructor;
 		this._serviceOptions = serviceOptions;
@@ -48,8 +55,6 @@ export class ServiceBridge implements IServiceBridge {
 		this._suppressMissingMethodHandlerWarning = true
 		return this;
 	}
-
-
 
 	private _collectLifecycleMetadata(symbol: Metadata.ModuleLifecycle, proto: any, instance: any) {
 		const key: string = Reflect.getMetadata(symbol, proto)
@@ -83,33 +88,40 @@ export class ServiceBridge implements IServiceBridge {
 		this._ensureServiceBuilded()
 		this._registerServiceMethodsAndServiceEvents(this._service, this._serviceConstructor.prototype)
 
-		if(this._serviceOptions.modules?.length) {
-			for (const module of this._serviceOptions.modules) {
-				const moduleInstance = this._container.get(module)
-				this._registerServiceMethodsAndServiceEvents(moduleInstance, module.prototype)
-
-				this._collectLifecycleMetadata(
-					Metadata.ModuleLifecycle.PreServiceInit,
-					module.prototype,
-					moduleInstance
-				)
-				this._collectLifecycleMetadata(
-					Metadata.ModuleLifecycle.PostServiceInit,
-					module.prototype,
-					moduleInstance
-				)
-				this._collectLifecycleMetadata(
-					Metadata.ModuleLifecycle.PreServiceDestroy,
-					module.prototype,
-					moduleInstance
-				)
-				this._collectLifecycleMetadata(
-					Metadata.ModuleLifecycle.PostServiceDestroy,
-					module.prototype,
-					moduleInstance
-				)
+		for (const moduleName of this.moduleDependencyGraph.overallOrder()) {
+			const constructor = this.moduleDependencyGraph.getNodeData(moduleName)
+			if (!constructor) {
+				continue
 			}
+
+			const instance = this._container.get(constructor)
+
+			this._registerServiceMethodsAndServiceEvents(instance, constructor.prototype)
+
+			this._collectLifecycleMetadata(
+				Metadata.ModuleLifecycle.PreServiceInit,
+				constructor.prototype,
+				instance
+			)
+			this._collectLifecycleMetadata(
+				Metadata.ModuleLifecycle.PostServiceInit,
+				constructor.prototype,
+				instance
+			)
+			this._collectLifecycleMetadata(
+				Metadata.ModuleLifecycle.PreServiceDestroy,
+				constructor.prototype,
+				instance
+			)
+			this._collectLifecycleMetadata(
+				Metadata.ModuleLifecycle.PostServiceDestroy,
+				constructor.prototype,
+				instance
+			)
 		}
+
+		this._moduleMethodArrays[Metadata.ModuleLifecycle.PreServiceDestroy].reverse()
+		this._moduleMethodArrays[Metadata.ModuleLifecycle.PostServiceDestroy].reverse()
 
 		return this;
 	}
