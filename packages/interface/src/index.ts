@@ -60,6 +60,7 @@ export {
 	PredefinedFormat,
 	SchemaResult,
 	Nested,
+	configurator
 } from './Configuration/konvenient'
 
 export {IIntermediateService} from './Interpretation/IIntermediateService'
