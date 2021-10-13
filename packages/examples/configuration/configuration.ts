@@ -1,6 +1,6 @@
 import path from 'path'
-import { Catamaran, IntegrationTestBuilderStrategy, } from '@catamaranjs/service'
-import { Configuration, Configurable, Inject, Service, } from '@catamaranjs/interface'
+import { Catamaran, IntegrationTestBuilderStrategy, ConfigSources } from '@catamaranjs/service'
+import { Configuration, Configurable, Inject, Service } from '@catamaranjs/interface'
 
 @Configuration()
 class PizzaConfig {
@@ -11,8 +11,7 @@ class PizzaConfig {
 }
 
 @Service({
-	config: PizzaConfig,
-	configSources: [path.join(__dirname, '/local.yml')],
+	config: PizzaConfig
 })
 class PizzaService {
 	constructor(@Inject(PizzaConfig) config: PizzaConfig) {
@@ -21,6 +20,7 @@ class PizzaService {
 }
 
 async function start() {
+	Catamaran.use(ConfigSources.from([path.join(__dirname, 'local.yml')]))
 	const service = await Catamaran.createServiceWithStrategy(PizzaService, IntegrationTestBuilderStrategy)
 	const systemUnderTest = await service.start()
 

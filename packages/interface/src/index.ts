@@ -28,6 +28,8 @@ export {
 
 export {Metadata} from './metadata/Metadata'
 
+export const PELDA = 'ide-'
+
 // ----------- Container -----------//
 export { Inject, Injectable, MultiInject } from './Container/decorators'
 export { IContextContainer } from './Container/IContextContainer'
