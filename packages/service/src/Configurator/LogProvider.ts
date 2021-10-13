@@ -3,10 +3,9 @@ import {
 	Constructor,
 	ContainerConstant,
 	ILogProvider,
-	Injectable,
 	InversifyContainer,
-	InversifyMetadata
 } from "@catamaranjs/interface";
+import { ensureInjectable } from "@catamaranjs/interface/src/annotation_utils";
 
 export class LogProvider implements IConfigurator {
 	private readonly _logProvider: Constructor<ILogProvider>
@@ -19,14 +18,7 @@ export class LogProvider implements IConfigurator {
 	}
 
 	configure(container: InversifyContainer): void {
-		// Bind logProvider
-		const isLogProviderDecorated = Reflect.hasOwnMetadata(
-			InversifyMetadata.PARAM_TYPES,
-			this._logProvider
-		)
-		const injectableLogProvider = (
-			isLogProviderDecorated ? this._logProvider : Injectable()(this._logProvider)
-		) as Constructor<ILogProvider>
+		const injectableLogProvider = ensureInjectable(this._logProvider)
 		container.rebind<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE).to(injectableLogProvider)
 	}
 

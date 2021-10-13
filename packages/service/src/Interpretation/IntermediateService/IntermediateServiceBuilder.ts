@@ -1,5 +1,3 @@
-import * as konvenient from 'konvenient'
-
 import {
 	ServiceOptions,
 	InversifyContainer,
@@ -12,7 +10,8 @@ import {
 	ILogProvider,
 	LoggerFactory,
 	Errors,
-	Metadata, reconfigureToEnvPrefix
+	Metadata, reconfigureToEnvPrefix,
+	configurator
 } from '@catamaranjs/interface'
 
 
@@ -22,6 +21,7 @@ import { ConsoleLoggerProvider } from "../../Log/console-logger/ConsoleLoggerPro
 import { extractServiceOptions } from "../annotation_utils";
 import { IntermediateService } from "./IntermediateService";
 import { IConfigurator } from "../../Configurator/IConfigurator";
+import { ensureInjectable } from "@catamaranjs/interface/src/annotation_utils";
 
 
 export function buildIntermediateService<T = any>(
@@ -55,7 +55,12 @@ export function buildIntermediateService<T = any>(
 
 	// Bind config to container
 	if (serviceOptions.config) {
-		container.bind<any>(serviceOptions.config).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, serviceOptions.config))
+		container.bind<any>(serviceOptions.config).to(
+			reconfigureToEnvPrefix(
+				serviceOptions.envPrefix,
+				ensureInjectable(serviceOptions.config)
+			)
+		)
 	}
 
 	// Default logProvider
@@ -69,7 +74,7 @@ export function buildIntermediateService<T = any>(
 	if (hasConfigSources) {
 		const configSources = container.get<string[]>(ContainerConstant.CONFIG_SOURCES)
 		console.log(configSources)
-		konvenient.configurator.withSources(configSources)
+		configurator.withSources(configSources)
 	}
 
 	const handleExternalServices = function (externalServices?: Constructor[]) {
@@ -120,7 +125,7 @@ export function buildIntermediateService<T = any>(
 		serviceOptions.modules.forEach((module: Constructor) => {
 			const moduleOptions: ModuleOptions = Reflect.getMetadata(Metadata.METADATA_MODULE_OPTIONS, module)
 			if (moduleOptions.config) {
-				container.bind(moduleOptions.config).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, moduleOptions.config))
+				container.bind(moduleOptions.config).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(moduleOptions.config)))
 			}
 
 			handleExternalServices(moduleOptions.externalServices)

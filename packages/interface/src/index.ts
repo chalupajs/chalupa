@@ -28,8 +28,6 @@ export {
 
 export {Metadata} from './metadata/Metadata'
 
-export const PELDA = 'ide-'
-
 // ----------- Container -----------//
 export { Inject, Injectable, MultiInject } from './Container/decorators'
 export { IContextContainer } from './Container/IContextContainer'
@@ -62,6 +60,7 @@ export {
 	PredefinedFormat,
 	SchemaResult,
 	Nested,
+	configurator
 } from './Configuration/konvenient'
 
 export {IIntermediateService} from './Interpretation/IIntermediateService'

@@ -1,9 +1,11 @@
 import { Configurable, Configuration } from 'konvenient'
+import { Injectable } from "../Container/decorators";
 
 /**
  * Configuration settings for the Catamaran Log API.
  */
 @Configuration()
+@Injectable()
 export class LogConfig {
 	@Configurable({
 		doc: 'The minimum log level which will be displayed.',
