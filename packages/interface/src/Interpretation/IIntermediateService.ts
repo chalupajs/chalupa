@@ -3,7 +3,7 @@ import { Constructor } from '../types'
 import { ILogger } from "../Log/ILogger";
 import { ServiceOptions } from "../Service/decorators";
 import { IServiceBridge } from "./IServiceBridge";
-import {IDependencyGraph} from "../../../service/src/DependencyGraph";
+import {IDependencyGraph} from "../DependencyGraph";
 
 export interface IIntermediateService {
 	container: Container

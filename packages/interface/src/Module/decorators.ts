@@ -23,6 +23,8 @@ export interface ModuleOptions {
 
 	constants?: Array<[string, any]>
 
+	modules?: Constructor[],
+
 	/**
 	 * An array of external service classes to be loaded and instrumented by Catamaran. The
 	 * service referencing the module will automatically depend on these external services

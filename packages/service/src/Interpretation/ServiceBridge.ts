@@ -1,7 +1,6 @@
 import { IServiceBridge } from "@catamaranjs/interface/src/Interpretation/IServiceBridge";
-import { Constructor, ILogger, InversifyContainer, Metadata, ServiceOptions } from "@catamaranjs/interface";
+import { Constructor, ILogger, InversifyContainer, Metadata, ServiceOptions, IDependencyGraph } from "@catamaranjs/interface";
 import { timeout } from "../util";
-import {IDependencyGraph} from "../DependencyGraph";
 
 export class ServiceBridge implements IServiceBridge {
 	private _container: InversifyContainer

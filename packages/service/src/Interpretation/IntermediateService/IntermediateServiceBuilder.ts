@@ -11,7 +11,8 @@ import {
 	LoggerFactory,
 	Errors,
 	Metadata, reconfigureToEnvPrefix,
-	configurator
+	configurator,
+	DependencyGraph,
 } from '@catamaranjs/interface'
 
 
@@ -20,7 +21,6 @@ import { ContextContainer, NO_PARENT } from '../../Container/ContextContainer'
 import { ConsoleLoggerProvider } from "../../Log/console-logger/ConsoleLoggerProvider";
 import { extractServiceOptions } from "../annotation_utils";
 import { IntermediateService } from "./IntermediateService";
-import { DependencyGraph } from "../../DependencyGraph";
 import { IConfigurator } from "../../Configurator/IConfigurator";
 import { ensureInjectable } from "@catamaranjs/interface/src/annotation_utils";
 
@@ -69,7 +69,6 @@ export function buildIntermediateService<T = any>(
 
 	configurators.forEach((configurator: IConfigurator) => configurator.configure(container))
 
-
 	const hasConfigSources: boolean = container.isBound(ContainerConstant.CONFIG_SOURCES)
 	console.log('Has config source?', hasConfigSources)
 	if (hasConfigSources) {
@@ -104,7 +103,7 @@ export function buildIntermediateService<T = any>(
 			moduleDependencyGraph.addDependency(parent.name, current.name)
 		}
 
-		const moduleOptions: ModuleOptions = Reflect.getMetadata(Metadata.METADATA_MODULE_OPTIONS, module)
+		const moduleOptions: ModuleOptions = Reflect.getMetadata(Metadata.METADATA_MODULE_OPTIONS, current)
 		if (moduleOptions.config) {
 			container.bind(moduleOptions.config).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(moduleOptions.config)))
 		}
@@ -145,8 +144,14 @@ export function buildIntermediateService<T = any>(
 		})
 	}
 
+	const handleModules = function (modules?: Constructor[]) {
+		modules?.forEach(current => moduleBindingProcessor(current, NO_PARENT))
+	}
+
 	// Inject LoggerFactory
 	container.bind<LoggerFactory>(LoggerFactory).toSelf()
+
+	handleModules(serviceOptions.modules)
 
 	handleExternalServices(serviceOptions.externalServices)
 

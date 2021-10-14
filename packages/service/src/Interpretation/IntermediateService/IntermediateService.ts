@@ -4,12 +4,12 @@ import {
 	ILogger,
 	InversifyContainer,
 	LoggerFactory,
-	ServiceOptions
+	ServiceOptions,
+	IDependencyGraph,
 } from "@catamaranjs/interface";
 import { extractServiceOptions } from "../annotation_utils";
 import { IServiceBridge } from "@catamaranjs/interface/src/Interpretation/IServiceBridge";
 import { ServiceBridge } from "../ServiceBridge";
-import {IDependencyGraph} from "../../DependencyGraph";
 
 export class IntermediateService implements IIntermediateService {
 	container: InversifyContainer

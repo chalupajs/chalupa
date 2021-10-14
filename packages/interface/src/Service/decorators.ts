@@ -35,6 +35,8 @@ export interface ServiceOptions {
 
 	constants?: Array<[string, any]>
 
+	modules?: Constructor[]
+
 	/**
 	 * An array of external service names. This service will wait for these services
 	 * to show up before starting.
