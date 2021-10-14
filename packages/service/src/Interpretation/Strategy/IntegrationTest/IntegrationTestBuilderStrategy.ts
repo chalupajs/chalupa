@@ -117,11 +117,6 @@ Ooops, you forgot to properly mock this Darcon communication:
 					await callNetworkEvent(Metadata.NetworkEvent.EntityAppeared, [name])
 				}
 			},
-			async entityLinked(name) {
-				if (!isItMe(name)) {
-					await callNetworkEvent(Metadata.NetworkEvent.EntityLinked, [name])
-				}
-			},
 			async entityDisappeared(name) {
 				if (!isItMe(name)) {
 					await callNetworkEvent(Metadata.NetworkEvent.EntityDisappeared, [name])

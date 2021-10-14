@@ -1,12 +1,8 @@
-import * as konvenient from 'konvenient'
-
 import {
 	ServiceOptions,
 	InversifyContainer,
-	InversifyMetadata,
 	ContainerConstant,
 	Constructor,
-	Injectable,
 	ExternalServiceOptions,
 	ModuleOptions,
 	IIntermediateService,
@@ -14,7 +10,8 @@ import {
 	ILogProvider,
 	LoggerFactory,
 	Errors,
-	Metadata, reconfigureToEnvPrefix
+	Metadata, reconfigureToEnvPrefix,
+	configurator
 } from '@catamaranjs/interface'
 
 
@@ -23,11 +20,13 @@ import { ContextContainer } from '../../Container/ContextContainer'
 import { ConsoleLoggerProvider } from "../../Log/console-logger/ConsoleLoggerProvider";
 import { extractServiceOptions } from "../annotation_utils";
 import { IntermediateService } from "./IntermediateService";
+import { IConfigurator } from "../../Configurator/IConfigurator";
+import { ensureInjectable } from "@catamaranjs/interface/src/annotation_utils";
 
 
 export function buildIntermediateService<T = any>(
 	constructor: Constructor<T>,
-	logProvider?: Constructor<ILogProvider>
+	configurators: IConfigurator[]
 ): IIntermediateService {
 	if (!Reflect.hasOwnMetadata(Metadata.SERVICE_OPTIONS, constructor)) {
 		throw new Errors.MissingServiceDecoratorError(constructor.name)
@@ -48,6 +47,7 @@ export function buildIntermediateService<T = any>(
 	container
 		.bind<string>(ContainerConstant.SERVICE_DIRECTORY)
 		.toConstantValue(serviceOptions.serviceDirectory)
+
 	// Bind the service to the container
 	container.bind<T>(constructor).toSelf()
 
@@ -55,25 +55,26 @@ export function buildIntermediateService<T = any>(
 
 	// Bind config to container
 	if (serviceOptions.config) {
-		container.bind<any>(serviceOptions.config).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, serviceOptions.config))
-	}
-
-	if (serviceOptions.configSources) {
-		konvenient.configurator.withSources(serviceOptions.configSources)
-	}
-
-	if(logProvider) {
-		// Bind logProvider
-		const isLogProviderDecorated = Reflect.hasOwnMetadata(
-			InversifyMetadata.PARAM_TYPES,
-			logProvider
+		container.bind<any>(serviceOptions.config).to(
+			reconfigureToEnvPrefix(
+				serviceOptions.envPrefix,
+				ensureInjectable(serviceOptions.config)
+			)
 		)
-		const injectableLogProvider = (
-			isLogProviderDecorated ? logProvider : Injectable()(logProvider)
-		) as Constructor<ILogProvider>
-		container.bind<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE).to(injectableLogProvider)
-	} else {
-		container.bind<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE).to(ConsoleLoggerProvider)
+	}
+
+	// Default logProvider
+	container.bind<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE).to(ConsoleLoggerProvider)
+
+	configurators.forEach((configurator: IConfigurator) => configurator.configure(container))
+
+
+	const hasConfigSources: boolean = container.isBound(ContainerConstant.CONFIG_SOURCES)
+	console.log('Has config source?', hasConfigSources)
+	if (hasConfigSources) {
+		const configSources = container.get<string[]>(ContainerConstant.CONFIG_SOURCES)
+		console.log(configSources)
+		configurator.withSources(configSources)
 	}
 
 	const handleExternalServices = function (externalServices?: Constructor[]) {
@@ -124,7 +125,7 @@ export function buildIntermediateService<T = any>(
 		serviceOptions.modules.forEach((module: Constructor) => {
 			const moduleOptions: ModuleOptions = Reflect.getMetadata(Metadata.METADATA_MODULE_OPTIONS, module)
 			if (moduleOptions.config) {
-				container.bind(moduleOptions.config).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, moduleOptions.config))
+				container.bind(moduleOptions.config).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(moduleOptions.config)))
 			}
 
 			handleExternalServices(moduleOptions.externalServices)

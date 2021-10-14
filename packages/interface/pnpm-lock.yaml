@@ -6,7 +6,7 @@ specifiers:
   '@types/uuid': 8.3.1
   inversify: 5.1.1
   js-yaml: 4.0.0
-  konvenient: 2.3.2
+  konvenient: 3.0.0
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
   typedoc: 0.21.0
@@ -16,7 +16,7 @@ specifiers:
 dependencies:
   inversify: 5.1.1
   js-yaml: 4.0.0
-  konvenient: 2.3.2_inversify@5.1.1
+  konvenient: 3.0.0
   reflect-metadata: 0.1.13
   uuid: 8.3.2
 
@@ -139,17 +139,11 @@ packages:
     resolution: {integrity: sha512-fQzRfAbIBnR0IQvftw9FJveWiHp72Fg20giDrHz6TdfB12UH/uue0D3hm57UB5KgAVuniLMCaS8P1IMj9NR7cA==}
     dev: true
 
-  /konvenient/2.3.2_inversify@5.1.1:
-    resolution: {integrity: sha512-5IZZVrH9RrFruzvIMqavx18IJMWRabk8iE5UNyCz+POLG6dSGmzSfBHTe0G50gZFRqwxyLvx2eIWv8Fx+qlxig==}
+  /konvenient/3.0.0:
+    resolution: {integrity: sha512-axZe4/oopbjLs5QTQ1I9jcnV3kX5wgRyHKayVGP5XFMxJApILlPlujybe9KfbuLosXjU/mQRxPAsgLVlAGYDog==}
     engines: {node: '>=14'}
-    peerDependencies:
-      inversify: ^5.1.1
-    peerDependenciesMeta:
-      inversify:
-        optional: true
     dependencies:
       convict: 6.1.0
-      inversify: 5.1.1
       lodash.clonedeepwith: 4.5.0
       lodash.snakecase: 4.1.1
       reflect-metadata: 0.1.13

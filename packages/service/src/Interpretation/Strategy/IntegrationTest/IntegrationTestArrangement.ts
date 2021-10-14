@@ -53,12 +53,6 @@ export interface SystemUnderTest {
 	entityAppeared(name: string): Promise<void>
 
 	/**
-	 * Fire an entity linked network event.
-	 * @param name The name of the linked entity.
-	 */
-	entityLinked(name: string): Promise<void>
-
-	/**
 	 * Fire an entity disappeared network event.
 	 * @param name The name of the disappeared entity.
 	 */

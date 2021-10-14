@@ -5,6 +5,7 @@ specifiers:
   '@catamaranjs/interface': workspace:*
   '@catamaranjs/logger-pino': workspace:*
   '@catamaranjs/service': workspace:*
+  '@types/node': 16.10.5
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
   ts-node: 10.2.1
@@ -19,8 +20,9 @@ dependencies:
   reflect-metadata: 0.1.13
 
 devDependencies:
+  '@types/node': 16.10.5
   rimraf: 3.0.2
-  ts-node: 10.2.1_typescript@4.3.3
+  ts-node: 10.2.1_443e2318ceedbbfb23cf4340c4e16f07
   typedoc: 0.21.0_typescript@4.3.3
   typescript: 4.3.3
 
@@ -52,6 +54,10 @@ packages:
 
   /@tsconfig/node16/1.0.2:
     resolution: {integrity: sha512-eZxlbI8GZscaGS7kkc/trHTT5xgrjH3/1n2JDwusC9iahPKWMRvRjJSAN5mCXviuTGQ/lHnhvv8Q1YTpnfz9gA==}
+    dev: true
+
+  /@types/node/16.10.5:
+    resolution: {integrity: sha512-9iI3OOlkyOjLQQ9s+itIJNMRepDhB/96jW3fqduJ2FTPQj1dJjw6Q3QCImF9FE1wmdBs5QSun4FjDSFS8d8JLw==}
     dev: true
 
   /acorn-walk/8.2.0:
@@ -220,7 +226,7 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /ts-node/10.2.1_typescript@4.3.3:
+  /ts-node/10.2.1_443e2318ceedbbfb23cf4340c4e16f07:
     resolution: {integrity: sha512-hCnyOyuGmD5wHleOQX6NIjJtYVIO8bPP8F2acWkB4W06wdlkgyvJtubO/I9NkI88hCFECbsEgoLc0VNkYmcSfw==}
     engines: {node: '>=12.0.0'}
     hasBin: true
@@ -240,6 +246,7 @@ packages:
       '@tsconfig/node12': 1.0.9
       '@tsconfig/node14': 1.0.1
       '@tsconfig/node16': 1.0.2
+      '@types/node': 16.10.5
       acorn: 8.5.0
       acorn-walk: 8.2.0
       arg: 4.1.3
