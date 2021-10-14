@@ -110,7 +110,9 @@ export function buildIntermediateService<T = any>(
 
 		handleExternalServices(moduleOptions.externalServices)
 
-		handleInject(moduleOptions, parent)
+		handleInject(moduleOptions, current)
+
+		handleModules(moduleOptions.modules, current)
 
 		handleConstants(moduleOptions.constants)
 
@@ -144,14 +146,14 @@ export function buildIntermediateService<T = any>(
 		})
 	}
 
-	const handleModules = function (modules?: Constructor[]) {
-		modules?.forEach(current => moduleBindingProcessor(current, NO_PARENT))
+	const handleModules = function (modules: Constructor[] | undefined, parent: Constructor | null) {
+		modules?.forEach(current => moduleBindingProcessor(current, parent))
 	}
 
 	// Inject LoggerFactory
 	container.bind<LoggerFactory>(LoggerFactory).toSelf()
 
-	handleModules(serviceOptions.modules)
+	handleModules(serviceOptions.modules, NO_PARENT)
 
 	handleExternalServices(serviceOptions.externalServices)
 
