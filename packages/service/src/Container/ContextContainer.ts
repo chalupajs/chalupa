@@ -1,15 +1,19 @@
 import { InversifyContainer, Constructor, IContextContainer } from '@catamaranjs/interface'
 
+export type ModuleBindingProcessor = (current: Constructor, parent: Constructor | null) => void;
+
+export const NO_PARENT = null
+
 /**
  * Represents the dependency injection container of a service,
  * containing the bindings used to resolve dependency relations.
  */
 export class ContextContainer implements IContextContainer {
-	private readonly container: InversifyContainer
-
-	constructor(container: InversifyContainer) {
-		this.container = container
-	}
+	constructor(
+		private readonly container: InversifyContainer,
+		private readonly moduleBindingProcessor: ModuleBindingProcessor,
+		private readonly parent: Constructor | null
+	) {}
 
 	/**
 	 * Binds the specified constructor to the accessor. The container will inject
@@ -52,6 +56,14 @@ export class ContextContainer implements IContextContainer {
 	 */
 	bindConstant<T>(accessor: string, constant: T): this {
 		this.container.bind<T>(accessor).toConstantValue(constant)
+		return this
+	}
+
+	bindModule<T>(moduleConstructor: Constructor<T>): this {
+		// TODO: check if really a module constructor
+
+		this.moduleBindingProcessor(moduleConstructor, this.parent)
+
 		return this
 	}
 }

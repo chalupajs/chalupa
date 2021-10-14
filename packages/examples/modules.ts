@@ -1,15 +1,13 @@
 import {
 	Catamaran,
 } from '@catamaranjs/service'
-import {PinoLogProvider} from '@catamaranjs/logger-pino'
 import {
 	ILogger,
 	Inject,
 	Injectable,
 	LoggerFactory,
 	Module, PostInit, PostServiceDestroy, PreDestroy,
-	PreServiceInit, Service,
-	ServiceMethod
+	PreServiceInit, Service
 } from "@catamaranjs/interface";
 import { DarconBuilderStrategy } from "@catamaranjs/communication-darcon";
 
@@ -19,6 +17,71 @@ class SubclassOne {}
 class SubclassTwo {}
 @Injectable()
 class ASD {}
+
+@Module()
+class GrandChildModule {
+	private readonly _logger: ILogger
+
+	constructor(@Inject(LoggerFactory) loggerFactory: LoggerFactory) {
+		console.log('asd')
+		this._logger = loggerFactory.getLogger(ExampleModule)
+	}
+
+	@PreServiceInit()
+	init() {
+		this._logger.info('GrandChild init')
+	}
+
+	@PostServiceDestroy()
+	destroy() {
+		this._logger.info('GrandChild destroy')
+	}
+}
+
+@Module({
+	inject(container) {
+		container.bindModule(GrandChildModule)
+	}
+})
+class ChildOfDynamicModule {
+	private readonly _logger: ILogger
+
+	constructor(@Inject(LoggerFactory) loggerFactory: LoggerFactory) {
+		console.log('asd')
+		this._logger = loggerFactory.getLogger(ExampleModule)
+	}
+
+	@PreServiceInit()
+	init() {
+		this._logger.info('ChildOfDynamic init')
+	}
+
+	@PostServiceDestroy()
+	destroy() {
+		this._logger.info('ChildOfDynamic destroy')
+	}
+}
+
+@Module({
+	modules: [ChildOfDynamicModule]
+})
+class DynamicModule {
+	private readonly _logger: ILogger
+
+	constructor(@Inject(LoggerFactory) loggerFactory: LoggerFactory) {
+		this._logger = loggerFactory.getLogger(ExampleModule)
+	}
+
+	@PreServiceInit()
+	init() {
+		this._logger.info('Dynamic init')
+	}
+
+	@PostServiceDestroy()
+	destroy() {
+		this._logger.info('Dynamic destroy')
+	}
+}
 
 @Module({
 	inject: [SubclassOne, SubclassTwo, ASD],
@@ -30,26 +93,22 @@ class ExampleModule {
 		this._logger = loggerFactory.getLogger(ExampleModule)
 	}
 
-	@ServiceMethod()
-	moduleServiceMethod(that: string) {
-		console.log('ModuleService method called with:', that)
-		return 'Hello from module service method'
-	}
-
 	@PreServiceInit()
 	init() {
-		this._logger.info('ExampleModule init called')
+		this._logger.info('Example init')
 	}
 
 	@PostServiceDestroy()
 	destroy() {
-		this._logger.info('ExampleModule destroy called')
+		this._logger.info('Example destroy')
 	}
 }
 
 @Service({
 	modules: [ExampleModule],
-	logProvider: PinoLogProvider
+	inject(container) {
+		container.bindModule(DynamicModule)
+	}
 })
 class TestService {
 	private readonly _logger: ILogger
@@ -60,18 +119,12 @@ class TestService {
 
 	@PostInit()
 	async init() {
-		this._logger.info('Service Init called')
+		this._logger.info('Service init')
 	}
 
 	@PreDestroy()
 	async destroy() {
-		this._logger.info('Service destroy called')
-	}
-
-	@ServiceMethod()
-	async rootMethod() {
-		console.log('Root method called')
-		return 'Hello from rootMethod!'
+		this._logger.info('Service destroy')
 	}
 }
 
