@@ -20,6 +20,23 @@ module.exports = {
 				type: 'input',
 				name: 'remote',
 				message: "Repository remote",
+			},
+			{
+				type: 'select',
+				name: 'logProvider',
+				message: 'Pick a log provider',
+				choices: ['ConsoleLogger', 'Pino', 'TSLog'],
+				default: 'ConsoleLogger'
+			},
+			{
+				type: 'multiselect',
+				name: 'communicationChannels',
+				message: 'Pick your communication channels',
+				choices: [
+					{ name: 'Nats', value: 'darcon' },
+					{ name: 'IPC', value: 'ipc' },
+					{ name: 'In Memory', value: 'inMemory' }
+				]
 			}
 		])
 	}
