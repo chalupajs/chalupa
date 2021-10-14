@@ -42,7 +42,7 @@ Catamaran is a high-level framework for microservices, with the goal of making i
 
 **TODO:**
 ~~~~
-npm init @catamaran/app
+npm init @catamaran/service
 ~~~~
 
 ## Learn More
