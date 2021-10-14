@@ -4,5 +4,7 @@ namespace ContainerConstant {
 	export const SERVICE_DIRECTORY = 'serviceDirectory'
 	export const LOG_PROVIDER_INTERFACE = 'ILogProvider'
 	export const COMMUNICATION_CHANNEL_INTERFACE = 'ICommunicationChannel'
+
+	export const CONFIG_SOURCES = 'Konvenient_configSources'
 }
 export { ContainerConstant }

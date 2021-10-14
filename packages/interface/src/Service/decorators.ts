@@ -14,8 +14,6 @@ export interface ServiceOptions {
 	 */
 	config: Constructor
 
-	configSources?: string[]
-
 	/**
 	 * The external name of the service. By default the name of the decorated class is used.
 	 */

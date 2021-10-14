@@ -1,4 +1,6 @@
 import * as konvenient from "konvenient";
+import { Constructor } from "./types";
+import { Injectable, InversifyMetadata } from "./index";
 export const reconfigureToEnvPrefix = function (envPrefix: string | undefined, configClass: any) {
 	if (typeof envPrefix !== 'undefined') {
 		konvenient.reconfigure(options => {
@@ -9,3 +11,9 @@ export const reconfigureToEnvPrefix = function (envPrefix: string | undefined, c
 	}
 	return configClass
 }
+
+export const ensureInjectable = function <T>(constructor: Constructor<T>) {
+	const isConstructorDecorated = Reflect.hasOwnMetadata(InversifyMetadata.PARAM_TYPES, constructor)
+	return (isConstructorDecorated ? constructor : Injectable()(constructor)) as Constructor<T>
+}
+
