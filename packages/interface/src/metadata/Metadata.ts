@@ -39,6 +39,9 @@ namespace Metadata {
 	// ExternalService
 	export const METADATA_EXTERNAL_SERVICE_INJECTED = 'Catamaran_Symbol_MetadataExternalServiceInjected'
 	export const METADATA_EXTERNAL_SERVICE_OPTIONS = 'Catamaran_Symbol_MetadataExternalServiceOptions'
+
+	// ErrorHandler
+	export const METADATA_ERROR_HANDLER_MAP = 'Catamaran_Symbol_MetadataErrorHandlerMap'
 }
 
 export { Metadata }
