@@ -94,6 +94,42 @@ export function buildIntermediateService<T = any>(
 
 	const moduleDependencyGraph = new DependencyGraph<Constructor>();
 
+	const handleErrorHandlers = function (scope: Constructor) {
+		const errorHandlers: Map<string, Constructor<Error>[]> | null = Reflect.getMetadata(Metadata.METADATA_ERROR_HANDLER_MAP, scope.prototype)
+		console.log(errorHandlers)
+
+		if (!errorHandlers) {
+			return
+		}
+
+		const serviceMethods: Map<string, string> | null = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, scope.prototype)
+		serviceMethods?.forEach(internalName => wrapWithErrorHandling(scope, internalName, errorHandlers))
+
+		const serviceEvents: Map<string, string> | null = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, scope.prototype)
+		serviceEvents?.forEach(internalName => wrapWithErrorHandling(scope, internalName, errorHandlers))
+	}
+
+	const wrapWithErrorHandling = function (scope: Constructor, internalName: string, errorHandlers: Map<string, Constructor<Error>[]>) {
+		const originalFunction = scope.prototype[internalName]
+
+		scope.prototype[internalName] = async function (...args: unknown[]) {
+			try {
+				return await originalFunction(...args)
+			} catch (e) {
+				for (const [errorHandler, types] of errorHandlers.entries()) {
+					const clazz = types.find(type => e instanceof type)
+					if (clazz) {
+						await scope.prototype[errorHandler](e, args)
+
+						return
+					}
+				}
+
+				throw e
+			}
+		}
+	}
+
 	const moduleBindingProcessor = function (current: Constructor, parent: Constructor | null) {
 		if (!moduleDependencyGraph.hasNode(current.name)) {
 			moduleDependencyGraph.addNode(current.name, current)
@@ -113,6 +149,8 @@ export function buildIntermediateService<T = any>(
 		handleInject(moduleOptions, current)
 
 		handleModules(moduleOptions.modules, current)
+
+		handleErrorHandlers(current)
 
 		handleConstants(moduleOptions.constants)
 
@@ -156,6 +194,8 @@ export function buildIntermediateService<T = any>(
 	handleModules(serviceOptions.modules, NO_PARENT)
 
 	handleExternalServices(serviceOptions.externalServices)
+
+	handleErrorHandlers(constructor)
 
 	handleInject(serviceOptions, NO_PARENT)
 

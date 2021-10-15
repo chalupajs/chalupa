@@ -1,8 +1,11 @@
-import {Constructor, Metadata} from "@catamaranjs/interface";
+import {Constructor} from '../types'
+import {Metadata} from '../metadata/Metadata'
 
 export function ErrorHandler(errors: Constructor<Error> | Constructor<Error>[]) {
 	return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
 		const arrayErrors = Array.isArray(errors) ? errors : [errors]
+
+		console.log('setting')
 
 		registerInMapOnTarget(target, Metadata.METADATA_ERROR_HANDLER_MAP, propertyKey, arrayErrors)
 	}

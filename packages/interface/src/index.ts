@@ -79,3 +79,5 @@ export {Errors} from './error'
 export {reconfigureToEnvPrefix} from './annotation_utils'
 
 export { DependencyGraph, IDependencyGraph, DepGraphCycleError } from './DependencyGraph'
+
+export {ErrorHandler} from './ErrorHandler/decorators'
