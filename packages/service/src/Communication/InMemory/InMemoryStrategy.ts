@@ -69,6 +69,7 @@ export class InMemoryStrategy implements IBuilderStrategy<ConstructedService> {
 			}
 			await serviceBridge.respectDelayedStart()
 			await serviceBridge.callLifecycleMethodOnService(Metadata.ServiceLifecycle.PostInit)
+			InMemoryOrchestrator.keepServiceAlive()
 		}
 
 		const close = async function () {

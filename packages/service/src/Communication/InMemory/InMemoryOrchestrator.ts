@@ -79,16 +79,22 @@ export interface IInMemoryOrchestrator {
 class InMemoryOrchestrator implements IInMemoryOrchestrator {
 	private _messageBus: TinyEmitter
 	private _services: Map<string, IMemoryService>
-	private _keepAlive: NodeJS.Timer
+	private _keepAlive?: NodeJS.Timer
 
 	constructor() {
 		this._messageBus = new TinyEmitter()
 		this._services = new Map<string, IMemoryService>()
-		this._keepAlive = setInterval(() => {}, 1 << 30);
+	}
+
+	keepServiceAlive() {
+		if(typeof this._keepAlive === 'undefined') {
+			this._keepAlive = setInterval(() => {}, 1 << 30);
+		}
 	}
 
 	close(): void {
-		clearInterval(this._keepAlive)
+		if(this._keepAlive)
+			clearInterval(this._keepAlive)
 	}
 
 	onEntityAppeared(cb: CallableFunction): void {
