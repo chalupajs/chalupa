@@ -36,9 +36,6 @@
 	},
 	"dependencies": {
 		"@catamaranjs/interface": "workspace:*",
-		"@catamaranjs/service": "workspace:*",
-		"reflect-metadata": "0.1.13",
-		"tiny-emitter": "^2.1.0",
-		"why-is-node-running": "^2.2.0"
+		"reflect-metadata": "0.1.13"
 	}
 }
