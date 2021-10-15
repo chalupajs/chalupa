@@ -5,12 +5,14 @@ specifiers:
   jest: 27.2.5
   jest-junit: 13.0.0
   ts-jest: 27.0.5
+  typescript: 4.4.4
 
 devDependencies:
   '@types/jest': 27.0.2
   jest: 27.2.5
   jest-junit: 13.0.0
-  ts-jest: 27.0.5_@types+jest@27.0.2+jest@27.2.5
+  ts-jest: 27.0.5_fe15ac987db2e7d4ad38346689ae2fc5
+  typescript: 4.4.4
 
 packages:
 
@@ -2464,7 +2466,7 @@ packages:
       punycode: 2.1.1
     dev: true
 
-  /ts-jest/27.0.5_@types+jest@27.0.2+jest@27.2.5:
+  /ts-jest/27.0.5_fe15ac987db2e7d4ad38346689ae2fc5:
     resolution: {integrity: sha512-lIJApzfTaSSbtlksfFNHkWOzLJuuSm4faFAfo5kvzOiRAuoN4/eKxVJ2zEAho8aecE04qX6K1pAzfH5QHL1/8w==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     hasBin: true
@@ -2491,6 +2493,7 @@ packages:
       lodash: 4.17.21
       make-error: 1.3.6
       semver: 7.3.5
+      typescript: 4.4.4
       yargs-parser: 20.2.9
     dev: true
 
@@ -2515,6 +2518,12 @@ packages:
     resolution: {integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==}
     dependencies:
       is-typedarray: 1.0.0
+    dev: true
+
+  /typescript/4.4.4:
+    resolution: {integrity: sha512-DqGhF5IKoBl8WNf8C1gu8q0xZSInh9j1kJJMqT3a94w1JzVaBU4EXOSMrz9yDqMT0xt3selp83fuFMQ0uzv6qA==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
     dev: true
 
   /universalify/0.1.2:
