@@ -33,4 +33,6 @@ export interface IContextContainer {
 	 * @param constant
 	 */
 	bindConstant<T>(accessor: string, constant: T): this
+
+	bindModule<T>(moduleConstructor: Constructor<T>): this
 }
