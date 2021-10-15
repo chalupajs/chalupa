@@ -1,12 +1,12 @@
 /** @type {import('@jest/types').Config.InitialOptions} */
 module.exports = {
-	preset: 'ts-jest',
-	testEnvironment: 'node',
+	"preset": "ts-jest",
+	"testEnvironment": "node",
 
-	moduleFileExtensions: ['js', 'ts', 'jsx', 'tsx', 'json'],
+	"moduleFileExtensions": ["js", "ts", "jsx", "tsx", "json"],
 
-	testRegex: '/(test|__test__)/.*\\.test\\.(ts|tsx)$',
-	collectCoverageFrom: [
+	"testRegex": "/(test|__test__)/.*\\.test\\.(ts|tsx)$",
+	"collectCoverageFrom": [
 		"**/*.{ts,tsx}",
 		"!**/node_modules/**",
 		"!**/dist/**",
@@ -14,10 +14,11 @@ module.exports = {
 		"!**/__test__/**"
 	],
 
-	globals: {
-		'ts-jest': {
+	"globals": {
+		"ts-jest": {
+			"tsconfig": "tsconfig.build.json"
 		}
 	},
 
-	reporters: ['default', 'jest-junit'],
+	"reporters": ["default", "jest-junit"]
 }
