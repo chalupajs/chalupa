@@ -14,6 +14,7 @@
 		"docs": "typedoc --out generated-docs src",
 		"lint": "xo",
 		"lint:fix": "xo --fix",
+		"test": "echo TODO",
 		"prepublishOnly": "npm run clean && npm run compile"
 	},
 	"repository": {

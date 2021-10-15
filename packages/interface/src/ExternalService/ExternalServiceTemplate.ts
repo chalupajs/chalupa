@@ -37,7 +37,7 @@ export class ExternalServiceTemplate {
 	 * @param props An arbitrary array of event props.
 	 * @param terms Additional terms of the event.
 	 */
-	emit(eventName: any, props = [], terms: Record<string, any> = {}): void {
+	emit(eventName: any, props: any[] = [], terms: Record<string, any> = {}): void {
 		return this.communicationChannel.emit(this.serviceName, eventName, props, terms)
 	}
 
