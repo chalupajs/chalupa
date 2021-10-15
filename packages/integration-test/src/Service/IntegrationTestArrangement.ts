@@ -39,6 +39,14 @@ export interface IntegrationTestArrangement {
  */
 export interface SystemUnderTest {
 	/**
+	 * Retrieve any component (injected value) from the system
+	 * by its key or constructor.
+	 * @param key The class constructor to retrieve by.
+	 * @returns The instance of the class.
+	 */
+	getComponent<T>(key: Constructor<T> | string): T
+
+	/**
 	 * Retrieve any Service or Module-decorated instance from
 	 * the system by its constructor.
 	 * @param key The class constructor to retrieve by.

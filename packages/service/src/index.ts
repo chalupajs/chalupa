@@ -5,12 +5,6 @@ import 'reflect-metadata'
 export { Catamaran } from './Interpretation/Catamaran'
 
 // ----------- BuilderStrategies -----------//
-export { IntegrationTestBuilderStrategy } from './Interpretation/Strategy/IntegrationTest/IntegrationTestBuilderStrategy'
-export {
-	IntegrationTestArrangement,
-	SystemUnderTest,
-} from './Interpretation/Strategy/IntegrationTest/IntegrationTestArrangement'
-
 export {InMemoryStrategy} from './Communication/InMemory/InMemoryStrategy'
 
 // ----------- Logging -----------//
