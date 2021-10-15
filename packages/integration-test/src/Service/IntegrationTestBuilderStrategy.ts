@@ -57,6 +57,11 @@ export class IntegrationTestBuilderStrategy
 			},
 		}
 
+		serviceBridge
+			.suppressEventWarning()
+			.suppressMethodWarning()
+			.buildDependencyTree()
+
 		const arrangement: IntegrationTestArrangement = {
 			rebind(key, boundValue) {
 				intermediateService.container.rebind(key).toConstantValue(boundValue)
