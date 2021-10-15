@@ -119,3 +119,6 @@ dist
 
 # WebStorm
 .idea
+
+# Test Results
+junit.xml
