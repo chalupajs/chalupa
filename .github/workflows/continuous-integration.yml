@@ -3,7 +3,7 @@ name: Continuous Integration
 env:
   NODE_VERSION: 16
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   lint:
@@ -52,24 +52,23 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ env.NODE_VERSION }}
+      - name: Cache .pnpm-store
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-node${{ env.NODE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}
 
-        - name: Cache .pnpm-store
-          uses: actions/cache@v2
-          with:
-            path: ~/.pnpm-store
-            key: ${{ runner.os }}-node${{ env.NODE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+      - name: Install pnpm
+        shell: bash
+        run: |
+          npm i pnpm -g
 
-        - name: Install pnpm
-          shell: bash
-          run: |
-            npm i pnpm -g
-
-        - name: Install Dependencies
-          shell: bash
-          run: |
-            pnpm install --frozen-lockfile
-          env:
-            CI: true
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          pnpm install --frozen-lockfile
+        env:
+          CI: true
 
       - name: Test
         shell: bash
