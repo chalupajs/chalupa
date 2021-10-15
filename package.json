@@ -5,7 +5,7 @@
 	"scripts": {
 		"compile": "pnpm run compile --recursive",
 		"clean": "pnpm run clean --recursive",
-		"test": "pnpm run test --recursive",
+		"test": "jest --coverage",
 		"lint": "echo TODO"
 	},
 	"author": "Lajos Kovács <lajoskvcs@icloud.com>",
