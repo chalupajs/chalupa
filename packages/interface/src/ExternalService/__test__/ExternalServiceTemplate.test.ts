@@ -1,7 +1,7 @@
 import "reflect-metadata"
 
 import { ExternalServiceTemplate } from '../ExternalServiceTemplate'
-import { ICommunicationChannel } from "@catamaranjs/interface";
+import { ICommunicationChannel } from "../ICommunicationChannel";
 
 const emitMock = jest.fn()
 const servicesMock = jest.fn()
