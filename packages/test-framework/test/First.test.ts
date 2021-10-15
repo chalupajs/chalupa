@@ -2,10 +2,15 @@
 const log = require('why-is-node-running')
 import {Catamaran} from "@catamaranjs/service";
 import {ModuleHost} from "../src/Module/ModuleHost";
-import {ILogger, LoggerFactory, Module, PostServiceDestroy, PreServiceInit} from "@catamaranjs/interface";
+import {ILogger, Injectable, LoggerFactory, Module, PostServiceDestroy, PreServiceInit} from "@catamaranjs/interface";
 import {IntegrationTestBuilderStrategy} from "../src/Service/IntegrationTestBuilderStrategy";
 
-@Module()
+@Injectable()
+class Some {}
+
+@Module({
+	inject: [Some]
+})
 class ExampleModule {
 	private readonly logger: ILogger
 
@@ -35,6 +40,8 @@ describe('', () => {
 
 		console.log(sut.getServiceOrModule(ExampleModule))
 
-		await sut.close()
+		console.log(sut.getComponent(Some))
+
+		expect(true).toBeFalsy()
 	})
 })

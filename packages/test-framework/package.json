@@ -1,5 +1,5 @@
 {
-	"name": "@catamaranjs/integration-test",
+	"name": "@catamaranjs/test-framework",
 	"version": "1.0.0",
 	"description": "Service framework",
 	"main": "dist/src/index.js",

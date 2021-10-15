@@ -11,7 +11,7 @@
 			"@catamaranjs/db-mongo": ["database/mongo/src"],
 			"@catamaranjs/examples": ["examples/src"],
 			"@catamaranjs/communication-darcon": ["communication/darcon/src"],
-		    "@catamaranjs/integration-test": ["integration-test/src"]
+		    "@catamaranjs/test-framework": ["test-framework/src"]
 		}
 	}
 }
