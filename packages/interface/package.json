@@ -16,9 +16,9 @@
 		"compile:watch": "tsc -p tsconfig.build.json --watch",
 		"docs": "typedoc --out generated-docs src",
 		"test": "jest --coverage",
-		"lint": "xo",
-		"lint:fix": "xo --fix",
-		"prepublishOnly": "npm run clean && npm run compile"
+		"lint": "eslint ./src",
+		"lint:fix": "eslint ./src --fix",
+		"prepublishOnly": "pnpm run clean && pnpm run compile"
 	},
 	"repository": {
 		"type": "git",
@@ -26,9 +26,12 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
+		"@dwmt/eslint-config": "1.0.0",
 		"@types/convict": "6.1.1",
 		"@types/js-yaml": "4.0.3",
 		"@types/uuid": "8.3.1",
+		"eslint": "7.32.0",
+		"prettier": "2.4.1",
 		"rimraf": "3.0.2",
 		"typedoc": "0.21.0",
 		"typescript": "4.3.3"

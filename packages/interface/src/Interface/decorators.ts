@@ -47,12 +47,7 @@ export function ServiceEvent(options: ServiceEventOptions = {}) {
 	}
 }
 
-function registerInMapOnTarget(
-	target: any,
-	mapIdentifier: string,
-	externalName: string,
-	internalName: string
-) {
+function registerInMapOnTarget(target: any, mapIdentifier: string, externalName: string, internalName: string) {
 	if (!Reflect.getMetadata(mapIdentifier, target)) {
 		Reflect.defineMetadata(mapIdentifier, new Map<string, string>(), target)
 	}

@@ -2,7 +2,7 @@
  * Interface for external Logging APIs, abstracting away the creation
  * of an API-specific root logger.
  */
-import { ILogger } from "./ILogger";
+import { ILogger } from './ILogger'
 
 export interface ILogProvider {
 	/**

@@ -1,9 +1,9 @@
+import { ContainerConstant } from '../constants'
+import { Inject, Injectable } from '../Container/decorators'
+import { Constructor } from '../types'
 import { LogConfig } from './Configuration'
-import { ContainerConstant } from "../constants";
-import { Inject, Injectable } from "../Container/decorators";
-import { Constructor } from "../types";
-import { ILogger } from "./ILogger";
-import { ILogProvider } from "./ILogProvider";
+import { ILogger } from './ILogger'
+import { ILogProvider } from './ILogProvider'
 
 /**
  * Factory class producing Loggers in a provider-agnostic way (which means, you can
@@ -58,9 +58,3 @@ export class LoggerFactory {
 		return this._config
 	}
 }
-
-
-
-
-
-

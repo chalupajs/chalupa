@@ -1,5 +1,5 @@
-import {Constructor} from '../types'
-import {Metadata} from '../metadata/Metadata'
+import { Constructor } from '../types'
+import { Metadata } from '../metadata/Metadata'
 
 export function ErrorHandler(errors: Constructor<Error> | Constructor<Error>[]) {
 	return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
@@ -9,16 +9,14 @@ export function ErrorHandler(errors: Constructor<Error> | Constructor<Error>[]) 
 	}
 }
 
-export function registerErrorHandlerOnTarget(
-	target: any,
-	handlerName: string,
-	errors: Constructor<Error>[],
-) {
+export function registerErrorHandlerOnTarget(target: any, handlerName: string, errors: Constructor<Error>[]) {
 	if (!Reflect.getMetadata(Metadata.METADATA_ERROR_HANDLER_MAP, target)) {
 		Reflect.defineMetadata(Metadata.METADATA_ERROR_HANDLER_MAP, new Map<string, Constructor<Error>[]>(), target)
 	}
 
-	const handlerMap = Reflect.getMetadata(Metadata.METADATA_ERROR_HANDLER_MAP, target) as Map<string, Constructor<Error>[]>
+	const handlerMap = Reflect.getMetadata(Metadata.METADATA_ERROR_HANDLER_MAP, target) as Map<
+		string,
+		Constructor<Error>[]
+	>
 	handlerMap.set(handlerName, errors)
 }
-

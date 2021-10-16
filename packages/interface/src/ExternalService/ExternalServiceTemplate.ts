@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment */
 import { Inject, Injectable } from '../Container/decorators'
-import { ICommunicationChannel } from "./ICommunicationChannel";
-import { ContainerConstant } from "../constants";
+import { ContainerConstant } from '../constants'
+import { ICommunicationChannel } from './ICommunicationChannel'
 
 /**
  * Abstract base for classes representing external services.
@@ -12,7 +12,9 @@ export class ExternalServiceTemplate {
 
 	private communicationChannel: ICommunicationChannel
 
-	constructor(@Inject(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE) communicationChannel: ICommunicationChannel) {
+	constructor(
+		@Inject(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE) communicationChannel: ICommunicationChannel
+	) {
 		this.communicationChannel = communicationChannel
 	}
 
@@ -23,11 +25,7 @@ export class ExternalServiceTemplate {
 	 * @param terms Additional terms of the call.
 	 * @returns The received response.
 	 */
-	async request<T>(
-		serviceMethodName: string,
-		parameters: any[] = [],
-		terms: Record<string, any> = {}
-	): Promise<T> {
+	async request<T>(serviceMethodName: string, parameters: any[] = [], terms: Record<string, any> = {}): Promise<T> {
 		return this.communicationChannel.request<T>(this.serviceName, serviceMethodName, parameters, terms)
 	}
 
@@ -111,7 +109,12 @@ export class ExternalServiceEmit<T = any> implements IExternalServiceEmit<T> {
 
 	async send(terms?: Record<string, any>): Promise<any> {
 		const finalTerms = { ...this._terms, ...terms }
-		return this._communicationChannel.emit(this._externalServiceName, this._externalServiceMethod, this._params, finalTerms)
+		return this._communicationChannel.emit(
+			this._externalServiceName,
+			this._externalServiceMethod,
+			this._params,
+			finalTerms
+		)
 	}
 }
 

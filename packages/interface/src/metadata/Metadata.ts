@@ -6,14 +6,14 @@ namespace Metadata {
 	// Service lifecycle
 	export enum ServiceLifecycle {
 		PostInit = 'Catamaran_Symbol_MetadataServiceLifecyclePostInit',
-		PreDestroy = 'Catamaran_Symbol_MetadataServiceLifecyclePreDestroy'
+		PreDestroy = 'Catamaran_Symbol_MetadataServiceLifecyclePreDestroy',
 	}
 
 	// Network event
 	export enum NetworkEvent {
 		EntityAppeared = 'Catamaran_Symbol_MetadataNetworkEventEntityAppeared',
 		EntityDisappeared = 'Catamaran_Symbol_MetadataNetworkEventEntityDisappeared',
-		EntityUpdated = 'Catamaran_Symbol_MetadataNetworkEventEntityUpdated'
+		EntityUpdated = 'Catamaran_Symbol_MetadataNetworkEventEntityUpdated',
 	}
 
 	// Module
@@ -22,14 +22,16 @@ namespace Metadata {
 
 	export const METADATA_MODULE_LIFECYCLE_PRE_SERVICE_INIT = 'Catamaran_Symbol_MetadataModuleLifeCyclePreServiceInit'
 	export const METADATA_MODULE_LIFECYCLE_POST_SERVICE_INIT = 'Catamaran_Symbol_MetadataModuleLifeCyclePostServiceInit'
-	export const METADATA_MODULE_LIFECYCLE_PRE_SERVICE_DESTROY = 'Catamaran_Symbol_MetadataModuleLifeCyclePreServiceDestroy'
-	export const METADATA_MODULE_LIFECYCLE_POST_SERVICE_DESTROY = 'Catamaran_Symbol_MetadataModuleLifeCyclePostServiceDestroy'
+	export const METADATA_MODULE_LIFECYCLE_PRE_SERVICE_DESTROY =
+		'Catamaran_Symbol_MetadataModuleLifeCyclePreServiceDestroy'
+	export const METADATA_MODULE_LIFECYCLE_POST_SERVICE_DESTROY =
+		'Catamaran_Symbol_MetadataModuleLifeCyclePostServiceDestroy'
 
 	export enum ModuleLifecycle {
 		PreServiceInit = 'Catamaran_Symbol_MetadataModuleLifeCyclePreServiceInit',
 		PostServiceInit = 'Catamaran_Symbol_MetadataModuleLifeCyclePostServiceInit',
 		PreServiceDestroy = 'Catamaran_Symbol_MetadataModuleLifeCyclePreServiceDestroy',
-		PostServiceDestroy = 'Catamaran_Symbol_MetadataModuleLifeCyclePostServiceDestroy'
+		PostServiceDestroy = 'Catamaran_Symbol_MetadataModuleLifeCyclePostServiceDestroy',
 	}
 
 	// Interface

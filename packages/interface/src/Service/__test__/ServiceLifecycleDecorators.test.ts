@@ -1,6 +1,7 @@
-import "reflect-metadata"
+import 'reflect-metadata'
 import { Service, PostInit, PreDestroy } from '../decorators'
-import { Metadata } from "../../metadata/Metadata";
+import { Metadata } from '../../metadata/Metadata'
+
 describe('Service lifecycle decorators', () => {
 	describe('@PostInit decorator', () => {
 		it('should assign the correct metadata', () => {
@@ -24,9 +25,11 @@ describe('Service lifecycle decorators', () => {
 			}
 			const hasPreDestroy = Reflect.hasMetadata(Metadata.ServiceLifecycle.PreDestroy, ToBeDecorated.prototype)
 			expect(hasPreDestroy).toBeTruthy()
-			const preDestroyMethodName = Reflect.getMetadata(Metadata.ServiceLifecycle.PreDestroy, ToBeDecorated.prototype)
+			const preDestroyMethodName = Reflect.getMetadata(
+				Metadata.ServiceLifecycle.PreDestroy,
+				ToBeDecorated.prototype
+			)
 			expect(preDestroyMethodName).toBe('destroy')
 		})
-
 	})
 })

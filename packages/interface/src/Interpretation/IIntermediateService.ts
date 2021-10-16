@@ -1,9 +1,9 @@
 import { Container } from 'inversify'
 import { Constructor } from '../types'
-import { ILogger } from "../Log/ILogger";
-import { ServiceOptions } from "../Service/decorators";
-import { IServiceBridge } from "./IServiceBridge";
-import {IDependencyGraph} from "../DependencyGraph";
+import { ILogger } from '../Log/ILogger'
+import { ServiceOptions } from '../Service/decorators'
+import { IDependencyGraph } from '../DependencyGraph'
+import { IServiceBridge } from './IServiceBridge'
 
 export interface IIntermediateService {
 	container: Container
@@ -12,6 +12,6 @@ export interface IIntermediateService {
 	moduleDependencyGraph: IDependencyGraph<Constructor>
 	bindLogger(logger: ILogger): void
 	timeout(ms: number): Promise<void>
-	getServiceFromContainer (): any
+	getServiceFromContainer(): any
 	bridge(): IServiceBridge
 }

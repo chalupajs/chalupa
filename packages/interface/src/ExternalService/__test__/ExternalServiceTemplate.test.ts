@@ -1,7 +1,7 @@
-import "reflect-metadata"
+import 'reflect-metadata'
 
 import { ExternalServiceTemplate } from '../ExternalServiceTemplate'
-import { ICommunicationChannel } from "../ICommunicationChannel";
+import { ICommunicationChannel } from '../ICommunicationChannel'
 
 const emitMock = jest.fn()
 const servicesMock = jest.fn()
@@ -12,7 +12,7 @@ const CommunicationChannelMock: ICommunicationChannel = {
 	emit: emitMock,
 	broadcast: broadcastMock,
 	services: servicesMock,
-	request: requestMock
+	request: requestMock,
 }
 
 describe('ExternalServiceTemplate tests', () => {
@@ -53,7 +53,7 @@ describe('ExternalServiceTemplate tests', () => {
 		const parameters: any[] = [1, 2, true, 'asd']
 		const terms: Record<string, any> = {
 			a: 1,
-			b: true
+			b: true,
 		}
 
 		// When
@@ -63,5 +63,4 @@ describe('ExternalServiceTemplate tests', () => {
 		expect(requestMock).toBeCalled()
 		expect(requestMock).toBeCalledWith(serviceName, serviceMethodName, parameters, terms)
 	})
-
 })

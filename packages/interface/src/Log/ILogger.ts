@@ -3,7 +3,7 @@
  * This is the central interface of the Catamaran Log API, providing the ability
  * to actually output log statements and create child loggers.
  */
-import { LogFunction } from "./LogFunction";
+import { LogFunction } from './LogFunction'
 
 export interface ILogger {
 	/**

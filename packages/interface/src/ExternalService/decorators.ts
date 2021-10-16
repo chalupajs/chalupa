@@ -108,20 +108,16 @@ function retargetExternalCommunication(constructor: Constructor, serviceName: st
 	// The latter is determined by the name of the external service class
 	// (or its name option) and the key or the name option of the function property.
 	for (const key of Object.keys(exampleInstance)) {
-		const methodOptions = Reflect.getMetadata(
-			externalServiceMethodMetadataKey,
-			exampleInstance,
-			key
-		) as ExternalServiceMethodOptions | undefined
+		const methodOptions = Reflect.getMetadata(externalServiceMethodMetadataKey, exampleInstance, key) as
+			| ExternalServiceMethodOptions
+			| undefined
 		if (methodOptions) {
 			retargetExternalMethod(methodOptions, key, constructor, serviceName)
 		}
 
-		const eventOptions = Reflect.getMetadata(
-			externalServiceEventMetadataKey,
-			exampleInstance,
-			key
-		) as ExternalServiceEventOptions | undefined
+		const eventOptions = Reflect.getMetadata(externalServiceEventMetadataKey, exampleInstance, key) as
+			| ExternalServiceEventOptions
+			| undefined
 		if (eventOptions) {
 			retargetExternalEmit(eventOptions, key, constructor, serviceName)
 		}

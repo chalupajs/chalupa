@@ -1,6 +1,7 @@
+import { METADATA_KEY } from 'inversify'
 import { ensureInjectable } from '../annotation_utils'
-import { METADATA_KEY } from "inversify";
-import { Injectable } from "../Container/decorators";
+import { Injectable } from '../Container/decorators'
+
 describe('ensureInjectable', () => {
 	it('should return an @Injectable decorated constructor when it is not decorated already', () => {
 		// Given

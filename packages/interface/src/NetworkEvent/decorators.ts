@@ -1,4 +1,4 @@
-import {Metadata} from '../metadata/Metadata'
+import { Metadata } from '../metadata/Metadata'
 
 /**
  * Options for the `NetworkEvent` decorator.
@@ -11,10 +11,7 @@ export interface NetworkEventOptions {
 	name: NetworkEventTypes
 }
 
-export type NetworkEventTypes =
-	| 'entityAppeared'
-	| 'entityDisappeared'
-	| 'entityUpdated'
+export type NetworkEventTypes = 'entityAppeared' | 'entityDisappeared' | 'entityUpdated'
 
 const NetworkMetadataMap: Record<NetworkEventTypes, string> = {
 	entityAppeared: Metadata.NetworkEvent.EntityAppeared,

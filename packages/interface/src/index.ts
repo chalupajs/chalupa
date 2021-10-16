@@ -1,4 +1,4 @@
-import "reflect-metadata"
+import 'reflect-metadata'
 // Types
 export { Constructor } from './types'
 
@@ -19,14 +19,9 @@ export {
 // ----------- Network events -----------//
 export { NetworkEvent, NetworkEventOptions } from './NetworkEvent/decorators'
 // ----------- Public interfacing -----------//
-export {
-	ServiceMethod,
-	ServiceMethodOptions,
-	ServiceEvent,
-	ServiceEventOptions,
-} from './Interface/decorators'
+export { ServiceMethod, ServiceMethodOptions, ServiceEvent, ServiceEventOptions } from './Interface/decorators'
 
-export {Metadata} from './metadata/Metadata'
+export { Metadata } from './metadata/Metadata'
 
 // ----------- Container -----------//
 export { Inject, Injectable, MultiInject } from './Container/decorators'
@@ -50,7 +45,7 @@ export {
 	ExternalServiceEvent,
 	ExternalServiceEventOptions,
 } from './ExternalService/decorators'
-export {ICommunicationChannel} from './ExternalService/ICommunicationChannel'
+export { ICommunicationChannel } from './ExternalService/ICommunicationChannel'
 // ----------- Configuration -----------//
 export {
 	Configuration,
@@ -60,24 +55,24 @@ export {
 	PredefinedFormat,
 	SchemaResult,
 	Nested,
-	configurator
+	configurator,
 } from './Configuration/konvenient'
 
-export {IIntermediateService} from './Interpretation/IIntermediateService'
-export {IBuilderStrategy} from './Interpretation/IBuilderStrategy'
-export {IServiceBridge} from './Interpretation/IServiceBridge'
+export { IIntermediateService } from './Interpretation/IIntermediateService'
+export { IBuilderStrategy } from './Interpretation/IBuilderStrategy'
+export { IServiceBridge } from './Interpretation/IServiceBridge'
 
 export { AbstractLoggerAdapter, ILoggerCompatibleInstance } from './Log/AbstractLoggerAdapter'
-export {LoggerFactory} from './Log/LoggerFactory'
-export {ILogProvider} from './Log/ILogProvider'
-export {LogFunction} from './Log/LogFunction'
-export {ILogger} from './Log/ILogger'
+export { LoggerFactory } from './Log/LoggerFactory'
+export { ILogProvider } from './Log/ILogProvider'
+export { LogFunction } from './Log/LogFunction'
+export { ILogger } from './Log/ILogger'
 export { LogConfig } from './Log/Configuration'
 
-export {Errors} from './error'
+export { Errors } from './error'
 
-export {reconfigureToEnvPrefix} from './annotation_utils'
+export { reconfigureToEnvPrefix } from './annotation_utils'
 
 export { DependencyGraph, IDependencyGraph, DepGraphCycleError } from './DependencyGraph'
 
-export {ErrorHandler} from './ErrorHandler/decorators'
+export { ErrorHandler } from './ErrorHandler/decorators'

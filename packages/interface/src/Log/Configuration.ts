@@ -1,5 +1,5 @@
 import { Configurable, Configuration } from 'konvenient'
-import { Injectable } from "../Container/decorators";
+import { Injectable } from '../Container/decorators'
 
 /**
  * Configuration settings for the Catamaran Log API.

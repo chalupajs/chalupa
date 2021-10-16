@@ -2,7 +2,7 @@ import { Constructor } from '../types'
 import { Errors } from '../error'
 import { Injectable } from '../Container/decorators'
 import { Metadata } from '../metadata/Metadata'
-import { IContextContainer } from "../Container/IContextContainer";
+import { IContextContainer } from '../Container/IContextContainer'
 
 /**
  * Options for the `Service` decorator.

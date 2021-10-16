@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call */
 
-import { ILogger } from "./ILogger";
-import { LogFunction } from "./LogFunction";
+import { ILogger } from './ILogger'
+import { LogFunction } from './LogFunction'
 
 /**
  * Adapter class, making it easy to fit the interface of some logging API

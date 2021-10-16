@@ -1,4 +1,4 @@
-import { Constructor } from "../index";
+import { Constructor } from '../index'
 
 export interface IContextContainer {
 	/**

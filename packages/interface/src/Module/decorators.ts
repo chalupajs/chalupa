@@ -1,8 +1,8 @@
 import { Constructor } from '../types'
 import { Errors } from '../error'
 import { Injectable } from '../Container/decorators'
-import {Metadata} from '../metadata/Metadata'
-import { IContextContainer } from "../Container/IContextContainer";
+import { Metadata } from '../metadata/Metadata'
+import { IContextContainer } from '../Container/IContextContainer'
 
 /**
  * Options for the `Module` decorator.
@@ -23,7 +23,7 @@ export interface ModuleOptions {
 
 	constants?: Array<[string, any]>
 
-	modules?: Constructor[],
+	modules?: Constructor[]
 
 	/**
 	 * An array of external service classes to be loaded and instrumented by Catamaran. The

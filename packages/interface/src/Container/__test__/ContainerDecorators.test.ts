@@ -1,6 +1,7 @@
-import "reflect-metadata"
-import { Injectable, Inject, MultiInject } from "../decorators";
-import { METADATA_KEY } from "inversify";
+import 'reflect-metadata'
+import { METADATA_KEY } from 'inversify'
+import { Injectable, Inject, MultiInject } from '../decorators'
+
 describe('Container decorators', () => {
 	describe('@Injectable', () => {
 		it('should have @Injectable metadata', () => {
@@ -17,8 +18,8 @@ describe('Container decorators', () => {
 				constructor(@Inject(mustBeInjected) _a: mustBeInjected) {}
 			}
 
-			const paramsMetadata = Reflect.getMetadata(METADATA_KEY.TAGGED, someClass);
-			expect(typeof paramsMetadata).toBe('object')
+			const parametersMetadata = Reflect.getMetadata(METADATA_KEY.TAGGED, someClass)
+			expect(typeof parametersMetadata).toBe('object')
 		})
 	})
 	describe('@MultiInject', () => {
@@ -27,8 +28,8 @@ describe('Container decorators', () => {
 			class someClass {
 				constructor(@MultiInject(mustBeInjected) _a: mustBeInjected) {}
 			}
-			const paramsMetadata = Reflect.getMetadata(METADATA_KEY.TAGGED, someClass);
-			expect(typeof paramsMetadata).toBe('object')
+			const parametersMetadata = Reflect.getMetadata(METADATA_KEY.TAGGED, someClass)
+			expect(typeof parametersMetadata).toBe('object')
 		})
 	})
 })

@@ -1,6 +1,7 @@
-import "reflect-metadata"
-import {ServiceMethod, ServiceEvent} from '../decorators'
-import {Metadata} from "../../metadata/Metadata";
+import 'reflect-metadata'
+import { ServiceMethod, ServiceEvent } from '../decorators'
+import { Metadata } from '../../metadata/Metadata'
+
 describe('Inteface decorators', () => {
 	describe('@ServiceMethod', () => {
 		it('should inject METHOD_MAP into constructor metadata', () => {
@@ -8,7 +9,10 @@ describe('Inteface decorators', () => {
 				@ServiceMethod()
 				asd() {}
 			}
-			const methodMap = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, oneMethodClass.prototype) as Map<string, string>
+			const methodMap = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, oneMethodClass.prototype) as Map<
+				string,
+				string
+			>
 			expect(typeof methodMap).toBe('object')
 			expect(methodMap.size).toBe(1)
 		})
@@ -17,7 +21,10 @@ describe('Inteface decorators', () => {
 				@ServiceMethod()
 				asd() {}
 			}
-			const methodMap = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, oneMethodClass.prototype) as Map<string, string>
+			const methodMap = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, oneMethodClass.prototype) as Map<
+				string,
+				string
+			>
 			expect(typeof methodMap).toBe('object')
 			expect(methodMap.size).toBe(1)
 			expect(methodMap.get('asd')).toBe('asd')
@@ -27,7 +34,10 @@ describe('Inteface decorators', () => {
 				@ServiceMethod({ name: 'DifferentName' })
 				asd() {}
 			}
-			const methodMap = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, oneMethodClass.prototype) as Map<string, string>
+			const methodMap = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, oneMethodClass.prototype) as Map<
+				string,
+				string
+			>
 			expect(typeof methodMap).toBe('object')
 			expect(methodMap.size).toBe(1)
 			expect(methodMap.get('DifferentName')).toBe('asd')
@@ -36,14 +46,20 @@ describe('Inteface decorators', () => {
 			class oneMethodClass {
 				@ServiceMethod()
 				hello() {}
+
 				@ServiceMethod()
 				asd() {}
+
 				@ServiceMethod()
 				kek() {}
+
 				@ServiceMethod()
 				lol() {}
 			}
-			const methodMap = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, oneMethodClass.prototype) as Map<string, string>
+			const methodMap = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, oneMethodClass.prototype) as Map<
+				string,
+				string
+			>
 			expect(typeof methodMap).toBe('object')
 			expect(methodMap.size).toBe(4)
 		})
@@ -54,7 +70,10 @@ describe('Inteface decorators', () => {
 				@ServiceEvent()
 				asd() {}
 			}
-			const eventMap = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, oneEventClass.prototype) as Map<string, string>
+			const eventMap = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, oneEventClass.prototype) as Map<
+				string,
+				string
+			>
 			expect(typeof eventMap).toBe('object')
 			expect(eventMap.size).toBe(1)
 		})
@@ -63,7 +82,10 @@ describe('Inteface decorators', () => {
 				@ServiceEvent()
 				ping() {}
 			}
-			const eventMap = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, oneEventClass.prototype) as Map<string, string>
+			const eventMap = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, oneEventClass.prototype) as Map<
+				string,
+				string
+			>
 			expect(typeof eventMap).toBe('object')
 			expect(eventMap.size).toBe(1)
 			expect(eventMap.get('ping')).toBe('ping')
@@ -73,7 +95,10 @@ describe('Inteface decorators', () => {
 				@ServiceEvent({ name: 'AnotherName' })
 				ping() {}
 			}
-			const eventMap = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, oneEventClass.prototype) as Map<string, string>
+			const eventMap = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, oneEventClass.prototype) as Map<
+				string,
+				string
+			>
 			expect(typeof eventMap).toBe('object')
 			expect(eventMap.size).toBe(1)
 			expect(eventMap.get('AnotherName')).toBe('ping')
@@ -82,12 +107,17 @@ describe('Inteface decorators', () => {
 			class oneEventClass {
 				@ServiceEvent()
 				ping() {}
+
 				@ServiceEvent()
 				pong() {}
+
 				@ServiceEvent()
 				lol() {}
 			}
-			const eventMap = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, oneEventClass.prototype) as Map<string, string>
+			const eventMap = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, oneEventClass.prototype) as Map<
+				string,
+				string
+			>
 			expect(typeof eventMap).toBe('object')
 			expect(eventMap.size).toBe(3)
 		})
