@@ -70,10 +70,8 @@ export function buildIntermediateService<T = any>(
 	configurators.forEach((configurator: IConfigurator) => configurator.configure(container))
 
 	const hasConfigSources: boolean = container.isBound(ContainerConstant.CONFIG_SOURCES)
-	console.log('Has config source?', hasConfigSources)
 	if (hasConfigSources) {
 		const configSources = container.get<string[]>(ContainerConstant.CONFIG_SOURCES)
-		console.log(configSources)
 		configurator.withSources(configSources)
 	}
 
@@ -96,7 +94,6 @@ export function buildIntermediateService<T = any>(
 
 	const handleErrorHandlers = function (scope: Constructor) {
 		const errorHandlers: Map<string, Constructor<Error>[]> | null = Reflect.getMetadata(Metadata.METADATA_ERROR_HANDLER_MAP, scope.prototype)
-		console.log(errorHandlers)
 
 		if (!errorHandlers) {
 			return
@@ -115,17 +112,14 @@ export function buildIntermediateService<T = any>(
 		scope.prototype[internalName] = async function (...args: unknown[]) {
 			try {
 				return await originalFunction(...args)
-			} catch (e) {
-				for (const [errorHandler, types] of errorHandlers.entries()) {
-					const clazz = types.find(type => e instanceof type)
-					if (clazz) {
-						await scope.prototype[errorHandler](e, args)
-
-						return
+			} catch (thrownError) {
+				for (const [errorHandler, handledErrors] of errorHandlers.entries()) {
+					if (handledErrors.find(handledType => thrownError instanceof handledType)) {
+						return await scope.prototype[errorHandler](thrownError, args)
 					}
 				}
 
-				throw e
+				throw thrownError
 			}
 		}
 	}
