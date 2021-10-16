@@ -12,8 +12,8 @@
 		"compile": "tsc -p tsconfig.build.json",
 		"compile:watch": "tsc -p tsconfig.build.json --watch",
 		"docs": "typedoc --out generated-docs src",
-		"lint": "xo",
-		"lint:fix": "xo --fix",
+		"lint": "eslint src/",
+		"lint:fix": "eslint src/ --fix",
 		"prepublishOnly": "pnpm run clean && pnpm run compile",
 		"test": "jest --coverage",
 		"test:watch": "jest --watch"
@@ -26,7 +26,10 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"@dwmt/eslint-config": "1.0.0",
 		"@types/node": "16.10.3",
+		"eslint": "7.32.0",
+		"prettier": "2.4.1",
 		"rimraf": "3.0.2",
 		"typedoc": "0.21.0",
 		"typescript": "4.3.3"

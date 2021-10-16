@@ -1,4 +1,5 @@
-import {ICommunicationChannel} from "@catamaranjs/interface";
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+import { ICommunicationChannel } from '@catamaranjs/interface'
 
 export class IntegrationTestCommunicationChannel implements ICommunicationChannel {
 	broadcast(eventName: string, parameters: any[], _terms: Record<string, any>): void {
@@ -23,7 +24,12 @@ Ooops, you forgot to properly mock this communication:
 `)
 	}
 
-	request<T>(serviceName: string, serviceMethodName: string, parameters: any[], _terms: Record<string, any>): Promise<T> {
+	request<T>(
+		serviceName: string,
+		serviceMethodName: string,
+		parameters: any[],
+		_terms: Record<string, any>
+	): Promise<T> {
 		throw new Error(`
 Ooops, you forgot to properly mock this communication:
 

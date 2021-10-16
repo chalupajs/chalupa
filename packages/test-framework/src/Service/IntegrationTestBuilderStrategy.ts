@@ -1,35 +1,35 @@
-/* eslint-disable  @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-implicit-any-catch */
 import {
 	ContainerConstant,
 	IBuilderStrategy,
 	ICommunicationChannel,
 	IIntermediateService,
-	Metadata
+	Metadata,
 } from '@catamaranjs/interface'
 
-import {IntegrationTestArrangement, SystemUnderTest} from './IntegrationTestArrangement'
-import {IntegrationTestCommunicationChannel} from "./IntegrationTestCommunicationChannel";
+import { IntegrationTestArrangement, SystemUnderTest } from './IntegrationTestArrangement'
+import { IntegrationTestCommunicationChannel } from './IntegrationTestCommunicationChannel'
 
 /**
  * Strategy creating an integration testing optimized version of the service, which
  * will not make any actual Darcon calls.
  */
-export class IntegrationTestBuilderStrategy
-	implements IBuilderStrategy<IntegrationTestArrangement>
-{
-	async build(intermediateService: IIntermediateService): Promise<IntegrationTestArrangement> {
+export class IntegrationTestBuilderStrategy implements IBuilderStrategy<IntegrationTestArrangement> {
+	build(intermediateService: IIntermediateService): Promise<IntegrationTestArrangement> {
 		const serviceBridge = intermediateService.bridge()
 
-		intermediateService.container.bind<ICommunicationChannel>(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE)
+		intermediateService.container
+			.bind<ICommunicationChannel>(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE)
 			.to(IntegrationTestCommunicationChannel)
 
 		const originalEnvValues = new Map<string, string | undefined>()
 
 		const sut: SystemUnderTest = {
 			getComponent(key) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 				return intermediateService.container.get(key)
 			},
 			getServiceOrModule(key) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 				return intermediateService.container.get(key)
 			},
 			async entityAppeared(name) {
@@ -57,10 +57,7 @@ export class IntegrationTestBuilderStrategy
 			},
 		}
 
-		serviceBridge
-			.suppressEventWarning()
-			.suppressMethodWarning()
-			.buildDependencyTree()
+		serviceBridge.suppressEventWarning().suppressMethodWarning().buildDependencyTree()
 
 		const arrangement: IntegrationTestArrangement = {
 			rebind(key, boundValue) {
@@ -72,6 +69,7 @@ export class IntegrationTestBuilderStrategy
 			reconfigure(variable: string, value: any) {
 				originalEnvValues.set(variable, process.env[variable])
 
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				process.env[variable] = value
 
 				return arrangement
@@ -84,7 +82,7 @@ export class IntegrationTestBuilderStrategy
 			},
 		}
 
-		return arrangement
+		return Promise.resolve(arrangement)
 
 		function isItMe(name: string) {
 			return name === intermediateService.serviceOptions.name
