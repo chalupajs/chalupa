@@ -1,6 +1,3 @@
 module.exports = {
-	extends: '@dwmt',
-	parserOptions: {
-		project: ['../../tsconfig.json']
-	}
+	extends: '@dwmt'
 }
