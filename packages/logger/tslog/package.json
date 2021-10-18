@@ -21,8 +21,8 @@
 		"test": "echo TODO"
 	},
 	"repository": {
-		"type": "git",
-		"url": "git@github.com:dwmt/Catamaran.git"
+	  	"type": "git",
+	  	"url": "git@github.com:dwmt/Catamaran.git"
 	},
 	"license": "MIT",
 	"devDependencies": {

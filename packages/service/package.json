@@ -19,12 +19,12 @@
 	    "test:watch": "jest --watch"
 	},
 	"repository": {
-		"type": "git",
-		"url": "git@gitlab.perfinal.com:perfinal/tools/entity-framework.git"
+	  	"type": "git",
+	  	"url": "git@github.com:dwmt/Catamaran.git"
 	},
+	"license": "MIT",
 	"keywords": [],
 	"author": "",
-	"license": "ISC",
 	"devDependencies": {
 		"@dwmt/eslint-config": "1.0.0",
 		"eslint": "7.32.0",

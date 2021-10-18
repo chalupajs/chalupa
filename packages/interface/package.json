@@ -21,8 +21,8 @@
 		"prepublishOnly": "pnpm run clean && pnpm run compile"
 	},
 	"repository": {
-		"type": "git",
-		"url": "git@github.com:dwmt/Catamaran.git"
+	  	"type": "git",
+	  	"url": "git@github.com:dwmt/Catamaran.git"
 	},
 	"license": "MIT",
 	"devDependencies": {
