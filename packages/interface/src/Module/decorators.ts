@@ -9,12 +9,6 @@ import { IContextContainer } from '../Container/IContextContainer'
  */
 export interface ModuleOptions {
 	/**
-	 * An optional konvenient configuration class that will be instrumented and loaded by
-	 * Catamaran. An instance of the configuration class will be available in the container.
-	 */
-	config?: Constructor
-
-	/**
 	 * Optional injection specifications. If you want to perform class-based injection only,
 	 * then this can be an array of classes. Otherwise, use the function form, which gives
 	 * access to both the container being built and an instance of the configuration (if specified).

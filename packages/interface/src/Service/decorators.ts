@@ -9,12 +9,6 @@ import { IContextContainer } from '../Container/IContextContainer'
  */
 export interface ServiceOptions {
 	/**
-	 * A konvenient configuration class that will be instrumented and loaded by
-	 * Catamaran. An instance of the configuration class will be available in the container.
-	 */
-	config: Constructor
-
-	/**
 	 * The external name of the service. By default the name of the decorated class is used.
 	 */
 	name: string

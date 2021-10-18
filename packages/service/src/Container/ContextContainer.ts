@@ -66,4 +66,10 @@ export class ContextContainer implements IContextContainer {
 
 		return this
 	}
+
+	immediate<T>(constructor: Constructor<T>): T {
+		this.container.bind<T>(constructor).toSelf()
+
+		return this.container.get<T>(constructor)
+	}
 }
