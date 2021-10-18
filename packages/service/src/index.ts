@@ -2,7 +2,7 @@
 import 'reflect-metadata'
 
 // ----------- Main -----------//
-export { Catamaran } from './Interpretation/Catamaran'
+export { Catamaran, ICatamaranBuilder } from './Interpretation/Catamaran'
 
 // ----------- BuilderStrategies -----------//
 export { InMemoryStrategy } from './Communication/InMemory/InMemoryStrategy'

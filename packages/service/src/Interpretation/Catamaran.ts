@@ -7,13 +7,13 @@ import { buildIntermediateService } from './IntermediateService/IntermediateServ
  * some representation of your service.
  */
 export class Catamaran {
-	static plugins: IPlugin[] = []
-
-	static use(plugin: IPlugin): Catamaran {
-		this.plugins.push(plugin)
-		
-		return Catamaran
+	static builder(): ICatamaranBuilder {
+		return new CatamaranBuilder()
 	}
+}
+
+export interface ICatamaranBuilder {
+	use(plugin: IPlugin): ICatamaranBuilder,
 
 	/**
 	 * Loads, wires up and creates some representation of specified
@@ -23,10 +23,26 @@ export class Catamaran {
 	 * @param serviceEntrypoint A `Service` decorated class.
 	 * @param builder A strategy that determines what is created from the passed structure.
 	 */
-	static async createServiceWithStrategy<T>(
+	createServiceWithStrategy<T>(
 		serviceEntrypoint: Constructor,
 		builder: Constructor<IBuilderStrategy<T>>
-	): Promise<T> {
+	): Promise<T>
+}
+
+export class CatamaranBuilder implements ICatamaranBuilder {
+	private readonly plugins: IPlugin[]
+
+	constructor() {
+		this.plugins = []
+	}
+
+	use(plugin: IPlugin): ICatamaranBuilder {
+		this.plugins.push(plugin)
+
+		return this
+	}
+
+	createServiceWithStrategy<T>(serviceEntrypoint: Constructor, builder: Constructor<IBuilderStrategy<T>>): Promise<T> {
 		const intermediateService = buildIntermediateService(serviceEntrypoint, this.plugins)
 		const builderInstance = new builder()
 		return builderInstance.build(intermediateService)
