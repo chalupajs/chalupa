@@ -38,6 +38,10 @@ export function buildIntermediateService<T = any>(
 		defaultScope: 'Singleton',
 	})
 
+	const envPrefix = container.isBound(ContainerConstant.ENV_PREFIX)
+		? container.get<string>(ContainerConstant.ENV_PREFIX)
+		: undefined
+
 	// Bind the rootClass name to the container
 	container.bind<string>(ContainerConstant.ROOT_CLASS).toConstantValue(constructor.name)
 	// Bind the service name to the container
@@ -48,7 +52,7 @@ export function buildIntermediateService<T = any>(
 	// Bind the service to the container
 	container.bind<T>(constructor).toSelf()
 
-	container.bind<LogConfig>(LogConfig).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, LogConfig))
+	container.bind<LogConfig>(LogConfig).to(reconfigureToEnvPrefix(envPrefix, LogConfig))
 
 	// Default logProvider
 	container.bind<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE).to(ConsoleLoggerProvider)
@@ -152,7 +156,7 @@ export function buildIntermediateService<T = any>(
 			if (Array.isArray(optionsObject.inject)) {
 				for (const constructor of optionsObject.inject) {
 					if (isConfiguration(constructor)) {
-						const reconfiguredConfig = reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(constructor))
+						const reconfiguredConfig = reconfigureToEnvPrefix(envPrefix, ensureInjectable(constructor))
 
 						container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
 					} else {
@@ -183,7 +187,7 @@ export function buildIntermediateService<T = any>(
 		return {
 			bindClass<T>(constructor: Constructor<T>) {
 				if (isConfiguration(constructor)) {
-					const reconfiguredConfig = reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(constructor))
+					const reconfiguredConfig = reconfigureToEnvPrefix(envPrefix, ensureInjectable(constructor))
 
 					container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
 				} else {
@@ -211,7 +215,7 @@ export function buildIntermediateService<T = any>(
 			},
 			immediate<T>(constructor: Constructor<T>) {
 				if (isConfiguration(constructor)) {
-					const reconfiguredConfig = reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(constructor))
+					const reconfiguredConfig = reconfigureToEnvPrefix(envPrefix, ensureInjectable(constructor))
 
 					container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
 				} else {

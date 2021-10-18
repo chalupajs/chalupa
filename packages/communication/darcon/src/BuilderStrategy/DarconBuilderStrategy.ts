@@ -25,7 +25,11 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 
 		const loggerFactory = container.get<LoggerFactory>(LoggerFactory)
 
-		container.bind<DarconConfig>(DarconConfig).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, DarconConfig))
+		const envPrefix = container.isBound(ContainerConstant.ENV_PREFIX)
+			? container.get<string>(ContainerConstant.ENV_PREFIX)
+			: undefined
+
+		container.bind<DarconConfig>(DarconConfig).to(reconfigureToEnvPrefix(envPrefix, DarconConfig))
 		const config: DarconConfig = container.get<DarconConfig>(DarconConfig)
 
 		const darconLogger = loggerFactory.getLogger('Darcon')

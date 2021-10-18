@@ -43,12 +43,6 @@ export interface ServiceOptions {
 	delayStart: number
 
 	/**
-	 * Environment variable prefix for every konvenient configurable value,
-	 * in either the configuration of the service or any of the modules.
-	 */
-	envPrefix: string
-
-	/**
 	 * The directory where the service class is located.
 	 */
 	serviceDirectory: string
