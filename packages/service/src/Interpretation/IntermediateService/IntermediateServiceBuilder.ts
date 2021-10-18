@@ -25,7 +25,7 @@ import { IntermediateService } from './IntermediateService'
 
 export function buildIntermediateService<T = any>(
 	constructor: Constructor<T>,
-	configurators: IPlugin[]
+	plugins: IPlugin[]
 ): IIntermediateService {
 	if (!Reflect.hasOwnMetadata(Metadata.SERVICE_OPTIONS, constructor)) {
 		throw new Errors.MissingServiceDecoratorError(constructor.name)
@@ -60,7 +60,7 @@ export function buildIntermediateService<T = any>(
 	// Default logProvider
 	container.bind<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE).to(ConsoleLoggerProvider)
 
-	configurators.forEach((configurator: IPlugin) => configurator.configure(container))
+	plugins.forEach((plugin: IPlugin) => plugin.configure(container))
 
 	const hasConfigSources: boolean = container.isBound(ContainerConstant.CONFIG_SOURCES)
 	if (hasConfigSources) {

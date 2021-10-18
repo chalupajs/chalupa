@@ -7,10 +7,10 @@ import { buildIntermediateService } from './IntermediateService/IntermediateServ
  * some representation of your service.
  */
 export class Catamaran {
-	static configurators: IPlugin[] = []
+	static plugins: IPlugin[] = []
 
-	static use(configurator: IPlugin) {
-		this.configurators.push(configurator)
+	static use(plugin: IPlugin) {
+		this.plugins.push(plugin)
 	}
 
 	/**
@@ -25,7 +25,7 @@ export class Catamaran {
 		serviceEntrypoint: Constructor,
 		builder: Constructor<IBuilderStrategy<T>>
 	): Promise<T> {
-		const intermediateService = buildIntermediateService(serviceEntrypoint, this.configurators)
+		const intermediateService = buildIntermediateService(serviceEntrypoint, this.plugins)
 		const builderInstance = new builder()
 		return builderInstance.build(intermediateService)
 	}
