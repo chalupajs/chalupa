@@ -98,9 +98,8 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 
 	close(): void {
 		if (this._keepAlive) {
-		{
-clearInterval(this._keepAlive)
-}
+			clearInterval(this._keepAlive)
+		}
 	}
 
 	onEntityAppeared(cb: CallableFunction): void {
