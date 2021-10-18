@@ -18,7 +18,7 @@ import {
 
 import { ensureInjectable } from '@catamaranjs/interface/src/annotation_utils'
 import { ContextContainer, NO_PARENT } from '../../Container/ContextContainer'
-import { ConsoleLoggerProvider } from '../../Log/console-logger/ConsoleLoggerProvider'
+import { ConsoleLoggerProvider } from '../../Log/Console/ConsoleLoggerProvider'
 import { extractServiceOptions } from '../annotation_utils'
 import { IConfigurator } from '../../Configurator/IConfigurator'
 import { IntermediateService } from './IntermediateService'

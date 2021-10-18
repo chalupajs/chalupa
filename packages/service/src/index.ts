@@ -8,9 +8,9 @@ export { Catamaran } from './Interpretation/Catamaran'
 export { InMemoryStrategy } from './Communication/InMemory/InMemoryStrategy'
 
 // ----------- Logging -----------//
-export { ConsoleLoggerProvider } from './Log/console-logger/ConsoleLoggerProvider'
-export { ConsoleLogger } from './Log/console-logger/ConsoleLogger'
-export { IConsoleLog, ConsoleLog } from './Log/console-logger/ConsoleLog'
+export { ConsoleLoggerProvider } from './Log/Console/ConsoleLoggerProvider'
+export { ConsoleLogger } from './Log/Console/ConsoleLogger'
+export { IConsoleLog, ConsoleLog } from './Log/Console/ConsoleLog'
 
 // ----------- Container -----------//
 export { ContextContainer } from './Container/ContextContainer'
