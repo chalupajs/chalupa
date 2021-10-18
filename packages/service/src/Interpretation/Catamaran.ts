@@ -9,8 +9,10 @@ import { buildIntermediateService } from './IntermediateService/IntermediateServ
 export class Catamaran {
 	static plugins: IPlugin[] = []
 
-	static use(plugin: IPlugin) {
+	static use(plugin: IPlugin): Catamaran {
 		this.plugins.push(plugin)
+		
+		return Catamaran
 	}
 
 	/**
