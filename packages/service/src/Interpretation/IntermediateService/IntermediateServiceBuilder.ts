@@ -21,7 +21,8 @@ import { ConsoleLoggerProvider } from '../../Log/Console/ConsoleLoggerProvider'
 import { extractServiceOptions } from '../annotation_utils'
 import { IPlugin } from '../../Plugin/IPlugin'
 import { IntermediateService } from './IntermediateService'
-import {NO_PARENT} from "../../Container/ContextContainer";
+
+const NO_PARENT = null
 
 export function buildIntermediateService<T = any>(
 	constructor: Constructor<T>,

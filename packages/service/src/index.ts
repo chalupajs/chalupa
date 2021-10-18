@@ -12,9 +12,6 @@ export { ConsoleLoggerProvider } from './Log/Console/ConsoleLoggerProvider'
 export { ConsoleLogger } from './Log/Console/ConsoleLogger'
 export { IConsoleLog, ConsoleLog } from './Log/Console/ConsoleLog'
 
-// ----------- Container -----------//
-export { ContextContainer } from './Container/ContextContainer'
-
 // ----------- Plugin -----------//
 export { IPlugin } from './Plugin/IPlugin'
 // Configurators
