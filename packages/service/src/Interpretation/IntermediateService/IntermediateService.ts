@@ -6,10 +6,10 @@ import {
 	LoggerFactory,
 	ServiceOptions,
 	IDependencyGraph,
-} from "@catamaranjs/interface";
-import { extractServiceOptions } from "../annotation_utils";
-import { IServiceBridge } from "@catamaranjs/interface/src/Interpretation/IServiceBridge";
-import { ServiceBridge } from "../ServiceBridge";
+} from '@catamaranjs/interface'
+import { IServiceBridge } from '@catamaranjs/interface/src/Interpretation/IServiceBridge'
+import { extractServiceOptions } from '../annotation_utils'
+import { ServiceBridge } from '../ServiceBridge'
 
 export class IntermediateService implements IIntermediateService {
 	container: InversifyContainer
@@ -26,8 +26,8 @@ export class IntermediateService implements IIntermediateService {
 		serviceConstructor: Constructor,
 		public readonly moduleDependencyGraph: IDependencyGraph<Constructor>
 	) {
-		this.container = container;
-		this.serviceConstructor = serviceConstructor;
+		this.container = container
+		this.serviceConstructor = serviceConstructor
 		this.serviceOptions = extractServiceOptions(serviceConstructor)
 		const loggerFactory = container.get<LoggerFactory>(LoggerFactory)
 		this._logger = loggerFactory.getLogger('CommunicationLayer')
@@ -53,11 +53,11 @@ export class IntermediateService implements IIntermediateService {
 				this.moduleDependencyGraph
 			)
 		}
+
 		return this._serviceBridgeSingleton
 	}
 
 	getServiceFromContainer(): any {
 		return this.container.get<any>(this.serviceConstructor)
 	}
-
 }

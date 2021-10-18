@@ -1,25 +1,19 @@
-import { ICommunicationChannel, Injectable } from "@catamaranjs/interface";
-import InMemoryOrchestrator from "./InMemoryOrchestrator";
+import { ICommunicationChannel, Injectable } from '@catamaranjs/interface'
+import InMemoryOrchestrator from './InMemoryOrchestrator'
 
 @Injectable()
 export class InMemoryCommunicationChannel implements ICommunicationChannel {
-
 	emit(serviceName: string, eventName: any, parameters: any[], terms: Record<string, any>): void {
-		InMemoryOrchestrator.emitTo(
-			serviceName,
-			eventName,
-			parameters,
-			terms
-		)
+		InMemoryOrchestrator.emitTo(serviceName, eventName, parameters, terms)
 	}
 
-	request<T>(serviceName: string, serviceMethodName: string, parameters: any[], terms: Record<string, any>): Promise<T> {
-		return InMemoryOrchestrator.request<T>(
-			serviceName,
-			serviceMethodName,
-			parameters,
-			terms
-		)
+	request<T>(
+		serviceName: string,
+		serviceMethodName: string,
+		parameters: any[],
+		terms: Record<string, any>
+	): Promise<T> {
+		return InMemoryOrchestrator.request<T>(serviceName, serviceMethodName, parameters, terms)
 	}
 
 	services(serviceName: string): Promise<string[]> {

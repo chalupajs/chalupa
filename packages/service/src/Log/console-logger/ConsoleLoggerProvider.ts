@@ -1,6 +1,6 @@
 import { ILogger, ILogProvider, LogConfig, Injectable } from '@catamaranjs/interface'
-import { ConsoleLog } from "./ConsoleLog";
-import { ConsoleLogger } from "./ConsoleLogger";
+import { ConsoleLog } from './ConsoleLog'
+import { ConsoleLogger } from './ConsoleLogger'
 
 @Injectable()
 export class ConsoleLoggerProvider implements ILogProvider {
@@ -11,9 +11,6 @@ export class ConsoleLoggerProvider implements ILogProvider {
 	}
 
 	createRootLogger(name: string): ILogger {
-		return new ConsoleLogger(new ConsoleLog(
-			name,
-			this.config.level,
-		))
+		return new ConsoleLogger(new ConsoleLog(name, this.config.level))
 	}
 }

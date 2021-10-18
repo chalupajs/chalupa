@@ -1,5 +1,5 @@
 import { ILogger, AbstractLoggerAdapter } from '@catamaranjs/interface'
-import { IConsoleLog } from "./ConsoleLog";
+import { IConsoleLog } from './ConsoleLog'
 
 export class ConsoleLogger extends AbstractLoggerAdapter {
 	private readonly loggerInstance: IConsoleLog

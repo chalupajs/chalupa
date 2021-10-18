@@ -1,6 +1,6 @@
 import pino from 'pino'
-import { PinoLogger } from './PinoLogger'
 import { ILogger, ILogProvider, LogConfig, Inject, Injectable } from '@catamaranjs/interface'
+import { PinoLogger } from './PinoLogger'
 
 @Injectable()
 export class PinoLogProvider implements ILogProvider {

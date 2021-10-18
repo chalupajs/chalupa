@@ -1,4 +1,4 @@
-import { TinyEmitter } from "tiny-emitter"
+import { TinyEmitter } from 'tiny-emitter'
 
 export interface IMemoryService {
 	callMethod<T>(methodName: string, parameters: any[]): Promise<T>
@@ -10,18 +10,15 @@ export interface IMemoryService {
 	link(): void
 }
 
-export class MemoryService implements IMemoryService{
+export class MemoryService implements IMemoryService {
 	private _serviceName: string
 	private _messageBus: TinyEmitter
 	private _methodMap: Map<string, CallableFunction>
 	private _isLinked: boolean
 
-	constructor(
-		serviceName: string,
-		messageBus: TinyEmitter
-	) {
-		this._serviceName = serviceName;
-		this._messageBus = messageBus;
+	constructor(serviceName: string, messageBus: TinyEmitter) {
+		this._serviceName = serviceName
+		this._messageBus = messageBus
 		this._methodMap = new Map<string, CallableFunction>()
 		this._isLinked = false
 	}
@@ -30,24 +27,26 @@ export class MemoryService implements IMemoryService{
 		this._isLinked = true
 	}
 
-	get methods (): string[] {
-		return Array.from(this._methodMap.keys())
+	get methods(): string[] {
+		return [...this._methodMap.keys()]
 	}
 
 	addEvent(eventName: string, fn: Function): this {
 		this._messageBus.on(`${this._serviceName}_${eventName}`, fn)
-		if(this._isLinked) {
+		if (this._isLinked) {
 			this._messageBus.emit('entityUpdated', this._serviceName)
 		}
-		return this;
+
+		return this
 	}
 
 	addMethod(methodName: string, fn: Function): this {
 		this._methodMap.set(methodName, fn)
-		if(this._isLinked) {
+		if (this._isLinked) {
 			this._messageBus.emit('entityUpdated', this._serviceName)
 		}
-		return this;
+
+		return this
 	}
 
 	callEvent(eventName: string, parameters: any[]): void {
@@ -55,16 +54,21 @@ export class MemoryService implements IMemoryService{
 	}
 
 	callMethod<T>(methodName: string, parameters: any[]): Promise<T> {
-		if(!this._methodMap.has(methodName)) {
+		if (!this._methodMap.has(methodName)) {
 			throw new Error(`Method '${methodName}' is not exists on service ${this._serviceName}`)
 		}
-		return this._methodMap.get(methodName)!(...parameters);
-	}
 
+		return this._methodMap.get(methodName)!(...parameters)
+	}
 }
 
 export interface IInMemoryOrchestrator {
-	request<T>(serviceName: string, serviceMethodName: string, parameters: any[], terms: Record<string, any>): Promise<T>
+	request<T>(
+		serviceName: string,
+		serviceMethodName: string,
+		parameters: any[],
+		terms: Record<string, any>
+	): Promise<T>
 	emitTo(serviceName: string, eventName: any, parameters: any[], terms: Record<string, any>): void
 	services: string[]
 	methods(serviceName: string): Promise<string[]>
@@ -87,22 +91,26 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 	}
 
 	keepServiceAlive() {
-		if(typeof this._keepAlive === 'undefined') {
-			this._keepAlive = setInterval(() => {}, 1 << 30);
+		if (typeof this._keepAlive === 'undefined') {
+			this._keepAlive = setInterval(() => {}, 1 << 30)
 		}
 	}
 
 	close(): void {
-		if(this._keepAlive)
-			clearInterval(this._keepAlive)
+		if (this._keepAlive) {
+		{
+clearInterval(this._keepAlive)
+}
 	}
 
 	onEntityAppeared(cb: CallableFunction): void {
 		this._messageBus.on('entityAppeared', cb)
 	}
+
 	onEntityUpdated(cb: CallableFunction): void {
 		this._messageBus.on('entityUpdated', cb)
 	}
+
 	onEntityDisappeared(cb: CallableFunction): void {
 		this._messageBus.on('entityDisappeared', cb)
 	}
@@ -111,30 +119,40 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 		const service = new MemoryService(serviceName, this._messageBus)
 		this._services.set(serviceName, service)
 		this._messageBus.emit('entityAppeared', serviceName)
-		return service;
+		return service
 	}
 
-	request<T>(serviceName: string, serviceMethodName: string, parameters: any[], _terms: Record<string, any>): Promise<T> {
-		if(!this._services.has(serviceName)) {
+	request<T>(
+		serviceName: string,
+		serviceMethodName: string,
+		parameters: any[],
+		_terms: Record<string, any>
+	): Promise<T> {
+		if (!this._services.has(serviceName)) {
 			throw new Error('Service not exists!')
 		}
+
 		return this._services.get(serviceName)!.callMethod<T>(serviceMethodName, parameters)
 	}
+
 	emitTo(serviceName: string, eventName: any, parameters: any[], _terms: Record<string, any>): void {
 		this._messageBus.emit(`${serviceName}_${eventName}`, ...parameters)
 	}
-	get services (): string[] {
-		return Array.from(this._services.keys())
+
+	get services(): string[] {
+		return [...this._services.keys()]
 	}
 
 	methods(serviceName: string): Promise<string[]> {
-		if(!this._services.has(serviceName)) {
+		if (!this._services.has(serviceName)) {
 			throw new Error(`Service '${serviceName}' not exists!`)
 		}
-		return Promise.resolve(Array.from(this._services.get(serviceName)!.methods))
+
+		return Promise.resolve([...this._services.get(serviceName)!.methods])
 	}
+
 	broadcast(eventName: string, parameters: any[], _terms: Record<string, any>): void {
-		for(let serviceName in this._services.keys()) {
+		for (const serviceName in this._services.keys()) {
 			this._messageBus.emit(`${serviceName}_${eventName}`, ...parameters)
 		}
 	}

@@ -6,12 +6,15 @@ import {
 	LoggerFactory,
 	IBuilderStrategy,
 	IIntermediateService,
-	Metadata, reconfigureToEnvPrefix, ICommunicationChannel, ContainerConstant
+	Metadata,
+	reconfigureToEnvPrefix,
+	ICommunicationChannel,
+	ContainerConstant,
 } from '@catamaranjs/interface'
 
+import { DarconConfig } from '../Config/DarconConfig'
 import { ConstructedService } from './ConstructedService'
-import { DarconConfig } from "../Config/DarconConfig";
-import { DarconCommunicationChannel } from "./DarconCommunicationChannel";
+import { DarconCommunicationChannel } from './DarconCommunicationChannel'
 
 /**
  * Strategy which builds a self-contained, executable service, that can publish itself to Darcon.
@@ -71,19 +74,28 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 			},
 			millieu: {},
 			async entityUpdated(_: any, name: string, terms = {}) {
-				if (isItMe(name)) return 'OK'
+				if (isItMe(name)) {
+					return 'OK'
+				}
+
 				await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityUpdated, [name, terms])
 				return 'OK'
 			},
 
 			async entityDisappeared(_: any, name: string) {
-				if (isItMe(name)) return 'OK'
+				if (isItMe(name)) {
+					return 'OK'
+				}
+
 				await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityDisappeared, [name])
 				return 'OK'
 			},
 
 			async entityAppeared(_: any, name: string) {
-				if (isItMe(name)) return 'OK'
+				if (isItMe(name)) {
+					return 'OK'
+				}
+
 				await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityAppeared, [name])
 				depends = depends.filter(depend => depend !== name)
 				darconLogger.info(`'${name}' appeared on the network`)
@@ -92,7 +104,9 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 		})
 
 		container.bind<any>('darcon').toConstantValue(darcon)
-		container.bind<ICommunicationChannel>(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE).to(DarconCommunicationChannel)
+		container
+			.bind<ICommunicationChannel>(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE)
+			.to(DarconCommunicationChannel)
 
 		const services: string[] = []
 		const events: string[] = []
@@ -112,7 +126,6 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 				return events
 			},
 		}
-
 
 		serviceBridge
 			.serviceMethodHandler((externalName: string, fn: any) => {

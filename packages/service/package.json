@@ -12,8 +12,8 @@
 		"compile": "tsc -p tsconfig.build.json",
 		"compile:watch": "tsc -p tsconfig.build.json --watch",
 		"docs": "typedoc --out generated-docs src",
-		"lint": "xo",
-		"lint:fix": "xo --fix",
+		"lint": "eslint ./src",
+		"lint:fix": "eslint ./src --fix",
 		"prepublishOnly": "pnpm run clean && pnpm run compile",
 	    "test": "jest --coverage",
 	    "test:watch": "jest --watch"

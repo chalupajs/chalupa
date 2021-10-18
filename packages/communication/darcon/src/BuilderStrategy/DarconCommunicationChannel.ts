@@ -1,6 +1,6 @@
-import { ContainerConstant, ICommunicationChannel, Inject, Injectable } from "@catamaranjs/interface";
-import Darcon = darcon.Darcon;
-import { newUID } from "../util";
+import { ContainerConstant, ICommunicationChannel, Inject, Injectable } from '@catamaranjs/interface'
+import Darcon = darcon.Darcon
+import { newUID } from '../util'
 
 const DarconCommunication = Object.freeze({
 	Request: 'R',
@@ -12,11 +12,8 @@ export class DarconCommunicationChannel implements ICommunicationChannel {
 	private _darcon: Darcon
 	private _serviceName: string
 
-	constructor(
-		@Inject('darcon') darcon: darcon.Darcon,
-		@Inject(ContainerConstant.SERVICE_NAME) serviceName: string
-	) {
-		this._darcon = darcon;
+	constructor(@Inject('darcon') darcon: darcon.Darcon, @Inject(ContainerConstant.SERVICE_NAME) serviceName: string) {
+		this._darcon = darcon
 		this._serviceName = serviceName
 	}
 
@@ -24,18 +21,15 @@ export class DarconCommunicationChannel implements ICommunicationChannel {
 		const flowID = terms.flowID ?? newUID()
 		const processID = terms.processID ?? newUID()
 
-		this._darcon.comm(
-			DarconCommunication.Inform,
-			flowID,
-			processID,
-			serviceName,
-			eventName,
-			parameters,
-			terms
-		)
+		this._darcon.comm(DarconCommunication.Inform, flowID, processID, serviceName, eventName, parameters, terms)
 	}
 
-	request<T>(serviceName: string, serviceMethodName: string, parameters: any[], terms: Record<string, any>): Promise<T> {
+	request<T>(
+		serviceName: string,
+		serviceMethodName: string,
+		parameters: any[],
+		terms: Record<string, any>
+	): Promise<T> {
 		const flowID = terms.flowID ?? newUID()
 		const processID = terms.processID ?? newUID()
 
@@ -54,19 +48,10 @@ export class DarconCommunicationChannel implements ICommunicationChannel {
 		const flowID = newUID()
 		const processID = newUID()
 
-		return this._darcon.comm(
-			DarconCommunication.Request,
-			flowID,
-			processID,
-			serviceName,
-			'services',
-			[],
-			{}
-		)
+		return this._darcon.comm(DarconCommunication.Request, flowID, processID, serviceName, 'services', [], {})
 	}
 
 	broadcast(eventName: string, _parameters: any[], _terms: Record<string, any>) {
 		this._darcon.proclaim(this._serviceName, eventName, _terms)
 	}
-
 }

@@ -1,6 +1,13 @@
-import { IServiceBridge } from "@catamaranjs/interface/src/Interpretation/IServiceBridge";
-import { Constructor, ILogger, InversifyContainer, Metadata, ServiceOptions, IDependencyGraph } from "@catamaranjs/interface";
-import { timeout } from "../util";
+import { IServiceBridge } from '@catamaranjs/interface/src/Interpretation/IServiceBridge'
+import {
+	Constructor,
+	ILogger,
+	InversifyContainer,
+	Metadata,
+	ServiceOptions,
+	IDependencyGraph,
+} from '@catamaranjs/interface'
+import { timeout } from '../util'
 
 export class ServiceBridge implements IServiceBridge {
 	private _container: InversifyContainer
@@ -13,7 +20,7 @@ export class ServiceBridge implements IServiceBridge {
 		[Metadata.ModuleLifecycle.PreServiceInit]: [],
 		[Metadata.ModuleLifecycle.PostServiceInit]: [],
 		[Metadata.ModuleLifecycle.PreServiceDestroy]: [],
-		[Metadata.ModuleLifecycle.PostServiceDestroy]: []
+		[Metadata.ModuleLifecycle.PostServiceDestroy]: [],
 	}
 
 	private _serviceEventHandler?: (externalName: string, fn: any) => void
@@ -29,10 +36,10 @@ export class ServiceBridge implements IServiceBridge {
 		logger: ILogger,
 		private readonly moduleDependencyGraph: IDependencyGraph<Constructor>
 	) {
-		this._container = container;
-		this._serviceConstructor = serviceConstructor;
-		this._serviceOptions = serviceOptions;
-		this._logger = logger;
+		this._container = container
+		this._serviceConstructor = serviceConstructor
+		this._serviceOptions = serviceOptions
+		this._logger = logger
 	}
 
 	private _getServiceFromContainer(): any {
@@ -47,12 +54,12 @@ export class ServiceBridge implements IServiceBridge {
 
 	suppressEventWarning(): IServiceBridge {
 		this._suppressMissingEventHandlerWarning = true
-		return this;
+		return this
 	}
 
 	suppressMethodWarning(): IServiceBridge {
 		this._suppressMissingMethodHandlerWarning = true
-		return this;
+		return this
 	}
 
 	private _collectLifecycleMetadata(symbol: Metadata.ModuleLifecycle, proto: any, instance: any) {
@@ -62,15 +69,22 @@ export class ServiceBridge implements IServiceBridge {
 		}
 	}
 
-	private _registerServiceMethodsAndServiceEvents (target: any, prototype: any) {
-		const serviceMethodMap: Map<string, string> | undefined = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, prototype)
-		if(serviceMethodMap && typeof this._serviceMethodHandler !== 'undefined') {
+	private _registerServiceMethodsAndServiceEvents(target: any, prototype: any) {
+		const serviceMethodMap: Map<string, string> | undefined = Reflect.getMetadata(
+			Metadata.METADATA_SERVICE_MAP,
+			prototype
+		)
+		if (serviceMethodMap && typeof this._serviceMethodHandler !== 'undefined') {
 			serviceMethodMap.forEach((propertyKey: string, externalName: string) => {
 				this._serviceMethodHandler!(externalName, target[propertyKey].bind(target))
 			})
 		}
-		const serviceEventMap: Map<string, string> | undefined = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, prototype)
-		if(serviceEventMap && typeof this._serviceEventHandler !== 'undefined') {
+
+		const serviceEventMap: Map<string, string> | undefined = Reflect.getMetadata(
+			Metadata.METADATA_EVENT_MAP,
+			prototype
+		)
+		if (serviceEventMap && typeof this._serviceEventHandler !== 'undefined') {
 			serviceEventMap.forEach((propertyKey: string, externalName: string) => {
 				this._serviceEventHandler!(externalName, target[propertyKey].bind(target))
 			})
@@ -78,12 +92,14 @@ export class ServiceBridge implements IServiceBridge {
 	}
 
 	buildDependencyTree(): IServiceBridge {
-		if(typeof this._serviceMethodHandler === 'undefined' && !this._suppressMissingMethodHandlerWarning) {
+		if (typeof this._serviceMethodHandler === 'undefined' && !this._suppressMissingMethodHandlerWarning) {
 			this._logger.warn('Missing serviceMethodHandler in ServiceBridge during service building')
 		}
-		if(typeof this._serviceEventHandler === 'undefined' && !this._suppressMissingEventHandlerWarning) {
+
+		if (typeof this._serviceEventHandler === 'undefined' && !this._suppressMissingEventHandlerWarning) {
 			this._logger.warn('Missing serviceEventHandler in ServiceBridge during service building')
 		}
+
 		this._ensureServiceBuilded()
 		this._registerServiceMethodsAndServiceEvents(this._service, this._serviceConstructor.prototype)
 
@@ -97,32 +113,16 @@ export class ServiceBridge implements IServiceBridge {
 
 			this._registerServiceMethodsAndServiceEvents(instance, constructor.prototype)
 
-			this._collectLifecycleMetadata(
-				Metadata.ModuleLifecycle.PreServiceInit,
-				constructor.prototype,
-				instance
-			)
-			this._collectLifecycleMetadata(
-				Metadata.ModuleLifecycle.PostServiceInit,
-				constructor.prototype,
-				instance
-			)
-			this._collectLifecycleMetadata(
-				Metadata.ModuleLifecycle.PreServiceDestroy,
-				constructor.prototype,
-				instance
-			)
-			this._collectLifecycleMetadata(
-				Metadata.ModuleLifecycle.PostServiceDestroy,
-				constructor.prototype,
-				instance
-			)
+			this._collectLifecycleMetadata(Metadata.ModuleLifecycle.PreServiceInit, constructor.prototype, instance)
+			this._collectLifecycleMetadata(Metadata.ModuleLifecycle.PostServiceInit, constructor.prototype, instance)
+			this._collectLifecycleMetadata(Metadata.ModuleLifecycle.PreServiceDestroy, constructor.prototype, instance)
+			this._collectLifecycleMetadata(Metadata.ModuleLifecycle.PostServiceDestroy, constructor.prototype, instance)
 		}
 
 		this._moduleMethodArrays[Metadata.ModuleLifecycle.PreServiceDestroy].reverse()
 		this._moduleMethodArrays[Metadata.ModuleLifecycle.PostServiceDestroy].reverse()
 
-		return this;
+		return this
 	}
 
 	private async _callModuleLifecycleMethods(symbol: Metadata.ModuleLifecycle) {
@@ -133,7 +133,7 @@ export class ServiceBridge implements IServiceBridge {
 		this._ensureServiceBuilded()
 
 		await this._callModuleLifecycleMethods(
-			(symbol === Metadata.ServiceLifecycle.PostInit)
+			symbol === Metadata.ServiceLifecycle.PostInit
 				? Metadata.ModuleLifecycle.PreServiceInit
 				: Metadata.ModuleLifecycle.PreServiceDestroy
 		)
@@ -141,8 +141,9 @@ export class ServiceBridge implements IServiceBridge {
 		if (typeof key !== 'undefined') {
 			await this._service[key]()
 		}
+
 		await this._callModuleLifecycleMethods(
-			(symbol === Metadata.ServiceLifecycle.PostInit)
+			symbol === Metadata.ServiceLifecycle.PostInit
 				? Metadata.ModuleLifecycle.PostServiceInit
 				: Metadata.ModuleLifecycle.PostServiceDestroy
 		)
@@ -150,10 +151,7 @@ export class ServiceBridge implements IServiceBridge {
 	}
 
 	async callNetworkEvent(symbol: Metadata.NetworkEvent, parameters: any[]): Promise<IServiceBridge> {
-		const propertyKey: string | null = Reflect.getMetadata(
-			symbol,
-			this._serviceConstructor.prototype
-		)
+		const propertyKey: string | null = Reflect.getMetadata(symbol, this._serviceConstructor.prototype)
 
 		if (propertyKey) {
 			this._ensureServiceBuilded()
@@ -163,6 +161,7 @@ export class ServiceBridge implements IServiceBridge {
 				this._logger.error(error)
 			}
 		}
+
 		return this
 	}
 
@@ -170,19 +169,19 @@ export class ServiceBridge implements IServiceBridge {
 		if (this._serviceOptions.delayStart) {
 			this._logger.info(`Waiting ${this._serviceOptions.delayStart} milliseconds for start`)
 			await timeout(this._serviceOptions.delayStart)
-			this._logger.info(`Delay ended!`)
+			this._logger.info('Delay ended!')
 		}
+
 		return this
 	}
 
 	serviceEventHandler(cb: (externalName: string, fn: any) => void): IServiceBridge {
 		this._serviceEventHandler = cb
-		return this;
+		return this
 	}
 
 	serviceMethodHandler(cb: (externalName: string, fn: any) => void): IServiceBridge {
 		this._serviceMethodHandler = cb
-		return this;
+		return this
 	}
-
 }

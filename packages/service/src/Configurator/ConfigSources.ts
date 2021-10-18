@@ -1,11 +1,11 @@
-import { ContainerConstant, InversifyContainer } from "@catamaranjs/interface";
-import { IConfigurator } from "./IConfigurator";
+import { ContainerConstant, InversifyContainer } from '@catamaranjs/interface'
+import { IConfigurator } from './IConfigurator'
 
 export class ConfigSources implements IConfigurator {
 	private readonly _configSources: string[]
 
 	constructor(configSources: string[]) {
-		this._configSources = configSources;
+		this._configSources = configSources
 	}
 
 	static from(configSources: string[]): ConfigSources {
@@ -15,5 +15,4 @@ export class ConfigSources implements IConfigurator {
 	configure(container: InversifyContainer): void {
 		container.bind<string[]>(ContainerConstant.CONFIG_SOURCES).toConstantValue(this._configSources)
 	}
-
 }

@@ -1,6 +1,6 @@
 import { Constructor, IBuilderStrategy } from '@catamaranjs/interface'
+import { IConfigurator } from '../Configurator/IConfigurator'
 import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
-import { IConfigurator } from "../Configurator/IConfigurator";
 
 /**
  * The entrypoint of the framework. Use this object to construct

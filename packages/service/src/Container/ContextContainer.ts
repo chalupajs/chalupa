@@ -1,6 +1,6 @@
 import { InversifyContainer, Constructor, IContextContainer } from '@catamaranjs/interface'
 
-export type ModuleBindingProcessor = (current: Constructor, parent: Constructor | null) => void;
+export type ModuleBindingProcessor = (current: Constructor, parent: Constructor | null) => void
 
 export const NO_PARENT = null
 

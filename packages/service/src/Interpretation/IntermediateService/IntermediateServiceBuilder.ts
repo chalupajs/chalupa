@@ -10,20 +10,18 @@ import {
 	ILogProvider,
 	LoggerFactory,
 	Errors,
-	Metadata, reconfigureToEnvPrefix,
+	Metadata,
+	reconfigureToEnvPrefix,
 	configurator,
 	DependencyGraph,
 } from '@catamaranjs/interface'
 
-
-
+import { ensureInjectable } from '@catamaranjs/interface/src/annotation_utils'
 import { ContextContainer, NO_PARENT } from '../../Container/ContextContainer'
-import { ConsoleLoggerProvider } from "../../Log/console-logger/ConsoleLoggerProvider";
-import { extractServiceOptions } from "../annotation_utils";
-import { IntermediateService } from "./IntermediateService";
-import { IConfigurator } from "../../Configurator/IConfigurator";
-import { ensureInjectable } from "@catamaranjs/interface/src/annotation_utils";
-
+import { ConsoleLoggerProvider } from '../../Log/console-logger/ConsoleLoggerProvider'
+import { extractServiceOptions } from '../annotation_utils'
+import { IConfigurator } from '../../Configurator/IConfigurator'
+import { IntermediateService } from './IntermediateService'
 
 export function buildIntermediateService<T = any>(
 	constructor: Constructor<T>,
@@ -45,9 +43,7 @@ export function buildIntermediateService<T = any>(
 	// Bind the service name to the container
 	container.bind<string>(ContainerConstant.SERVICE_NAME).toConstantValue(serviceOptions.name)
 	// Bind the service directory to the container
-	container
-		.bind<string>(ContainerConstant.SERVICE_DIRECTORY)
-		.toConstantValue(serviceOptions.serviceDirectory)
+	container.bind<string>(ContainerConstant.SERVICE_DIRECTORY).toConstantValue(serviceOptions.serviceDirectory)
 
 	// Bind the service to the container
 	container.bind<T>(constructor).toSelf()
@@ -56,12 +52,9 @@ export function buildIntermediateService<T = any>(
 
 	// Bind config to container
 	if (serviceOptions.config) {
-		container.bind<any>(serviceOptions.config).to(
-			reconfigureToEnvPrefix(
-				serviceOptions.envPrefix,
-				ensureInjectable(serviceOptions.config)
-			)
-		)
+		container
+			.bind<any>(serviceOptions.config)
+			.to(reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(serviceOptions.config)))
 	}
 
 	// Default logProvider
@@ -90,23 +83,36 @@ export function buildIntermediateService<T = any>(
 		})
 	}
 
-	const moduleDependencyGraph = new DependencyGraph<Constructor>();
+	const moduleDependencyGraph = new DependencyGraph<Constructor>()
 
 	const handleErrorHandlers = function (scope: Constructor) {
-		const errorHandlers: Map<string, Constructor<Error>[]> | null = Reflect.getMetadata(Metadata.METADATA_ERROR_HANDLER_MAP, scope.prototype)
+		const errorHandlers: Map<string, Constructor<Error>[]> | null = Reflect.getMetadata(
+			Metadata.METADATA_ERROR_HANDLER_MAP,
+			scope.prototype
+		)
 
 		if (!errorHandlers) {
 			return
 		}
 
-		const serviceMethods: Map<string, string> | null = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, scope.prototype)
+		const serviceMethods: Map<string, string> | null = Reflect.getMetadata(
+			Metadata.METADATA_SERVICE_MAP,
+			scope.prototype
+		)
 		serviceMethods?.forEach(internalName => wrapWithErrorHandling(scope, internalName, errorHandlers))
 
-		const serviceEvents: Map<string, string> | null = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, scope.prototype)
+		const serviceEvents: Map<string, string> | null = Reflect.getMetadata(
+			Metadata.METADATA_EVENT_MAP,
+			scope.prototype
+		)
 		serviceEvents?.forEach(internalName => wrapWithErrorHandling(scope, internalName, errorHandlers))
 	}
 
-	const wrapWithErrorHandling = function (scope: Constructor, internalName: string, errorHandlers: Map<string, Constructor<Error>[]>) {
+	const wrapWithErrorHandling = function (
+		scope: Constructor,
+		internalName: string,
+		errorHandlers: Map<string, Constructor<Error>[]>
+	) {
 		const originalFunction = scope.prototype[internalName]
 
 		scope.prototype[internalName] = async function (...args: unknown[]) {
@@ -135,7 +141,9 @@ export function buildIntermediateService<T = any>(
 
 		const moduleOptions: ModuleOptions = Reflect.getMetadata(Metadata.METADATA_MODULE_OPTIONS, current)
 		if (moduleOptions.config) {
-			container.bind(moduleOptions.config).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(moduleOptions.config)))
+			container
+				.bind(moduleOptions.config)
+				.to(reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(moduleOptions.config)))
 		}
 
 		handleExternalServices(moduleOptions.externalServices)
@@ -154,14 +162,12 @@ export function buildIntermediateService<T = any>(
 	const handleInject = function (optionsObject: ServiceOptions | ModuleOptions, parent: Constructor | null) {
 		if (optionsObject.inject) {
 			if (Array.isArray(optionsObject.inject)) {
-				for (const injectable of optionsObject.inject) container.bind(injectable).toSelf()
+				for (const injectable of optionsObject.inject) {
+					container.bind(injectable).toSelf()
+				}
 			} else {
 				optionsObject.inject(
-					new ContextContainer(
-						container,
-						moduleBindingProcessor,
-						parent
-					),
+					new ContextContainer(container, moduleBindingProcessor, parent),
 					optionsObject.config ? container.get<any>(optionsObject.config) : undefined
 				)
 			}
