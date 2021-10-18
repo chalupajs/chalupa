@@ -150,8 +150,14 @@ export function buildIntermediateService<T = any>(
 	const handleInject = function (optionsObject: ServiceOptions | ModuleOptions, parent: Constructor | null) {
 		if (optionsObject.inject) {
 			if (Array.isArray(optionsObject.inject)) {
-				for (const injectable of optionsObject.inject) {
-					container.bind(injectable).toSelf()
+				for (const constructor of optionsObject.inject) {
+					if (isConfiguration(constructor)) {
+						const reconfiguredConfig = reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(constructor))
+
+						container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
+					} else {
+						container.bind<T>(constructor).toSelf().inSingletonScope()
+					}
 				}
 			} else {
 				optionsObject.inject(contextFactory(container, parent))
