@@ -1,5 +1,5 @@
 import { ContainerConstant, InversifyContainer } from '@catamaranjs/interface'
-import { IPlugin } from './IPlugin'
+import { IPlugin } from '../Plugin/IPlugin'
 
 export class ConfigSources implements IPlugin {
 	private readonly _configSources: string[]

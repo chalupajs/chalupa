@@ -19,4 +19,4 @@ export { ContextContainer } from './Container/ContextContainer'
 export { IPlugin } from './Plugin/IPlugin'
 // Configurators
 export { LogProvider } from './Log/Provider/LogProvider'
-export { ConfigSources } from './Plugin/ConfigSources'
+export { ConfigSources } from './Configuration/ConfigSources'
