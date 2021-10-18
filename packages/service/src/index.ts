@@ -18,5 +18,5 @@ export { ContextContainer } from './Container/ContextContainer'
 // ----------- Configurator -----------//
 export { IConfigurator } from './Configurator/IConfigurator'
 // Configurators
-export { LogProvider } from './Configurator/LogProvider'
+export { LogProvider } from './Log/Provider/LogProvider'
 export { ConfigSources } from './Configurator/ConfigSources'
