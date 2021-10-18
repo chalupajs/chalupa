@@ -8,7 +8,9 @@ import {DarconBuilderStrategy} from '@catamaranjs/communication-darcon'
 class TestService {}
 
 async function start() {
-	const service = await Catamaran.createServiceWithStrategy(TestService, DarconBuilderStrategy)
+	const service = await Catamaran
+		.builder()
+		.createServiceWithStrategy(TestService, DarconBuilderStrategy)
 	await service.start()
 }
 

@@ -1,6 +1,6 @@
 import {
 	Catamaran,
-	InMemoryStrategy
+	InMemoryStrategy, LogProvider
 } from '@catamaranjs/service'
 import {
 	Service,
@@ -9,6 +9,7 @@ import {
 	LoggerFactory,
 	NetworkEvent,
 } from '@catamaranjs/interface'
+import {PinoLogProvider} from "@catamaranjs/logger-pino";
 
 @Service()
 class TestService {
@@ -35,7 +36,10 @@ class TestService {
 }
 
 async function start() {
-	const service = await Catamaran.createServiceWithStrategy(TestService, InMemoryStrategy)
+	const service = await Catamaran
+		.builder()
+		.use(LogProvider.provider(PinoLogProvider))
+		.createServiceWithStrategy(TestService, InMemoryStrategy)
 	await service.start()
 }
 

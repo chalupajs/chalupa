@@ -1,5 +1,5 @@
 import {
-	Catamaran,
+	Catamaran, LogProvider,
 } from '@catamaranjs/service'
 import {
 	ILogger,
@@ -10,6 +10,7 @@ import {
 	PreServiceInit, Service
 } from "@catamaranjs/interface";
 import { DarconBuilderStrategy } from "@catamaranjs/communication-darcon";
+import {PinoLogProvider} from "@catamaranjs/logger-pino";
 
 @Injectable()
 class SubclassOne {}
@@ -129,7 +130,10 @@ class TestService {
 }
 
 async function start() {
-	const service = await Catamaran.createServiceWithStrategy(TestService, DarconBuilderStrategy)
+	const service = await Catamaran
+		.builder()
+		.use(LogProvider.provider(PinoLogProvider))
+		.createServiceWithStrategy(TestService, DarconBuilderStrategy)
 	await service.start()
 }
 
