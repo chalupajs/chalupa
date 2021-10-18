@@ -26,6 +26,9 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
+		"@dwmt/eslint-config": "1.0.0",
+		"eslint": "7.32.0",
+		"prettier": "2.4.1",
 		"@types/uuid": "8.3.1",
 		"rimraf": "3.0.2",
 		"typedoc": "0.21.0",
