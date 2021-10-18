@@ -1,5 +1,10 @@
-import { Constructor, ContainerConstant, ILogProvider, InversifyContainer } from '@catamaranjs/interface'
-import { ensureInjectable } from '@catamaranjs/interface/src/annotation_utils'
+import {
+	Constructor,
+	ContainerConstant,
+	ensureInjectable,
+	ILogProvider,
+	InversifyContainer
+} from '@catamaranjs/interface'
 import { IPlugin } from '../../Plugin/IPlugin'
 
 export class LogProvider implements IPlugin {

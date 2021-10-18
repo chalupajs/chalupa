@@ -14,15 +14,14 @@ import {
 	reconfigureToEnvPrefix,
 	configurator,
 	DependencyGraph,
-	IContextContainer,
+	IContextContainer, isConfiguration, ensureInjectable,
 } from '@catamaranjs/interface'
 
-import { ensureInjectable } from '@catamaranjs/interface/src/annotation_utils'
-import { ContextContainer, NO_PARENT } from '../../Container/ContextContainer'
 import { ConsoleLoggerProvider } from '../../Log/Console/ConsoleLoggerProvider'
 import { extractServiceOptions } from '../annotation_utils'
 import { IPlugin } from '../../Plugin/IPlugin'
 import { IntermediateService } from './IntermediateService'
+import {NO_PARENT} from "../../Container/ContextContainer";
 
 export function buildIntermediateService<T = any>(
 	constructor: Constructor<T>,
@@ -50,13 +49,6 @@ export function buildIntermediateService<T = any>(
 	container.bind<T>(constructor).toSelf()
 
 	container.bind<LogConfig>(LogConfig).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, LogConfig))
-
-	// Bind config to container
-	if (serviceOptions.config) {
-		container
-			.bind<any>(serviceOptions.config)
-			.to(reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(serviceOptions.config)))
-	}
 
 	// Default logProvider
 	container.bind<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE).to(ConsoleLoggerProvider)
@@ -141,11 +133,6 @@ export function buildIntermediateService<T = any>(
 		}
 
 		const moduleOptions: ModuleOptions = Reflect.getMetadata(Metadata.METADATA_MODULE_OPTIONS, current)
-		if (moduleOptions.config) {
-			container
-				.bind(moduleOptions.config)
-				.to(reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(moduleOptions.config)))
-		}
 
 		handleExternalServices(moduleOptions.externalServices)
 
@@ -189,7 +176,13 @@ export function buildIntermediateService<T = any>(
 	const contextFactory = function (container: InversifyContainer, parent: Constructor | null): IContextContainer {
 		return {
 			bindClass<T>(constructor: Constructor<T>) {
-				container.bind<T>(constructor).toSelf().inSingletonScope()
+				if (isConfiguration(constructor)) {
+					const reconfiguredConfig = reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(constructor))
+
+					container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
+				} else {
+					container.bind<T>(constructor).toSelf().inSingletonScope()
+				}
 
 				return this
 			},
@@ -211,7 +204,13 @@ export function buildIntermediateService<T = any>(
 				return this
 			},
 			immediate<T>(constructor: Constructor<T>) {
-				container.bind<T>(constructor).toSelf()
+				if (isConfiguration(constructor)) {
+					const reconfiguredConfig = reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(constructor))
+
+					container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
+				} else {
+					container.bind<T>(constructor).toSelf().inSingletonScope()
+				}
 
 				return container.get<T>(constructor)
 			},
