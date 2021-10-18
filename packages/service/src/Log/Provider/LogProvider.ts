@@ -1,8 +1,8 @@
 import { Constructor, ContainerConstant, ILogProvider, InversifyContainer } from '@catamaranjs/interface'
 import { ensureInjectable } from '@catamaranjs/interface/src/annotation_utils'
-import { IConfigurator } from '../../Configurator/IConfigurator'
+import { IPlugin } from '../../Plugin/IPlugin'
 
-export class LogProvider implements IConfigurator {
+export class LogProvider implements IPlugin {
 	private readonly _logProvider: Constructor<ILogProvider>
 	constructor(logProvider: Constructor<ILogProvider>) {
 		this._logProvider = logProvider

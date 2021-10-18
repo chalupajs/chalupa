@@ -20,12 +20,12 @@ import { ensureInjectable } from '@catamaranjs/interface/src/annotation_utils'
 import { ContextContainer, NO_PARENT } from '../../Container/ContextContainer'
 import { ConsoleLoggerProvider } from '../../Log/Console/ConsoleLoggerProvider'
 import { extractServiceOptions } from '../annotation_utils'
-import { IConfigurator } from '../../Configurator/IConfigurator'
+import { IPlugin } from '../../Plugin/IPlugin'
 import { IntermediateService } from './IntermediateService'
 
 export function buildIntermediateService<T = any>(
 	constructor: Constructor<T>,
-	configurators: IConfigurator[]
+	configurators: IPlugin[]
 ): IIntermediateService {
 	if (!Reflect.hasOwnMetadata(Metadata.SERVICE_OPTIONS, constructor)) {
 		throw new Errors.MissingServiceDecoratorError(constructor.name)
@@ -60,7 +60,7 @@ export function buildIntermediateService<T = any>(
 	// Default logProvider
 	container.bind<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE).to(ConsoleLoggerProvider)
 
-	configurators.forEach((configurator: IConfigurator) => configurator.configure(container))
+	configurators.forEach((configurator: IPlugin) => configurator.configure(container))
 
 	const hasConfigSources: boolean = container.isBound(ContainerConstant.CONFIG_SOURCES)
 	if (hasConfigSources) {

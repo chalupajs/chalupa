@@ -1,7 +1,7 @@
 import { ContainerConstant, InversifyContainer } from '@catamaranjs/interface'
-import { IConfigurator } from './IConfigurator'
+import { IPlugin } from './IPlugin'
 
-export class ConfigSources implements IConfigurator {
+export class ConfigSources implements IPlugin {
 	private readonly _configSources: string[]
 
 	constructor(configSources: string[]) {

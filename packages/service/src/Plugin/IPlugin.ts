@@ -1,5 +1,5 @@
 import { InversifyContainer } from '@catamaranjs/interface'
 
-export interface IConfigurator {
+export interface IPlugin {
 	configure(container: InversifyContainer): void
 }

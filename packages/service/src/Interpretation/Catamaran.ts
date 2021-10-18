@@ -1,5 +1,5 @@
 import { Constructor, IBuilderStrategy } from '@catamaranjs/interface'
-import { IConfigurator } from '../Configurator/IConfigurator'
+import { IPlugin } from '../Plugin/IPlugin'
 import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
 
 /**
@@ -7,9 +7,9 @@ import { buildIntermediateService } from './IntermediateService/IntermediateServ
  * some representation of your service.
  */
 export class Catamaran {
-	static configurators: IConfigurator[] = []
+	static configurators: IPlugin[] = []
 
-	static use(configurator: IConfigurator) {
+	static use(configurator: IPlugin) {
 		this.configurators.push(configurator)
 	}
 
