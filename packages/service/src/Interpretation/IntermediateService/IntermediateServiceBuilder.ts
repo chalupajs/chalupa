@@ -14,6 +14,7 @@ import {
 	reconfigureToEnvPrefix,
 	configurator,
 	DependencyGraph,
+	IContextContainer,
 } from '@catamaranjs/interface'
 
 import { ensureInjectable } from '@catamaranjs/interface/src/annotation_utils'
@@ -166,10 +167,7 @@ export function buildIntermediateService<T = any>(
 					container.bind(injectable).toSelf()
 				}
 			} else {
-				optionsObject.inject(
-					new ContextContainer(container, moduleBindingProcessor, parent),
-					optionsObject.config ? container.get<any>(optionsObject.config) : undefined
-				)
+				optionsObject.inject(contextFactory(container, parent))
 			}
 		}
 	}
@@ -186,6 +184,38 @@ export function buildIntermediateService<T = any>(
 
 	const handleModules = function (modules: Constructor[] | undefined, parent: Constructor | null) {
 		modules?.forEach(current => moduleBindingProcessor(current, parent))
+	}
+
+	const contextFactory = function (container: InversifyContainer, parent: Constructor | null): IContextContainer {
+		return {
+			bindClass<T>(constructor: Constructor<T>) {
+				container.bind<T>(constructor).toSelf().inSingletonScope()
+
+				return this
+			},
+			bindConstant<T>(accessor: string, constant: T) {
+				container.bind<T>(accessor).toConstantValue(constant)
+
+				return this
+			},
+			bindInterface<T>(accessor: string, constructor: Constructor<T>) {
+				container.bind<T>(accessor).to(constructor).inSingletonScope()
+
+				return this
+			},
+			bindModule<T>(moduleConstructor: Constructor<T>) {
+				container.bind(moduleConstructor).toSelf()
+
+				moduleBindingProcessor(moduleConstructor, parent)
+
+				return this
+			},
+			immediate<T>(constructor: Constructor<T>) {
+				container.bind<T>(constructor).toSelf()
+
+				return container.get<T>(constructor)
+			},
+		}
 	}
 
 	// Inject LoggerFactory
