@@ -2,18 +2,32 @@ import { Constructor, IBuilderStrategy } from '@catamaranjs/interface'
 import { IPlugin } from '../Plugin/IPlugin'
 import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
 
+type ICatamaran = {
+	_plugins: IPlugin[],
+	globalUse(plugin: IPlugin | IPlugin[]): void,
+	builder(): ICatamaranBuilder
+}
+
 /**
  * The entrypoint of the framework. Use this object to construct
  * some representation of your service.
  */
-export const Catamaran = {
+export const Catamaran: ICatamaran = {
+	_plugins: [],
+	globalUse(plugin: IPlugin | IPlugin[]): void {
+		if(Array.isArray(plugin)) {
+			this._plugins.push(...plugin)
+		} else {
+			this._plugins.push(plugin)
+		}
+	},
 	builder(): ICatamaranBuilder {
-		return new CatamaranBuilder()
+		return (new CatamaranBuilder()).use(this._plugins)
 	},
 }
 
 export interface ICatamaranBuilder {
-	use(plugin: IPlugin): ICatamaranBuilder
+	use(plugin: IPlugin | IPlugin[]): ICatamaranBuilder
 
 	/**
 	 * Loads, wires up and creates some representation of specified
@@ -33,8 +47,12 @@ export class CatamaranBuilder implements ICatamaranBuilder {
 		this.plugins = []
 	}
 
-	use(plugin: IPlugin): ICatamaranBuilder {
-		this.plugins.push(plugin)
+	use(plugin: IPlugin | IPlugin[]): ICatamaranBuilder {
+		if(Array.isArray(plugin)) {
+			this.plugins.push(...plugin)
+		} else {
+			this.plugins.push(plugin)
+		}
 
 		return this
 	}

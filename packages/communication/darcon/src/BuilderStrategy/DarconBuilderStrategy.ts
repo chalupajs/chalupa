@@ -21,6 +21,20 @@ import { DarconCommunicationChannel } from './DarconCommunicationChannel'
  */
 export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedService> {
 	async build(intermediateService: IIntermediateService): Promise<ConstructedService> {
+		// const orchesrator = intermediateService.bridge().useCommunicationOrchestrator(DarconCommunicationOrchestrator)
+		//
+		// const start = function () {
+		// 	orchesrator.start()
+		// }
+		// const stop = function () {
+		// 	orchesrator.close()
+		// }
+		//
+		// return {
+		// 	start,
+		// 	stop
+		// }
+
 		const { container, serviceOptions } = intermediateService
 
 		const loggerFactory = container.get<LoggerFactory>(LoggerFactory)
@@ -52,10 +66,6 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 
 		const darcon = new Darcon()
 
-		const isItMe = function (name: string) {
-			return name === serviceOptions.name
-		}
-
 		await darcon.init({
 			logger: darconLogger,
 			name: config.division,
@@ -79,19 +89,11 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 			millieu: {},
 
 			async entityDisappeared(_: any, name: string) {
-				if (isItMe(name)) {
-					return 'OK'
-				}
-
 				await serviceBridge.callServiceDisappeared([name])
 				return 'OK'
 			},
 
 			async entityAppeared(_: any, name: string) {
-				if (isItMe(name)) {
-					return 'OK'
-				}
-
 				await serviceBridge.callServiceAppeared([name])
 				depends = depends.filter(depend => depend !== name)
 				darconLogger.info(`'${name}' appeared on the network`)

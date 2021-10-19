@@ -33,23 +33,12 @@ export class InMemoryStrategy implements IBuilderStrategy<ConstructedService> {
 			depends = depends.filter(d => d !== linkedServiceName)
 		}
 
-		const isItMe = function (name: string) {
-			return name === serviceOptions.name
-		}
 		InMemoryOrchestrator.onServiceAppeared(async (serviceName: string) => {
-			if (isItMe(serviceName)) {
-				return
-			}
-
 			await serviceBridge.callServiceAppeared([serviceName])
 			depends = depends.filter(depend => depend !== serviceName)
 			MemoryService.link()
 		})
 		InMemoryOrchestrator.onServiceDisappeared(async (serviceName: string) => {
-			if (isItMe(serviceName)) {
-				return
-			}
-
 			await serviceBridge.callServiceDisappeared([serviceName])
 		})
 
