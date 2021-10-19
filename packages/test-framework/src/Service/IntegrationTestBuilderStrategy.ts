@@ -32,12 +32,12 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 				return intermediateService.container.get(key)
 			},
-			async entityAppeared(name) {
+			async serviceAppeared(name) {
 				if (!isItMe(name)) {
 					await serviceBridge.callServiceAppeared([name])
 				}
 			},
-			async entityDisappeared(name) {
+			async serviceDisappeared(name) {
 				if (!isItMe(name)) {
 					await serviceBridge.callServiceDisappeared([name])
 				}

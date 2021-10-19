@@ -14,17 +14,15 @@ export class MemoryService implements IMemoryService {
 	private _serviceName: string
 	private _messageBus: TinyEmitter
 	private _methodMap: Map<string, CallableFunction>
-	private _isLinked: boolean
 
 	constructor(serviceName: string, messageBus: TinyEmitter) {
 		this._serviceName = serviceName
 		this._messageBus = messageBus
 		this._methodMap = new Map<string, CallableFunction>()
-		this._isLinked = false
 	}
 
 	link(): void {
-		this._isLinked = true
+		// No-op.
 	}
 
 	get methods(): string[] {
@@ -33,18 +31,12 @@ export class MemoryService implements IMemoryService {
 
 	addEvent(eventName: string, fn: Function): this {
 		this._messageBus.on(`${this._serviceName}_${eventName}`, fn)
-		if (this._isLinked) {
-			this._messageBus.emit('entityUpdated', this._serviceName)
-		}
 
 		return this
 	}
 
 	addMethod(methodName: string, fn: Function): this {
 		this._methodMap.set(methodName, fn)
-		if (this._isLinked) {
-			this._messageBus.emit('entityUpdated', this._serviceName)
-		}
 
 		return this
 	}
@@ -76,8 +68,8 @@ export interface IInMemoryOrchestrator {
 	methods(serviceName: string): Promise<string[]>
 	broadcast(eventName: string, parameters: unknown[], terms: Record<string, unknown>): void
 	createService(serviceName: string): IMemoryService
-	onEntityAppeared(cb: CallableFunction): void
-	onEntityDisappeared(cb: CallableFunction): void
+	onServiceAppeared(cb: CallableFunction): void
+	onServiceDisappeared(cb: CallableFunction): void
 	close(): void
 }
 
@@ -106,18 +98,18 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 		}
 	}
 
-	onEntityAppeared(cb: CallableFunction): void {
-		this._messageBus.on('entityAppeared', cb)
+	onServiceAppeared(cb: CallableFunction): void {
+		this._messageBus.on('serviceAppeared', cb)
 	}
 
-	onEntityDisappeared(cb: CallableFunction): void {
-		this._messageBus.on('entityDisappeared', cb)
+	onServiceDisappeared(cb: CallableFunction): void {
+		this._messageBus.on('serviceDisappeared', cb)
 	}
 
 	createService(serviceName: string): IMemoryService {
 		const service = new MemoryService(serviceName, this._messageBus)
 		this._services.set(serviceName, service)
-		this._messageBus.emit('entityAppeared', serviceName)
+		this._messageBus.emit('serviceAppeared', serviceName)
 		return service
 	}
 

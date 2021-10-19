@@ -55,16 +55,16 @@ export interface SystemUnderTest {
 	getServiceOrModule<T>(key: Constructor<T>): T
 
 	/**
-	 * Fire an entity appeared network event.
-	 * @param name The name of the appeared entity.
+	 * Fire a service appeared network event.
+	 * @param name The name of the appeared service.
 	 */
-	entityAppeared(name: string): Promise<void>
+	serviceAppeared(name: string): Promise<void>
 
 	/**
-	 * Fire an entity disappeared network event.
-	 * @param name The name of the disappeared entity.
+	 * Fire a service disappeared network event.
+	 * @param name The name of the disappeared service.
 	 */
-	entityDisappeared(name: string): Promise<void>
+	serviceDisappeared(name: string): Promise<void>
 
 	/**
 	 * Close the service, calling the appropriate lifecycle methods
