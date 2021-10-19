@@ -1,5 +1,11 @@
-import { Injectable, IntegrationTestBuilderStrategy, MultiInject, Catamaran, Service } from '@catamaranjs/service'
+import {
+	Injectable,
+	MultiInject,
+	Service,
+} from '@catamaranjs/interface'
 import {PinoLogProvider} from '@catamaranjs/logger-pino'
+import {Catamaran, LogProvider} from "@catamaranjs/service";
+import {IntegrationTestBuilderStrategy} from "@catamaranjs/test-framework";
 
 interface DailyOffering {
 	restaurant: string
@@ -31,7 +37,6 @@ class BlahaneDailyOfferingScraper implements IDailyOfferingScraper {
 }
 
 @Service({
-	logProvider: PinoLogProvider,
 	inject(contextContainer) {
 		contextContainer
 			.bindInterface('IDailyOfferingScraper', KingPadliDailyOfferingScraper)
@@ -45,10 +50,13 @@ class DailyOfferingService {
 }
 
 async function start() {
-	const service = await Catamaran.createServiceWithStrategy(
-		DailyOfferingService,
-		IntegrationTestBuilderStrategy
-	)
+	const service = await Catamaran
+		.builder()
+		.use(LogProvider.provider(PinoLogProvider))
+		.createServiceWithStrategy(
+			DailyOfferingService,
+			IntegrationTestBuilderStrategy
+		)
 	const systemUnderTest = await service.start()
 
 	systemUnderTest.getServiceOrModule(DailyOfferingService)

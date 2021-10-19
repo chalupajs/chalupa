@@ -14,14 +14,18 @@ import {
 	reconfigureToEnvPrefix,
 	configurator,
 	DependencyGraph,
+	IContextContainer,
+	isConfiguration,
+	ensureInjectable,
+	isExternalService,
 } from '@catamaranjs/interface'
 
-import { ensureInjectable } from '@catamaranjs/interface/src/annotation_utils'
-import { ContextContainer, NO_PARENT } from '../../Container/ContextContainer'
 import { ConsoleLoggerProvider } from '../../Log/Console/ConsoleLoggerProvider'
 import { extractServiceOptions } from '../annotation_utils'
 import { IPlugin } from '../../Plugin/IPlugin'
 import { IntermediateService } from './IntermediateService'
+
+const NO_PARENT = null
 
 export function buildIntermediateService<T = any>(
 	constructor: Constructor<T>,
@@ -33,10 +37,16 @@ export function buildIntermediateService<T = any>(
 
 	const serviceOptions = extractServiceOptions(constructor)
 
+	const externalServiceConstructors: Constructor[] = []
+
 	// Create the container for the future
 	const container = new InversifyContainer({
 		defaultScope: 'Singleton',
 	})
+
+	const envPrefix = container.isBound(ContainerConstant.ENV_PREFIX)
+		? container.get<string>(ContainerConstant.ENV_PREFIX)
+		: undefined
 
 	// Bind the rootClass name to the container
 	container.bind<string>(ContainerConstant.ROOT_CLASS).toConstantValue(constructor.name)
@@ -48,14 +58,7 @@ export function buildIntermediateService<T = any>(
 	// Bind the service to the container
 	container.bind<T>(constructor).toSelf()
 
-	container.bind<LogConfig>(LogConfig).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, LogConfig))
-
-	// Bind config to container
-	if (serviceOptions.config) {
-		container
-			.bind<any>(serviceOptions.config)
-			.to(reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(serviceOptions.config)))
-	}
+	container.bind<LogConfig>(LogConfig).to(reconfigureToEnvPrefix(envPrefix, LogConfig))
 
 	// Default logProvider
 	container.bind<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE).to(ConsoleLoggerProvider)
@@ -68,9 +71,8 @@ export function buildIntermediateService<T = any>(
 		configurator.withSources(configSources)
 	}
 
-	const handleExternalServices = function (externalServices?: Constructor[]) {
-		externalServices?.forEach(externalService => {
-			container.bind(externalService).toSelf()
+	const handleExternalServices = function () {
+		externalServiceConstructors.forEach(externalService => {
 			const externalServiceOptions = Reflect.getMetadata(
 				Metadata.METADATA_EXTERNAL_SERVICE_OPTIONS,
 				externalService
@@ -140,13 +142,6 @@ export function buildIntermediateService<T = any>(
 		}
 
 		const moduleOptions: ModuleOptions = Reflect.getMetadata(Metadata.METADATA_MODULE_OPTIONS, current)
-		if (moduleOptions.config) {
-			container
-				.bind(moduleOptions.config)
-				.to(reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(moduleOptions.config)))
-		}
-
-		handleExternalServices(moduleOptions.externalServices)
 
 		handleInject(moduleOptions, current)
 
@@ -162,14 +157,21 @@ export function buildIntermediateService<T = any>(
 	const handleInject = function (optionsObject: ServiceOptions | ModuleOptions, parent: Constructor | null) {
 		if (optionsObject.inject) {
 			if (Array.isArray(optionsObject.inject)) {
-				for (const injectable of optionsObject.inject) {
-					container.bind(injectable).toSelf()
+				for (const constructor of optionsObject.inject) {
+					if (isConfiguration(constructor)) {
+						const reconfiguredConfig = reconfigureToEnvPrefix(envPrefix, ensureInjectable(constructor))
+
+						container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
+					} else if (isExternalService(constructor)) {
+						externalServiceConstructors.push(constructor)
+
+						container.bind(constructor).toSelf().inSingletonScope()
+					} else {
+						container.bind<T>(constructor).toSelf().inSingletonScope()
+					}
 				}
 			} else {
-				optionsObject.inject(
-					new ContextContainer(container, moduleBindingProcessor, parent),
-					optionsObject.config ? container.get<any>(optionsObject.config) : undefined
-				)
+				optionsObject.inject(contextFactory(container, parent))
 			}
 		}
 	}
@@ -188,12 +190,64 @@ export function buildIntermediateService<T = any>(
 		modules?.forEach(current => moduleBindingProcessor(current, parent))
 	}
 
+	const contextFactory = function (container: InversifyContainer, parent: Constructor | null): IContextContainer {
+		return {
+			bindClass<T>(constructor: Constructor<T>) {
+				if (isConfiguration(constructor)) {
+					const reconfiguredConfig = reconfigureToEnvPrefix(envPrefix, ensureInjectable(constructor))
+
+					container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
+				} else if (isExternalService(constructor)) {
+					externalServiceConstructors.push(constructor)
+
+					container.bind(constructor).toSelf().inSingletonScope()
+				} else {
+					container.bind<T>(constructor).toSelf().inSingletonScope()
+				}
+
+				return this
+			},
+			bindConstant<T>(accessor: string, constant: T) {
+				container.bind<T>(accessor).toConstantValue(constant)
+
+				return this
+			},
+			bindInterface<T>(accessor: string, constructor: Constructor<T>) {
+				container.bind<T>(accessor).to(constructor).inSingletonScope()
+
+				return this
+			},
+			bindModule<T>(moduleConstructor: Constructor<T>) {
+				container.bind(moduleConstructor).toSelf()
+
+				moduleBindingProcessor(moduleConstructor, parent)
+
+				return this
+			},
+			immediate<T>(constructor: Constructor<T>) {
+				if (isConfiguration(constructor)) {
+					const reconfiguredConfig = reconfigureToEnvPrefix(envPrefix, ensureInjectable(constructor))
+
+					container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
+				} else if (isExternalService(constructor)) {
+					externalServiceConstructors.push(constructor)
+
+					container.bind(constructor).toSelf().inSingletonScope()
+				} else {
+					container.bind<T>(constructor).toSelf().inSingletonScope()
+				}
+
+				return container.get<T>(constructor)
+			},
+		}
+	}
+
 	// Inject LoggerFactory
 	container.bind<LoggerFactory>(LoggerFactory).toSelf()
 
 	handleModules(serviceOptions.modules, NO_PARENT)
 
-	handleExternalServices(serviceOptions.externalServices)
+	handleExternalServices()
 
 	handleErrorHandlers(constructor)
 

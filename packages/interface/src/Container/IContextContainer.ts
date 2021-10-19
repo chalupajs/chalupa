@@ -35,4 +35,6 @@ export interface IContextContainer {
 	bindConstant<T>(accessor: string, constant: T): this
 
 	bindModule<T>(moduleConstructor: Constructor<T>): this
+
+	immediate<T>(constructor: Constructor<T>): T
 }

@@ -1,4 +1,5 @@
 import {
+	Constructor,
 	ContainerConstant,
 	IBuilderStrategy,
 	ICommunicationChannel,
@@ -21,8 +22,6 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 			.bind<ICommunicationChannel>(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE)
 			.to(IntegrationTestCommunicationChannel)
 
-		const originalEnvValues = new Map<string, string | undefined>()
-
 		const sut: SystemUnderTest = {
 			getComponent(key) {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -32,19 +31,14 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 				return intermediateService.container.get(key)
 			},
-			async entityAppeared(name) {
+			async serviceAppeared(name) {
 				if (!isItMe(name)) {
-					await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityAppeared, [name])
+					await serviceBridge.callServiceAppeared([name])
 				}
 			},
-			async entityDisappeared(name) {
+			async serviceDisappeared(name) {
 				if (!isItMe(name)) {
-					await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityDisappeared, [name])
-				}
-			},
-			async entityUpdated(name, terms) {
-				if (!isItMe(name)) {
-					await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityUpdated, [name, terms])
+					await serviceBridge.callServiceDisappeared([name])
 				}
 			},
 			async close() {
@@ -60,17 +54,14 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 		serviceBridge.suppressEventWarning().suppressMethodWarning().buildDependencyTree()
 
 		const arrangement: IntegrationTestArrangement = {
-			rebind(key, boundValue) {
-				intermediateService.container.rebind(key).toConstantValue(boundValue)
+			bind(key: string | Constructor, boundValue: any) {
+				intermediateService.container.bind(key).toConstantValue(boundValue)
 
 				return arrangement
 			},
 
-			reconfigure(variable: string, value: any) {
-				originalEnvValues.set(variable, process.env[variable])
-
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				process.env[variable] = value
+			rebind(key, boundValue) {
+				intermediateService.container.rebind(key).toConstantValue(boundValue)
 
 				return arrangement
 			},

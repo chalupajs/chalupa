@@ -15,7 +15,7 @@ import InMemoryOrchestrator from './InMemoryOrchestrator'
  * Strategy which builds a self-contained, executable service, that can publish itself to Darcon.
  */
 export class InMemoryStrategy implements IBuilderStrategy<ConstructedService> {
-	async build(intermediateService: IIntermediateService): Promise<ConstructedService> {
+	build(intermediateService: IIntermediateService): Promise<ConstructedService> {
 		const { container, serviceOptions } = intermediateService
 
 		const loggerFactory = container.get<LoggerFactory>(LoggerFactory)
@@ -36,29 +36,21 @@ export class InMemoryStrategy implements IBuilderStrategy<ConstructedService> {
 		const isItMe = function (name: string) {
 			return name === serviceOptions.name
 		}
-
-		InMemoryOrchestrator.onEntityUpdated(async (serviceName: string) => {
+		InMemoryOrchestrator.onServiceAppeared(async (serviceName: string) => {
 			if (isItMe(serviceName)) {
 				return
 			}
 
-			await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityUpdated, [serviceName])
-		})
-		InMemoryOrchestrator.onEntityAppeared(async (serviceName: string) => {
-			if (isItMe(serviceName)) {
-				return
-			}
-
-			await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityAppeared, [serviceName])
+			await serviceBridge.callServiceAppeared([serviceName])
 			depends = depends.filter(depend => depend !== serviceName)
 			MemoryService.link()
 		})
-		InMemoryOrchestrator.onEntityDisappeared(async (serviceName: string) => {
+		InMemoryOrchestrator.onServiceDisappeared(async (serviceName: string) => {
 			if (isItMe(serviceName)) {
 				return
 			}
 
-			await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityDisappeared, [serviceName])
+			await serviceBridge.callServiceDisappeared([serviceName])
 		})
 
 		container
@@ -91,15 +83,15 @@ export class InMemoryStrategy implements IBuilderStrategy<ConstructedService> {
 		}
 
 		process.on('SIGINT', () => {
-			close()
+			void close()
 		})
 		process.on('SIGTERM', () => {
-			close()
+			void close()
 		})
 
-		return {
+		return Promise.resolve({
 			start,
 			close,
-		}
+		})
 	}
 }

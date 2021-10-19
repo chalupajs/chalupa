@@ -6,5 +6,6 @@ namespace ContainerConstant {
 	export const COMMUNICATION_CHANNEL_INTERFACE = 'ICommunicationChannel'
 
 	export const CONFIG_SOURCES = 'Konvenient_configSources'
+	export const ENV_PREFIX = 'Konvenient_envPrefix'
 }
 export { ContainerConstant }

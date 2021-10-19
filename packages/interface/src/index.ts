@@ -17,7 +17,7 @@ export {
 	PostServiceDestroy,
 } from './Module/decorators'
 // ----------- Network events -----------//
-export { NetworkEvent, NetworkEventOptions } from './NetworkEvent/decorators'
+export { ServiceAppeared, ServiceDisappeared } from './NetworkEvent/decorators'
 // ----------- Public interfacing -----------//
 export { ServiceMethod, ServiceMethodOptions, ServiceEvent, ServiceEventOptions } from './Interface/decorators'
 
@@ -56,6 +56,7 @@ export {
 	SchemaResult,
 	Nested,
 	configurator,
+	CONFIGURATION_CLASS,
 } from './Configuration/konvenient'
 
 export { IIntermediateService } from './Interpretation/IIntermediateService'
@@ -71,7 +72,7 @@ export { LogConfig } from './Log/Configuration'
 
 export { Errors } from './error'
 
-export { reconfigureToEnvPrefix } from './annotation_utils'
+export { reconfigureToEnvPrefix, ensureInjectable, isConfiguration, isExternalService } from './annotation_utils'
 
 export { DependencyGraph, IDependencyGraph, DepGraphCycleError } from './DependencyGraph'
 

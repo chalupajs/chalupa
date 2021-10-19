@@ -25,7 +25,11 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 
 		const loggerFactory = container.get<LoggerFactory>(LoggerFactory)
 
-		container.bind<DarconConfig>(DarconConfig).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, DarconConfig))
+		const envPrefix = container.isBound(ContainerConstant.ENV_PREFIX)
+			? container.get<string>(ContainerConstant.ENV_PREFIX)
+			: undefined
+
+		container.bind<DarconConfig>(DarconConfig).to(reconfigureToEnvPrefix(envPrefix, DarconConfig))
 		const config: DarconConfig = container.get<DarconConfig>(DarconConfig)
 
 		const darconLogger = loggerFactory.getLogger('Darcon')
@@ -73,21 +77,13 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 				enabled: false,
 			},
 			millieu: {},
-			async entityUpdated(_: any, name: string, terms = {}) {
-				if (isItMe(name)) {
-					return 'OK'
-				}
-
-				await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityUpdated, [name, terms])
-				return 'OK'
-			},
 
 			async entityDisappeared(_: any, name: string) {
 				if (isItMe(name)) {
 					return 'OK'
 				}
 
-				await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityDisappeared, [name])
+				await serviceBridge.callServiceDisappeared([name])
 				return 'OK'
 			},
 
@@ -96,7 +92,7 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 					return 'OK'
 				}
 
-				await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityAppeared, [name])
+				await serviceBridge.callServiceAppeared([name])
 				depends = depends.filter(depend => depend !== name)
 				darconLogger.info(`'${name}' appeared on the network`)
 				return 'OK'

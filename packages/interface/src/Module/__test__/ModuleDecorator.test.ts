@@ -1,5 +1,4 @@
 import 'reflect-metadata'
-import { METADATA_KEY } from 'inversify'
 import { Module, PreServiceInit, PostServiceInit, PreServiceDestroy, PostServiceDestroy } from '../decorators'
 import { Metadata } from '../../metadata/Metadata'
 import { Errors } from '../../error'
@@ -107,22 +106,6 @@ describe('Module decorators', () => {
 
 			// Then
 			expect(decorateMultipleTimes).toThrow(Errors.AlreadyDecoratedError)
-		})
-		it('should assign the correct metadata with the provided options', () => {
-			// Given
-			class SomeModule {}
-			class ConfigClass {}
-
-			// When
-			const configs = {
-				config: ConfigClass,
-			}
-			Module(configs)(SomeModule)
-
-			// Then
-			expect(Reflect.getMetadata(Metadata.METADATA_MODULE_INJECTED, SomeModule)).toBeTruthy()
-			expect(Reflect.hasOwnMetadata(METADATA_KEY.PARAM_TYPES, SomeModule)).toBeTruthy()
-			expect(Reflect.getMetadata(Metadata.METADATA_MODULE_OPTIONS, SomeModule)).toBe(configs)
 		})
 	})
 })

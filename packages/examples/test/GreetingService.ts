@@ -1,6 +1,5 @@
 import {
-	Catamaran,
-	DarconBuilderStrategy,
+	Catamaran, LogProvider,
 } from '@catamaranjs/service'
 import {Service,
 	ExternalServiceTemplate,
@@ -12,6 +11,7 @@ import {Service,
 	Inject,
 	IExternalServiceCall} from '@catamaranjs/interface'
 import {PinoLogProvider} from '@catamaranjs/logger-pino'
+import {DarconBuilderStrategy} from "@catamaranjs/communication-darcon";
 
 @ExternalService()
 export class DateTimeService extends ExternalServiceTemplate {
@@ -20,8 +20,7 @@ export class DateTimeService extends ExternalServiceTemplate {
 }
 
 @Service({
-	externalServices: [DateTimeService],
-	logProvider: PinoLogProvider
+	inject: [DateTimeService],
 })
 export class GreetingService {
 	private readonly logger: ILogger
@@ -45,7 +44,10 @@ export class GreetingService {
 }
 
 async function start() {
-	const service = await Catamaran.createServiceWithStrategy(GreetingService, DarconBuilderStrategy)
+	const service = await Catamaran
+		.builder()
+		.use(LogProvider.provider(PinoLogProvider))
+		.createServiceWithStrategy(GreetingService, DarconBuilderStrategy)
 	await service.start()
 }
 

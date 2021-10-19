@@ -37,6 +37,7 @@
 		"@catamaranjs/service": "workspace:*",
 		"@catamaranjs/interface": "workspace:*",
 		"@catamaranjs/logger-pino": "workspace:*",
-		"@catamaranjs/communication-darcon": "workspace:*"
+		"@catamaranjs/communication-darcon": "workspace:*",
+	    "@catamaranjs/test-framework": "workspace:*"
 	}
 }

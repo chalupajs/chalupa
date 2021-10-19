@@ -150,7 +150,15 @@ export class ServiceBridge implements IServiceBridge {
 		return this
 	}
 
-	async callNetworkEvent(symbol: Metadata.NetworkEvent, parameters: any[]): Promise<IServiceBridge> {
+	async callServiceAppeared(parameters: any[]): Promise<IServiceBridge> {
+		return this.callNetworkEvent(Metadata.METADATA_SERVICE_APPEARED, parameters)
+	}
+
+	async callServiceDisappeared(parameters: any[]): Promise<IServiceBridge> {
+		return this.callNetworkEvent(Metadata.METADATA_SERVICE_DISAPPEARED, parameters)
+	}
+
+	private async callNetworkEvent(symbol: string, parameters: any[]): Promise<IServiceBridge> {
 		const propertyKey: string | null = Reflect.getMetadata(symbol, this._serviceConstructor.prototype)
 
 		if (propertyKey) {

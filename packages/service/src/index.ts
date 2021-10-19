@@ -2,7 +2,7 @@
 import 'reflect-metadata'
 
 // ----------- Main -----------//
-export { Catamaran } from './Interpretation/Catamaran'
+export { Catamaran, ICatamaranBuilder } from './Interpretation/Catamaran'
 
 // ----------- BuilderStrategies -----------//
 export { InMemoryStrategy } from './Communication/InMemory/InMemoryStrategy'
@@ -11,9 +11,6 @@ export { InMemoryStrategy } from './Communication/InMemory/InMemoryStrategy'
 export { ConsoleLoggerProvider } from './Log/Console/ConsoleLoggerProvider'
 export { ConsoleLogger } from './Log/Console/ConsoleLogger'
 export { IConsoleLog, ConsoleLog } from './Log/Console/ConsoleLog'
-
-// ----------- Container -----------//
-export { ContextContainer } from './Container/ContextContainer'
 
 // ----------- Plugin -----------//
 export { IPlugin } from './Plugin/IPlugin'

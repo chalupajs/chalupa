@@ -1,4 +1,4 @@
-import { Catamaran } from '@catamaranjs/service'
+import {Catamaran, LogProvider} from '@catamaranjs/service'
 import {DarconBuilderStrategy} from '@catamaranjs/communication-darcon'
 import { Service, Module, Inject } from '@catamaranjs/interface'
 import { PinoLogProvider } from '@catamaranjs/logger-pino'
@@ -18,12 +18,14 @@ class RandomModule {
 @Service({
 	modules: [RandomModule],
 	constants: [['kekw', false]],
-	logProvider: PinoLogProvider
 })
 class TestService {}
 
 async function start() {
-	const service = await Catamaran.createServiceWithStrategy(TestService, DarconBuilderStrategy)
+	const service = await Catamaran
+		.builder()
+		.use(LogProvider.provider(PinoLogProvider))
+		.createServiceWithStrategy(TestService, DarconBuilderStrategy)
 	await service.start()
 }
 

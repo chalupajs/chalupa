@@ -15,17 +15,16 @@ export interface IntegrationTestArrangement {
 	start(): Promise<SystemUnderTest>
 
 	/**
-	 * Sets the value of the specified environment variable. The original value
-	 * is automatically reset when calling `close`.
-	 * @param variable The environment variable name.
-	 * @param value The desired value.
+	 * Binds a new value with the specified injection key.
+	 * @param key A string or constructor function to bind to.
+	 * @param boundValue An actual instance to be bound.
 	 * @returns This instance for easy chaining of calls.
 	 */
-	reconfigure(variable: string, value: any): this
+	bind(key: string | Constructor, boundValue: any): this
 
 	/**
-	 * Rebinds the specified injection key to a new bound value. Perfect
-	 * to inject test doubles into the container.
+	 * Rebinds the specified injection key to a new bound value. Will overwrite
+	 * pre-existing bindings.
 	 * @param key A string or constructor function to bind to.
 	 * @param boundValue An actual instance to be bound.
 	 * @returns This instance for easy chaining of calls.
@@ -55,23 +54,16 @@ export interface SystemUnderTest {
 	getServiceOrModule<T>(key: Constructor<T>): T
 
 	/**
-	 * Fire an entity appeared network event.
-	 * @param name The name of the appeared entity.
+	 * Fire a service appeared network event.
+	 * @param name The name of the appeared service.
 	 */
-	entityAppeared(name: string): Promise<void>
+	serviceAppeared(name: string): Promise<void>
 
 	/**
-	 * Fire an entity disappeared network event.
-	 * @param name The name of the disappeared entity.
+	 * Fire a service disappeared network event.
+	 * @param name The name of the disappeared service.
 	 */
-	entityDisappeared(name: string): Promise<void>
-
-	/**
-	 * Fire an entity updated network event.
-	 * @param name The name of the updated entity.
-	 * @param terms Additional terms to the event.
-	 */
-	entityUpdated(name: string, terms: any): Promise<void>
+	serviceDisappeared(name: string): Promise<void>
 
 	/**
 	 * Close the service, calling the appropriate lifecycle methods

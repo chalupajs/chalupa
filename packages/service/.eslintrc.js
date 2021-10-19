@@ -1,3 +1,6 @@
 module.exports = {
-	extends: '@dwmt'
+	extends: '@dwmt',
+	rules: {
+		'no-void': ['error', { 'allowAsStatement': true }]
+	}
 }

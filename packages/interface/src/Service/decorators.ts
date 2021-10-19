@@ -9,22 +9,9 @@ import { IContextContainer } from '../Container/IContextContainer'
  */
 export interface ServiceOptions {
 	/**
-	 * A konvenient configuration class that will be instrumented and loaded by
-	 * Catamaran. An instance of the configuration class will be available in the container.
-	 */
-	config: Constructor
-
-	/**
 	 * The external name of the service. By default the name of the decorated class is used.
 	 */
 	name: string
-
-	/**
-	 * An array of external service classes to be loaded and instrumented by Catamaran. The
-	 * service will automatically depend on these external services (wait for them to show up
-	 * before starting as if they were in the `dependsOn` array).
-	 */
-	externalServices: Constructor[]
 
 	/**
 	 * Injection specifications. If you want to perform class-based injection only,
@@ -47,12 +34,6 @@ export interface ServiceOptions {
 	 * Starting delay in milliseconds.
 	 */
 	delayStart: number
-
-	/**
-	 * Environment variable prefix for every konvenient configurable value,
-	 * in either the configuration of the service or any of the modules.
-	 */
-	envPrefix: string
 
 	/**
 	 * The directory where the service class is located.
