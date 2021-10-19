@@ -15,15 +15,6 @@ export interface IntegrationTestArrangement {
 	start(): Promise<SystemUnderTest>
 
 	/**
-	 * Sets the value of the specified environment variable. The original value
-	 * is automatically reset when calling `close`.
-	 * @param variable The environment variable name.
-	 * @param value The desired value.
-	 * @returns This instance for easy chaining of calls.
-	 */
-	reconfigure(variable: string, value: any): this
-
-	/**
 	 * Rebinds the specified injection key to a new bound value. Perfect
 	 * to inject test doubles into the container.
 	 * @param key A string or constructor function to bind to.

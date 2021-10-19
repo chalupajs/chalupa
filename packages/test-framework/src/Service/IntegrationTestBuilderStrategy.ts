@@ -21,8 +21,6 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 			.bind<ICommunicationChannel>(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE)
 			.to(IntegrationTestCommunicationChannel)
 
-		const originalEnvValues = new Map<string, string | undefined>()
-
 		const sut: SystemUnderTest = {
 			getComponent(key) {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -57,15 +55,6 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 		const arrangement: IntegrationTestArrangement = {
 			rebind(key, boundValue) {
 				intermediateService.container.rebind(key).toConstantValue(boundValue)
-
-				return arrangement
-			},
-
-			reconfigure(variable: string, value: any) {
-				originalEnvValues.set(variable, process.env[variable])
-
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				process.env[variable] = value
 
 				return arrangement
 			},
