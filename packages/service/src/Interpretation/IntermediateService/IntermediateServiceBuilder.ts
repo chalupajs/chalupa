@@ -17,6 +17,7 @@ import {
 	IContextContainer,
 	isConfiguration,
 	ensureInjectable,
+	isExternalService,
 } from '@catamaranjs/interface'
 
 import { ConsoleLoggerProvider } from '../../Log/Console/ConsoleLoggerProvider'
@@ -35,6 +36,8 @@ export function buildIntermediateService<T = any>(
 	}
 
 	const serviceOptions = extractServiceOptions(constructor)
+
+	const externalServiceConstructors: Constructor[] = []
 
 	// Create the container for the future
 	const container = new InversifyContainer({
@@ -68,9 +71,8 @@ export function buildIntermediateService<T = any>(
 		configurator.withSources(configSources)
 	}
 
-	const handleExternalServices = function (externalServices?: Constructor[]) {
-		externalServices?.forEach(externalService => {
-			container.bind(externalService).toSelf()
+	const handleExternalServices = function () {
+		externalServiceConstructors.forEach(externalService => {
 			const externalServiceOptions = Reflect.getMetadata(
 				Metadata.METADATA_EXTERNAL_SERVICE_OPTIONS,
 				externalService
@@ -141,8 +143,6 @@ export function buildIntermediateService<T = any>(
 
 		const moduleOptions: ModuleOptions = Reflect.getMetadata(Metadata.METADATA_MODULE_OPTIONS, current)
 
-		handleExternalServices(moduleOptions.externalServices)
-
 		handleInject(moduleOptions, current)
 
 		handleModules(moduleOptions.modules, current)
@@ -162,6 +162,10 @@ export function buildIntermediateService<T = any>(
 						const reconfiguredConfig = reconfigureToEnvPrefix(envPrefix, ensureInjectable(constructor))
 
 						container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
+					} else if (isExternalService(constructor)) {
+						externalServiceConstructors.push(constructor)
+
+						container.bind(constructor).toSelf().inSingletonScope()
 					} else {
 						container.bind<T>(constructor).toSelf().inSingletonScope()
 					}
@@ -193,6 +197,10 @@ export function buildIntermediateService<T = any>(
 					const reconfiguredConfig = reconfigureToEnvPrefix(envPrefix, ensureInjectable(constructor))
 
 					container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
+				} else if (isExternalService(constructor)) {
+					externalServiceConstructors.push(constructor)
+
+					container.bind(constructor).toSelf().inSingletonScope()
 				} else {
 					container.bind<T>(constructor).toSelf().inSingletonScope()
 				}
@@ -221,6 +229,10 @@ export function buildIntermediateService<T = any>(
 					const reconfiguredConfig = reconfigureToEnvPrefix(envPrefix, ensureInjectable(constructor))
 
 					container.bind(constructor).to(reconfiguredConfig).inSingletonScope()
+				} else if (isExternalService(constructor)) {
+					externalServiceConstructors.push(constructor)
+
+					container.bind(constructor).toSelf().inSingletonScope()
 				} else {
 					container.bind<T>(constructor).toSelf().inSingletonScope()
 				}
@@ -235,7 +247,7 @@ export function buildIntermediateService<T = any>(
 
 	handleModules(serviceOptions.modules, NO_PARENT)
 
-	handleExternalServices(serviceOptions.externalServices)
+	handleExternalServices()
 
 	handleErrorHandlers(constructor)
 
