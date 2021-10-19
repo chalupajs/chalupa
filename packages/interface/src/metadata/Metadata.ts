@@ -16,6 +16,9 @@ namespace Metadata {
 		EntityUpdated = 'Catamaran_Symbol_MetadataNetworkEventEntityUpdated',
 	}
 
+	export const METADATA_SERVICE_APPEARED = 'Catamaran_Symbol_ServiceAppeared'
+	export const METADATA_SERVICE_DISAPPEARED = 'Catamaran_Symbol_ServiceDisappeared'
+
 	// Module
 	export const METADATA_MODULE_INJECTED = 'Catamaran_Symbol_MetadataModuleInjected'
 	export const METADATA_MODULE_OPTIONS = 'Catamaran_Symbol_MetadataModuleOptions'
