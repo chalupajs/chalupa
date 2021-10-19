@@ -19,8 +19,3 @@ describe('@NetworkEvent decorator', () => {
 		})
 	})
 })
-
-/*
-* | 'entityAppeared'
-	| 'entityDisappeared'
-	| 'entityUpdated' */

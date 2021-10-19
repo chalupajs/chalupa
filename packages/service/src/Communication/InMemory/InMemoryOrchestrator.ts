@@ -77,7 +77,6 @@ export interface IInMemoryOrchestrator {
 	broadcast(eventName: string, parameters: unknown[], terms: Record<string, unknown>): void
 	createService(serviceName: string): IMemoryService
 	onEntityAppeared(cb: CallableFunction): void
-	onEntityUpdated(cb: CallableFunction): void
 	onEntityDisappeared(cb: CallableFunction): void
 	close(): void
 }
@@ -109,10 +108,6 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 
 	onEntityAppeared(cb: CallableFunction): void {
 		this._messageBus.on('entityAppeared', cb)
-	}
-
-	onEntityUpdated(cb: CallableFunction): void {
-		this._messageBus.on('entityUpdated', cb)
 	}
 
 	onEntityDisappeared(cb: CallableFunction): void {

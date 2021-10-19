@@ -67,13 +67,6 @@ export interface SystemUnderTest {
 	entityDisappeared(name: string): Promise<void>
 
 	/**
-	 * Fire an entity updated network event.
-	 * @param name The name of the updated entity.
-	 * @param terms Additional terms to the event.
-	 */
-	entityUpdated(name: string, terms: any): Promise<void>
-
-	/**
 	 * Close the service, calling the appropriate lifecycle methods
 	 * and resetting the reconfigured environment variables.
 	 */

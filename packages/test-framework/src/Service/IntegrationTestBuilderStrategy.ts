@@ -42,11 +42,6 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 					await serviceBridge.callServiceDisappeared([name])
 				}
 			},
-			async entityUpdated(name, terms) {
-				if (!isItMe(name)) {
-					await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityUpdated, [name, terms])
-				}
-			},
 			async close() {
 				await intermediateService.bridge().callLifecycleMethodOnService(Metadata.ServiceLifecycle.PreDestroy)
 

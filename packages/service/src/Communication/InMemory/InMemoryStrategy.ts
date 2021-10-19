@@ -36,14 +36,6 @@ export class InMemoryStrategy implements IBuilderStrategy<ConstructedService> {
 		const isItMe = function (name: string) {
 			return name === serviceOptions.name
 		}
-
-		InMemoryOrchestrator.onEntityUpdated(async (serviceName: string) => {
-			if (isItMe(serviceName)) {
-				return
-			}
-
-			await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityUpdated, [serviceName])
-		})
 		InMemoryOrchestrator.onEntityAppeared(async (serviceName: string) => {
 			if (isItMe(serviceName)) {
 				return

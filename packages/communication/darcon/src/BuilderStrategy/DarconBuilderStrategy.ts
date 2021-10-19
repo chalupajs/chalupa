@@ -77,14 +77,6 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 				enabled: false,
 			},
 			millieu: {},
-			async entityUpdated(_: any, name: string, terms = {}) {
-				if (isItMe(name)) {
-					return 'OK'
-				}
-
-				await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityUpdated, [name, terms])
-				return 'OK'
-			},
 
 			async entityDisappeared(_: any, name: string) {
 				if (isItMe(name)) {

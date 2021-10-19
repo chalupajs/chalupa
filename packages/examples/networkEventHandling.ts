@@ -28,11 +28,6 @@ class TestService {
 	entityDisappeared() {
 		this._logger.info('EntityDisappeared')
 	}
-
-	@NetworkEvent()
-	entityUpdated() {
-		this._logger.info('EntityUpdated')
-	}
 }
 
 async function start() {
