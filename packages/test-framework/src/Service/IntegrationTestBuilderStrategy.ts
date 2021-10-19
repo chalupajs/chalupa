@@ -34,12 +34,12 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 			},
 			async entityAppeared(name) {
 				if (!isItMe(name)) {
-					await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityAppeared, [name])
+					await serviceBridge.callServiceAppeared([name])
 				}
 			},
 			async entityDisappeared(name) {
 				if (!isItMe(name)) {
-					await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityDisappeared, [name])
+					await serviceBridge.callServiceDisappeared([name])
 				}
 			},
 			async entityUpdated(name, terms) {

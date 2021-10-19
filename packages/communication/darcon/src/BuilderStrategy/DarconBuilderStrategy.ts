@@ -91,7 +91,7 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 					return 'OK'
 				}
 
-				await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityDisappeared, [name])
+				await serviceBridge.callServiceDisappeared([name])
 				return 'OK'
 			},
 
@@ -100,7 +100,7 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 					return 'OK'
 				}
 
-				await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityAppeared, [name])
+				await serviceBridge.callServiceAppeared([name])
 				depends = depends.filter(depend => depend !== name)
 				darconLogger.info(`'${name}' appeared on the network`)
 				return 'OK'

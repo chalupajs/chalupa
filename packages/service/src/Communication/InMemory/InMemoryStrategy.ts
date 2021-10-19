@@ -49,7 +49,7 @@ export class InMemoryStrategy implements IBuilderStrategy<ConstructedService> {
 				return
 			}
 
-			await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityAppeared, [serviceName])
+			await serviceBridge.callServiceAppeared([serviceName])
 			depends = depends.filter(depend => depend !== serviceName)
 			MemoryService.link()
 		})
@@ -58,7 +58,7 @@ export class InMemoryStrategy implements IBuilderStrategy<ConstructedService> {
 				return
 			}
 
-			await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityDisappeared, [serviceName])
+			await serviceBridge.callServiceDisappeared([serviceName])
 		})
 
 		container
