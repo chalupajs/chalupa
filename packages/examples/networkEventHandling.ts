@@ -7,7 +7,8 @@ import {
 	ILogger,
 	Inject,
 	LoggerFactory,
-	NetworkEvent,
+	ServiceAppeared,
+	ServiceDisappeared
 } from '@catamaranjs/interface'
 import {PinoLogProvider} from "@catamaranjs/logger-pino";
 
@@ -19,14 +20,14 @@ class TestService {
 		this._logger = loggerFactory.getLogger(TestService)
 	}
 
-	@NetworkEvent()
-	entityAppeared() {
-		this._logger.info('EntityAppeared')
+	@ServiceAppeared()
+	serviceAppeared() {
+		this._logger.info('ServiceAppeared')
 	}
 
-	@NetworkEvent()
-	entityDisappeared() {
-		this._logger.info('EntityDisappeared')
+	@ServiceDisappeared()
+	serviceDisappeared() {
+		this._logger.info('ServiceDisappeared')
 	}
 }
 

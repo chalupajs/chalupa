@@ -17,7 +17,7 @@ export {
 	PostServiceDestroy,
 } from './Module/decorators'
 // ----------- Network events -----------//
-export { NetworkEvent, NetworkEventOptions, ServiceAppeared, ServiceDisappeared } from './NetworkEvent/decorators'
+export { ServiceAppeared, ServiceDisappeared } from './NetworkEvent/decorators'
 // ----------- Public interfacing -----------//
 export { ServiceMethod, ServiceMethodOptions, ServiceEvent, ServiceEventOptions } from './Interface/decorators'
 

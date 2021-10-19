@@ -158,7 +158,7 @@ export class ServiceBridge implements IServiceBridge {
 		return this.callNetworkEvent(Metadata.METADATA_SERVICE_DISAPPEARED, parameters)
 	}
 
-	async callNetworkEvent(symbol: string, parameters: any[]): Promise<IServiceBridge> {
+	private async callNetworkEvent(symbol: string, parameters: any[]): Promise<IServiceBridge> {
 		const propertyKey: string | null = Reflect.getMetadata(symbol, this._serviceConstructor.prototype)
 
 		if (propertyKey) {

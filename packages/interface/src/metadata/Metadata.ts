@@ -9,12 +9,6 @@ namespace Metadata {
 		PreDestroy = 'Catamaran_Symbol_MetadataServiceLifecyclePreDestroy',
 	}
 
-	// Network event
-	export enum NetworkEvent {
-		EntityAppeared = 'Catamaran_Symbol_MetadataNetworkEventEntityAppeared',
-		EntityDisappeared = 'Catamaran_Symbol_MetadataNetworkEventEntityDisappeared',
-	}
-
 	export const METADATA_SERVICE_APPEARED = 'Catamaran_Symbol_ServiceAppeared'
 	export const METADATA_SERVICE_DISAPPEARED = 'Catamaran_Symbol_ServiceDisappeared'
 
