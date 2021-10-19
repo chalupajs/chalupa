@@ -14,13 +14,6 @@ export interface ServiceOptions {
 	name: string
 
 	/**
-	 * An array of external service classes to be loaded and instrumented by Catamaran. The
-	 * service will automatically depend on these external services (wait for them to show up
-	 * before starting as if they were in the `dependsOn` array).
-	 */
-	externalServices: Constructor[]
-
-	/**
 	 * Injection specifications. If you want to perform class-based injection only,
 	 * then this can be an array of classes. Otherwise, use the function form, which gives
 	 * access to both the container being built and an instance of the configuration.

@@ -27,7 +27,7 @@ class TestIniterService extends ExternalServiceTemplate {
 }
 
 @Service({
-	externalServices: [TestIniterService]
+	inject: [TestIniterService]
 })
 class TestService {
 	private readonly _logger: ILogger
