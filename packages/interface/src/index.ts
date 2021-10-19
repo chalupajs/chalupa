@@ -72,7 +72,7 @@ export { LogConfig } from './Log/Configuration'
 
 export { Errors } from './error'
 
-export { reconfigureToEnvPrefix, ensureInjectable, isConfiguration } from './annotation_utils'
+export { reconfigureToEnvPrefix, ensureInjectable, isConfiguration, isExternalService } from './annotation_utils'
 
 export { DependencyGraph, IDependencyGraph, DepGraphCycleError } from './DependencyGraph'
 

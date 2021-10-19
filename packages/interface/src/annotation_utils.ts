@@ -1,9 +1,13 @@
 import * as konvenient from 'konvenient'
 import { Constructor } from './types'
-import { Injectable, InversifyMetadata } from './index'
+import {Injectable, InversifyMetadata, Metadata} from './index'
 
-export const isConfiguration = function (configClass: Constructor): boolean {
-	return Reflect.hasMetadata(konvenient.KONVENIENT_CONFIGURATION_CLASS, configClass)
+export const isConfiguration = function (constructor: Constructor): boolean {
+	return Reflect.hasMetadata(konvenient.KONVENIENT_CONFIGURATION_CLASS, constructor)
+}
+
+export const isExternalService = function (constructor: Constructor): boolean {
+	return Reflect.hasMetadata(Metadata.METADATA_EXTERNAL_SERVICE, constructor)
 }
 
 export const reconfigureToEnvPrefix = function (envPrefix: string | undefined, configClass: any) {

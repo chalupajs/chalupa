@@ -2,6 +2,11 @@
 import { Inject, Injectable } from '../Container/decorators'
 import { ContainerConstant } from '../constants'
 import { ICommunicationChannel } from './ICommunicationChannel'
+import {Metadata} from "../metadata/Metadata";
+
+(function assignExternalServiceMetadata() {
+	Reflect.defineMetadata(Metadata.METADATA_EXTERNAL_SERVICE, true, ExternalServiceTemplate)
+})()
 
 /**
  * Abstract base for classes representing external services.
