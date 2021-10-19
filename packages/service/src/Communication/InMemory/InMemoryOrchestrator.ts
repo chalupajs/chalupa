@@ -54,11 +54,13 @@ export class MemoryService implements IMemoryService {
 	}
 
 	callMethod<T>(methodName: string, parameters: any[]): Promise<T> {
-		if (!this._methodMap.has(methodName)) {
+		const method = this._methodMap.get(methodName)
+
+		if (!method) {
 			throw new Error(`Method '${methodName}' is not exists on service ${this._serviceName}`)
 		}
 
-		return this._methodMap.get(methodName)!(...parameters)
+		return method(...parameters) as Promise<T>
 	}
 }
 
@@ -66,13 +68,13 @@ export interface IInMemoryOrchestrator {
 	request<T>(
 		serviceName: string,
 		serviceMethodName: string,
-		parameters: any[],
-		terms: Record<string, any>
+		parameters: unknown[],
+		terms: Record<string, unknown>
 	): Promise<T>
-	emitTo(serviceName: string, eventName: any, parameters: any[], terms: Record<string, any>): void
+	emitTo(serviceName: string, eventName: string, parameters: unknown[], terms: Record<string, unknown>): void
 	services: string[]
 	methods(serviceName: string): Promise<string[]>
-	broadcast(eventName: string, parameters: any[], terms: Record<string, any>): void
+	broadcast(eventName: string, parameters: unknown[], terms: Record<string, unknown>): void
 	createService(serviceName: string): IMemoryService
 	onEntityAppeared(cb: CallableFunction): void
 	onEntityUpdated(cb: CallableFunction): void
@@ -81,6 +83,9 @@ export interface IInMemoryOrchestrator {
 }
 
 class InMemoryOrchestrator implements IInMemoryOrchestrator {
+	// eslint-disable-next-line no-bitwise
+	private static readonly KEEP_ALIVE_DURATION = 1 << 30
+
 	private _messageBus: TinyEmitter
 	private _services: Map<string, IMemoryService>
 	private _keepAlive?: NodeJS.Timer
@@ -92,7 +97,7 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 
 	keepServiceAlive() {
 		if (typeof this._keepAlive === 'undefined') {
-			this._keepAlive = setInterval(() => {}, 1 << 30)
+			this._keepAlive = setInterval(() => {}, InMemoryOrchestrator.KEEP_ALIVE_DURATION)
 		}
 	}
 
@@ -124,8 +129,8 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 	request<T>(
 		serviceName: string,
 		serviceMethodName: string,
-		parameters: any[],
-		_terms: Record<string, any>
+		parameters: unknown[],
+		_terms: Record<string, unknown>
 	): Promise<T> {
 		if (!this._services.has(serviceName)) {
 			throw new Error('Service not exists!')
@@ -134,7 +139,7 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 		return this._services.get(serviceName)!.callMethod<T>(serviceMethodName, parameters)
 	}
 
-	emitTo(serviceName: string, eventName: any, parameters: any[], _terms: Record<string, any>): void {
+	emitTo(serviceName: string, eventName: string, parameters: unknown[], _terms: Record<string, unknown>): void {
 		this._messageBus.emit(`${serviceName}_${eventName}`, ...parameters)
 	}
 
@@ -150,7 +155,8 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 		return Promise.resolve([...this._services.get(serviceName)!.methods])
 	}
 
-	broadcast(eventName: string, parameters: any[], _terms: Record<string, any>): void {
+	broadcast(eventName: string, parameters: unknown[], _terms: Record<string, unknown>): void {
+		// eslint-disable-next-line guard-for-in
 		for (const serviceName in this._services.keys()) {
 			this._messageBus.emit(`${serviceName}_${eventName}`, ...parameters)
 		}

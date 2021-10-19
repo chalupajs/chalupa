@@ -14,7 +14,9 @@ import {
 	reconfigureToEnvPrefix,
 	configurator,
 	DependencyGraph,
-	IContextContainer, isConfiguration, ensureInjectable,
+	IContextContainer,
+	isConfiguration,
+	ensureInjectable,
 } from '@catamaranjs/interface'
 
 import { ConsoleLoggerProvider } from '../../Log/Console/ConsoleLoggerProvider'

@@ -3,7 +3,7 @@ import {
 	ContainerConstant,
 	ensureInjectable,
 	ILogProvider,
-	InversifyContainer
+	InversifyContainer,
 } from '@catamaranjs/interface'
 import { IPlugin } from '../../Plugin/IPlugin'
 

@@ -2,7 +2,11 @@ import { ContainerConstant, InversifyContainer } from '@catamaranjs/interface'
 import { IPlugin } from '../Plugin/IPlugin'
 
 export class EnvPrefix implements IPlugin {
-	constructor(private readonly prefix: string) {}
+	private readonly prefix: string
+
+	constructor(prefix: string) {
+		this.prefix = prefix
+	}
 
 	static from(prefix: string): EnvPrefix {
 		return new EnvPrefix(prefix)

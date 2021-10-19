@@ -15,7 +15,7 @@ import InMemoryOrchestrator from './InMemoryOrchestrator'
  * Strategy which builds a self-contained, executable service, that can publish itself to Darcon.
  */
 export class InMemoryStrategy implements IBuilderStrategy<ConstructedService> {
-	async build(intermediateService: IIntermediateService): Promise<ConstructedService> {
+	build(intermediateService: IIntermediateService): Promise<ConstructedService> {
 		const { container, serviceOptions } = intermediateService
 
 		const loggerFactory = container.get<LoggerFactory>(LoggerFactory)
@@ -91,15 +91,15 @@ export class InMemoryStrategy implements IBuilderStrategy<ConstructedService> {
 		}
 
 		process.on('SIGINT', () => {
-			close()
+			void close()
 		})
 		process.on('SIGTERM', () => {
-			close()
+			void close()
 		})
 
-		return {
+		return Promise.resolve({
 			start,
 			close,
-		}
+		})
 	}
 }
