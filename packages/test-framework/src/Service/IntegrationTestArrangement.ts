@@ -15,8 +15,16 @@ export interface IntegrationTestArrangement {
 	start(): Promise<SystemUnderTest>
 
 	/**
-	 * Rebinds the specified injection key to a new bound value. Perfect
-	 * to inject test doubles into the container.
+	 * Binds a new value with the specified injection key.
+	 * @param key A string or constructor function to bind to.
+	 * @param boundValue An actual instance to be bound.
+	 * @returns This instance for easy chaining of calls.
+	 */
+	bind(key: string | Constructor, boundValue: any): this
+
+	/**
+	 * Rebinds the specified injection key to a new bound value. Will overwrite
+	 * pre-existing bindings.
 	 * @param key A string or constructor function to bind to.
 	 * @param boundValue An actual instance to be bound.
 	 * @returns This instance for easy chaining of calls.

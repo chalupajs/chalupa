@@ -1,4 +1,5 @@
 import {
+	Constructor,
 	ContainerConstant,
 	IBuilderStrategy,
 	ICommunicationChannel,
@@ -53,6 +54,12 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 		serviceBridge.suppressEventWarning().suppressMethodWarning().buildDependencyTree()
 
 		const arrangement: IntegrationTestArrangement = {
+			bind(key: string | Constructor, boundValue: any) {
+				intermediateService.container.bind(key).toConstantValue(boundValue)
+
+				return arrangement
+			},
+
 			rebind(key, boundValue) {
 				intermediateService.container.rebind(key).toConstantValue(boundValue)
 
