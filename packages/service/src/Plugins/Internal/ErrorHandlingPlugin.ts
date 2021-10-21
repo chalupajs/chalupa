@@ -2,7 +2,7 @@ import {AbstractPlugin, Constructor, Metadata} from "@catamaranjs/interface"
 
 export class ErrorHandlingPlugin extends AbstractPlugin {
 	onBindClass<T>(constructor: Constructor<T>): Constructor<T> {
-		if (Reflect.getMetadata(Metadata.SERVICE_OPTIONS, constructor.prototype)) {
+		if (Reflect.getMetadata(Metadata.SERVICE_OPTIONS, constructor)) {
 			this.wrapFunctionsInScope(constructor)
 		}
 
@@ -24,7 +24,7 @@ export class ErrorHandlingPlugin extends AbstractPlugin {
 		const events: Map<string, string> = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, scope.prototype) || new Map<string, string>()
 		const methods: Map<string, string> = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, scope.prototype) || new Map<string, string>()
 
-		for (const propertyKey in [...events, ...methods]) {
+		for (const propertyKey of [...events.values(), ...methods.values()]) {
 			this.wrapFunctionWithErrorHandling(scope, propertyKey, handlers)
 		}
 	}
