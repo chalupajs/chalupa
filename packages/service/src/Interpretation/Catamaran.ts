@@ -1,6 +1,7 @@
 import { Constructor, IBuilderStrategy, IPlugin } from '@catamaranjs/interface'
 import { ExternalServicePlugin } from '../Plugins/Internal/ExternalServicePlugin'
 import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
+import {ErrorHandlingPlugin} from "../Plugins/Internal/ErrorHandlingPlugin";
 
 type ICatamaran = {
 	_plugins: IPlugin[]
@@ -44,8 +45,7 @@ export class CatamaranBuilder implements ICatamaranBuilder {
 	private readonly plugins: IPlugin[]
 
 	constructor() {
-		const externalServicePlugin = new ExternalServicePlugin()
-		this.plugins = [externalServicePlugin]
+		this.plugins = [new ExternalServicePlugin(), new ErrorHandlingPlugin()]
 	}
 
 	use(plugin: IPlugin | IPlugin[]): ICatamaranBuilder {
