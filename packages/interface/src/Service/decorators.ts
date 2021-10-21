@@ -2,7 +2,7 @@ import { Constructor } from '../types'
 import { Errors } from '../error'
 import { Injectable } from '../Container/decorators'
 import { Metadata } from '../metadata/Metadata'
-import { IContextContainer } from '../Container/IContextContainer'
+import { IInjectContainer } from '../Container/IInjectContainer'
 
 /**
  * Options for the `Service` decorator.
@@ -18,7 +18,7 @@ export interface ServiceOptions {
 	 * then this can be an array of classes. Otherwise, use the function form, which gives
 	 * access to both the container being built and an instance of the configuration.
 	 */
-	inject: Constructor[] | ((context: IContextContainer, config?: any) => void)
+	inject: Constructor[] | ((context: IInjectContainer, config?: any) => void)
 
 	constants?: Array<[string, any]>
 
@@ -69,7 +69,6 @@ export function Service<T = any>(options: Partial<ServiceOptions> = {}) {
 export function PostInit() {
 	return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
 		// The target will never be primitive, so this argument is actually safe.
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		Reflect.defineMetadata(Metadata.ServiceLifecycle.PostInit, propertyKey, target)
 	}
 }
@@ -82,7 +81,6 @@ export function PostInit() {
 export function PreDestroy() {
 	return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
 		// The target will never be primitive, so this argument is actually safe.
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		Reflect.defineMetadata(Metadata.ServiceLifecycle.PreDestroy, propertyKey, target)
 	}
 }

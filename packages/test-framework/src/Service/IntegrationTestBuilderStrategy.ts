@@ -4,7 +4,7 @@ import {
 	IBuilderStrategy,
 	ICommunicationChannel,
 	IIntermediateService,
-	Metadata,
+	// Metadata,
 } from '@catamaranjs/interface'
 
 import { IntegrationTestArrangement, SystemUnderTest } from './IntegrationTestArrangement'
@@ -16,7 +16,7 @@ import { IntegrationTestCommunicationChannel } from './IntegrationTestCommunicat
  */
 export class IntegrationTestBuilderStrategy implements IBuilderStrategy<IntegrationTestArrangement> {
 	build(intermediateService: IIntermediateService): Promise<IntegrationTestArrangement> {
-		const serviceBridge = intermediateService.bridge()
+		// Const serviceBridge = intermediateService.bridge()
 
 		intermediateService.container
 			.bind<ICommunicationChannel>(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE)
@@ -33,25 +33,28 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 			},
 			async serviceAppeared(name) {
 				if (!isItMe(name)) {
-					await serviceBridge.callServiceAppeared([name])
+					// Await serviceBridge.callServiceAppeared([name])
 				}
+
+				return Promise.resolve()
 			},
 			async serviceDisappeared(name) {
 				if (!isItMe(name)) {
-					await serviceBridge.callServiceDisappeared([name])
+					// Await serviceBridge.callServiceDisappeared([name])
 				}
+
+				return Promise.resolve()
 			},
 			async close() {
-				await intermediateService.bridge().callLifecycleMethodOnService(Metadata.ServiceLifecycle.PreDestroy)
-
+				// Await intermediateService.bridge().callLifecycleMethodOnService(Metadata.ServiceLifecycle.PreDestroy)
 				// @ts-ignore
-				for (const [key, value] of originalEnvValues.entries()) {
-					process.env[key] = value
-				}
+				// for (const [key, value] of originalEnvValues.entries()) {
+				// 	process.env[key] = value
+				// }
 			},
 		}
 
-		serviceBridge.suppressEventWarning().suppressMethodWarning().buildDependencyTree()
+		// ServiceBridge.suppressEventWarning().suppressMethodWarning().buildDependencyTree()
 
 		const arrangement: IntegrationTestArrangement = {
 			bind(key: string | Constructor, boundValue: any) {
@@ -67,9 +70,9 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 			},
 
 			async start() {
-				await serviceBridge.callLifecycleMethodOnService(Metadata.ServiceLifecycle.PostInit)
+				// Await serviceBridge.callLifecycleMethodOnService(Metadata.ServiceLifecycle.PostInit)
 
-				return sut
+				return Promise.resolve(sut)
 			},
 		}
 

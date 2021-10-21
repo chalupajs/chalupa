@@ -6,14 +6,24 @@ import {
 	Metadata,
 	ServiceOptions,
 	IDependencyGraph,
+	ICommunicationFacade,
+	IServiceBridgeOrchestrator,
+	IPlugin,
 } from '@catamaranjs/interface'
-import { timeout } from '../util'
+import { Container } from './Container'
+import { extractServiceEventMap, extractServiceMethodMap } from './annotation_utils'
+
+function createCallableMethod(callableFunction: (...parameters: any[]) => Promise<any>) {
+	return (parameters: any[], _terms: Record<string, any>): Promise<any> => callableFunction(...parameters)
+}
 
 export class ServiceBridge implements IServiceBridge {
-	private _container: InversifyContainer
-	private _serviceConstructor: Constructor
+	private readonly _container: InversifyContainer
+	private readonly _serviceConstructor: Constructor
 	private _serviceOptions: ServiceOptions
 	private _logger: ILogger
+
+	private readonly _plugins: IPlugin[]
 
 	private _service?: any
 	private _moduleMethodArrays: Record<Metadata.ModuleLifecycle, any[]> = {
@@ -23,23 +33,62 @@ export class ServiceBridge implements IServiceBridge {
 		[Metadata.ModuleLifecycle.PostServiceDestroy]: [],
 	}
 
-	private _serviceEventHandler?: (externalName: string, fn: any) => void
-	private _serviceMethodHandler?: (externalName: string, fn: any) => void
-
-	private _suppressMissingEventHandlerWarning: boolean = false
-	private _suppressMissingMethodHandlerWarning: boolean = false
-
+	// eslint-disable-next-line max-params
 	constructor(
 		container: InversifyContainer,
 		serviceConstructor: Constructor,
 		serviceOptions: ServiceOptions,
 		logger: ILogger,
-		private readonly moduleDependencyGraph: IDependencyGraph<Constructor>
+		private readonly moduleDependencyGraph: IDependencyGraph<Constructor>,
+		plugins: IPlugin[]
 	) {
 		this._container = container
 		this._serviceConstructor = serviceConstructor
 		this._serviceOptions = serviceOptions
 		this._logger = logger
+		this._plugins = plugins
+	}
+
+	useFacade(facade: Constructor<ICommunicationFacade>): IServiceBridgeOrchestrator {
+		const self = this
+
+		const pluginContainer = new Container(this._plugins, this._container, () => {}, null)
+		const facadeInstance = new facade(pluginContainer)
+
+		facadeInstance.onServiceAppeared(this.callServiceAppeared.bind(this))
+		facadeInstance.onServiceDisappeared(this.callServiceDisappeared.bind(this))
+
+		async function start() {
+			await facadeInstance.init(self._serviceOptions.name)
+			await facadeInstance.connectToNetwork()
+
+			self.buildDependencyTree(facadeInstance)
+
+			await Promise.all(self._plugins.map(plugin => plugin.preStart(pluginContainer)))
+
+			await self.callLifecycleMethodOnService(Metadata.ServiceLifecycle.PostInit)
+
+			await facadeInstance.publishSelf()
+
+			await Promise.all(self._plugins.map(plugin => plugin.postStart(pluginContainer)))
+
+			process.on('SIGINT', () => {
+				void close()
+			})
+		}
+
+		async function close() {
+			await Promise.all(self._plugins.map(plugin => plugin.preClose(pluginContainer)))
+
+			await self.callLifecycleMethodOnService(Metadata.ServiceLifecycle.PreDestroy)
+			await facadeInstance.closeSelf()
+			await Promise.all(self._plugins.map(plugin => plugin.postClose(pluginContainer)))
+		}
+
+		return {
+			start,
+			close,
+		}
 	}
 
 	private _getServiceFromContainer(): any {
@@ -48,60 +97,38 @@ export class ServiceBridge implements IServiceBridge {
 
 	private _ensureServiceBuilded() {
 		if (typeof this._service === 'undefined') {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			this._service = this._getServiceFromContainer()
 		}
 	}
 
-	suppressEventWarning(): IServiceBridge {
-		this._suppressMissingEventHandlerWarning = true
-		return this
-	}
-
-	suppressMethodWarning(): IServiceBridge {
-		this._suppressMissingMethodHandlerWarning = true
-		return this
-	}
-
 	private _collectLifecycleMetadata(symbol: Metadata.ModuleLifecycle, proto: any, instance: any) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const key: string = Reflect.getMetadata(symbol, proto)
 		if (key) {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
 			this._moduleMethodArrays[symbol].push(instance[key].bind(instance))
 		}
 	}
 
-	private _registerServiceMethodsAndServiceEvents(target: any, prototype: any) {
-		const serviceMethodMap: Map<string, string> | undefined = Reflect.getMetadata(
-			Metadata.METADATA_SERVICE_MAP,
-			prototype
-		)
-		if (serviceMethodMap && typeof this._serviceMethodHandler !== 'undefined') {
-			serviceMethodMap.forEach((propertyKey: string, externalName: string) => {
-				this._serviceMethodHandler!(externalName, target[propertyKey].bind(target))
-			})
-		}
+	private _registerServiceMethodsAndServiceEvents(facade: ICommunicationFacade, target: any, prototype: any) {
+		const serviceMethodMap = extractServiceMethodMap(prototype)
+		const serviceEventMap = extractServiceEventMap(prototype)
 
-		const serviceEventMap: Map<string, string> | undefined = Reflect.getMetadata(
-			Metadata.METADATA_EVENT_MAP,
-			prototype
-		)
-		if (serviceEventMap && typeof this._serviceEventHandler !== 'undefined') {
-			serviceEventMap.forEach((propertyKey: string, externalName: string) => {
-				this._serviceEventHandler!(externalName, target[propertyKey].bind(target))
-			})
-		}
+		serviceMethodMap?.forEach((propertyKey: string, externalName: string) => {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+			facade.addMethodHandler(externalName, createCallableMethod(target[propertyKey].bind(target)))
+		})
+
+		serviceEventMap?.forEach((propertyKey: string, externalName: string) => {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+			facade.addEventHandler(externalName, createCallableMethod(target[propertyKey].bind(target)))
+		})
 	}
 
-	buildDependencyTree(): IServiceBridge {
-		if (typeof this._serviceMethodHandler === 'undefined' && !this._suppressMissingMethodHandlerWarning) {
-			this._logger.warn('Missing serviceMethodHandler in ServiceBridge during service building')
-		}
-
-		if (typeof this._serviceEventHandler === 'undefined' && !this._suppressMissingEventHandlerWarning) {
-			this._logger.warn('Missing serviceEventHandler in ServiceBridge during service building')
-		}
-
+	buildDependencyTree(facade: ICommunicationFacade): IServiceBridge {
 		this._ensureServiceBuilded()
-		this._registerServiceMethodsAndServiceEvents(this._service, this._serviceConstructor.prototype)
+		this._registerServiceMethodsAndServiceEvents(facade, this._service, this._serviceConstructor.prototype)
 
 		for (const moduleName of this.moduleDependencyGraph.overallOrder()) {
 			const constructor = this.moduleDependencyGraph.getNodeData(moduleName)
@@ -109,9 +136,10 @@ export class ServiceBridge implements IServiceBridge {
 				continue
 			}
 
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const instance = this._container.get(constructor)
 
-			this._registerServiceMethodsAndServiceEvents(instance, constructor.prototype)
+			this._registerServiceMethodsAndServiceEvents(facade, instance, constructor.prototype)
 
 			this._collectLifecycleMetadata(Metadata.ModuleLifecycle.PreServiceInit, constructor.prototype, instance)
 			this._collectLifecycleMetadata(Metadata.ModuleLifecycle.PostServiceInit, constructor.prototype, instance)
@@ -126,6 +154,7 @@ export class ServiceBridge implements IServiceBridge {
 	}
 
 	private async _callModuleLifecycleMethods(symbol: Metadata.ModuleLifecycle) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return
 		return Promise.all(this._moduleMethodArrays[symbol].map(initMethod => initMethod()))
 	}
 
@@ -137,8 +166,10 @@ export class ServiceBridge implements IServiceBridge {
 				? Metadata.ModuleLifecycle.PreServiceInit
 				: Metadata.ModuleLifecycle.PreServiceDestroy
 		)
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const key: string | undefined = Reflect.getMetadata(symbol, this._serviceConstructor.prototype)
 		if (typeof key !== 'undefined') {
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
 			await this._service[key]()
 		}
 
@@ -150,46 +181,28 @@ export class ServiceBridge implements IServiceBridge {
 		return this
 	}
 
-	async callServiceAppeared(parameters: any[]): Promise<IServiceBridge> {
-		return this.callNetworkEvent(Metadata.METADATA_SERVICE_APPEARED, parameters)
+	async callServiceAppeared(serviceName: string): Promise<void> {
+		await Promise.all(this._plugins.map(plugin => plugin.onServiceAppeared(serviceName)))
+		await this.callNetworkEvent(Metadata.METADATA_SERVICE_APPEARED, serviceName)
 	}
 
-	async callServiceDisappeared(parameters: any[]): Promise<IServiceBridge> {
-		return this.callNetworkEvent(Metadata.METADATA_SERVICE_DISAPPEARED, parameters)
+	async callServiceDisappeared(serviceName: string): Promise<void> {
+		await Promise.all(this._plugins.map(plugin => plugin.onServiceDisappeared(serviceName)))
+		await this.callNetworkEvent(Metadata.METADATA_SERVICE_DISAPPEARED, serviceName)
 	}
 
-	private async callNetworkEvent(symbol: string, parameters: any[]): Promise<IServiceBridge> {
+	private async callNetworkEvent(symbol: string, serviceName: string): Promise<void> {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const propertyKey: string | null = Reflect.getMetadata(symbol, this._serviceConstructor.prototype)
 
 		if (propertyKey) {
 			this._ensureServiceBuilded()
 			try {
-				await this._service[propertyKey](...parameters)
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+				await this._service[propertyKey](serviceName)
 			} catch (error: any) {
 				this._logger.error(error)
 			}
 		}
-
-		return this
-	}
-
-	async respectDelayedStart(): Promise<IServiceBridge> {
-		if (this._serviceOptions.delayStart) {
-			this._logger.info(`Waiting ${this._serviceOptions.delayStart} milliseconds for start`)
-			await timeout(this._serviceOptions.delayStart)
-			this._logger.info('Delay ended!')
-		}
-
-		return this
-	}
-
-	serviceEventHandler(cb: (externalName: string, fn: any) => void): IServiceBridge {
-		this._serviceEventHandler = cb
-		return this
-	}
-
-	serviceMethodHandler(cb: (externalName: string, fn: any) => void): IServiceBridge {
-		this._serviceMethodHandler = cb
-		return this
 	}
 }

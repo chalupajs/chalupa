@@ -1,6 +1,7 @@
 import { ContainerConstant, ICommunicationChannel, Inject, Injectable } from '@catamaranjs/interface'
-import Darcon = darcon.Darcon
 import { newUID } from '../util'
+
+import Darcon = darcon.Darcon
 
 const DarconCommunication = Object.freeze({
 	Request: 'R',
@@ -21,7 +22,8 @@ export class DarconCommunicationChannel implements ICommunicationChannel {
 		const flowID = terms.flowID ?? newUID()
 		const processID = terms.processID ?? newUID()
 
-		this._darcon.comm(DarconCommunication.Inform, flowID, processID, serviceName, eventName, parameters, terms)
+		// eslint-disable-next-line no-void
+		void this._darcon.comm(DarconCommunication.Inform, flowID, processID, serviceName, eventName, parameters, terms)
 	}
 
 	request<T>(
@@ -33,6 +35,7 @@ export class DarconCommunicationChannel implements ICommunicationChannel {
 		const flowID = terms.flowID ?? newUID()
 		const processID = terms.processID ?? newUID()
 
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 		return this._darcon.comm(
 			DarconCommunication.Request,
 			flowID,
@@ -48,10 +51,12 @@ export class DarconCommunicationChannel implements ICommunicationChannel {
 		const flowID = newUID()
 		const processID = newUID()
 
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 		return this._darcon.comm(DarconCommunication.Request, flowID, processID, serviceName, 'services', [], {})
 	}
 
 	broadcast(eventName: string, _parameters: any[], _terms: Record<string, any>) {
-		this._darcon.proclaim(this._serviceName, eventName, _terms)
+		// eslint-disable-next-line no-void
+		void this._darcon.proclaim(this._serviceName, eventName, _terms)
 	}
 }

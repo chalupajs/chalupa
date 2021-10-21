@@ -15,10 +15,11 @@ describe('Container decorators', () => {
 		it('should have tagged metadata', () => {
 			class mustBeInjected {}
 			class someClass {
+				// eslint-disable-next-line no-useless-constructor
 				constructor(@Inject(mustBeInjected) _a: mustBeInjected) {}
 			}
 
-			const parametersMetadata = Reflect.getMetadata(METADATA_KEY.TAGGED, someClass)
+			const parametersMetadata = Reflect.getMetadata(METADATA_KEY.TAGGED, someClass) as Record<string, any>
 			expect(typeof parametersMetadata).toBe('object')
 		})
 	})
@@ -26,9 +27,10 @@ describe('Container decorators', () => {
 		it('hould have tagged metadata', () => {
 			class mustBeInjected {}
 			class someClass {
+				// eslint-disable-next-line no-useless-constructor
 				constructor(@MultiInject(mustBeInjected) _a: mustBeInjected) {}
 			}
-			const parametersMetadata = Reflect.getMetadata(METADATA_KEY.TAGGED, someClass)
+			const parametersMetadata = Reflect.getMetadata(METADATA_KEY.TAGGED, someClass) as Record<string, any>
 			expect(typeof parametersMetadata).toBe('object')
 		})
 	})

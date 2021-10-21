@@ -1,9 +1,10 @@
 import { TinyEmitter } from 'tiny-emitter'
 
 export interface IMemoryService {
-	callMethod<T>(methodName: string, parameters: any[]): Promise<T>
-	callEvent(eventName: string, parameters: any[]): void
+	callMethod<T>(methodName: string, parameters: any[], terms: Record<string, any>): Promise<T>
+	callEvent(eventName: string, parameters: any[], terms: Record<string, any>): void
 
+	connect(): this
 	addMethod(methodName: string, fn: CallableFunction): this
 	addEvent(eventName: string, fn: CallableFunction): this
 	methods: string[]
@@ -41,18 +42,23 @@ export class MemoryService implements IMemoryService {
 		return this
 	}
 
-	callEvent(eventName: string, parameters: any[]): void {
-		this._messageBus.emit(`${this._serviceName}_${eventName}`, ...parameters)
+	connect(): this {
+		this._messageBus.emit('serviceAppeared', this._serviceName)
+		return this
 	}
 
-	callMethod<T>(methodName: string, parameters: any[]): Promise<T> {
+	callEvent(eventName: string, parameters: any[], terms: Record<string, any>): void {
+		this._messageBus.emit(`${this._serviceName}_${eventName}`, parameters, terms)
+	}
+
+	callMethod<T>(methodName: string, parameters: any[], terms: Record<string, any>): Promise<T> {
 		const method = this._methodMap.get(methodName)
 
 		if (!method) {
 			throw new Error(`Method '${methodName}' is not exists on service ${this._serviceName}`)
 		}
 
-		return method(...parameters) as Promise<T>
+		return method(parameters, terms) as Promise<T>
 	}
 }
 
@@ -109,7 +115,6 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 	createService(serviceName: string): IMemoryService {
 		const service = new MemoryService(serviceName, this._messageBus)
 		this._services.set(serviceName, service)
-		this._messageBus.emit('serviceAppeared', serviceName)
 		return service
 	}
 
@@ -123,11 +128,11 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 			throw new Error('Service not exists!')
 		}
 
-		return this._services.get(serviceName)!.callMethod<T>(serviceMethodName, parameters)
+		return this._services.get(serviceName)!.callMethod<T>(serviceMethodName, parameters, _terms)
 	}
 
 	emitTo(serviceName: string, eventName: string, parameters: unknown[], _terms: Record<string, unknown>): void {
-		this._messageBus.emit(`${serviceName}_${eventName}`, ...parameters)
+		this._messageBus.emit(`${serviceName}_${eventName}`, parameters, _terms)
 	}
 
 	get services(): string[] {
@@ -145,7 +150,7 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 	broadcast(eventName: string, parameters: unknown[], _terms: Record<string, unknown>): void {
 		// eslint-disable-next-line guard-for-in
 		for (const serviceName in this._services.keys()) {
-			this._messageBus.emit(`${serviceName}_${eventName}`, ...parameters)
+			this._messageBus.emit(`${serviceName}_${eventName}`, parameters, _terms)
 		}
 	}
 }

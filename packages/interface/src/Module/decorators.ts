@@ -2,7 +2,7 @@ import { Constructor } from '../types'
 import { Errors } from '../error'
 import { Injectable } from '../Container/decorators'
 import { Metadata } from '../metadata/Metadata'
-import { IContextContainer } from '../Container/IContextContainer'
+import { IInjectContainer } from '../Container/IInjectContainer'
 
 /**
  * Options for the `Module` decorator.
@@ -13,7 +13,7 @@ export interface ModuleOptions {
 	 * then this can be an array of classes. Otherwise, use the function form, which gives
 	 * access to both the container being built and an instance of the configuration (if specified).
 	 */
-	inject?: Constructor[] | ((context: IContextContainer, config?: any) => void)
+	inject?: Constructor[] | ((context: IInjectContainer, config?: any) => void)
 
 	constants?: Array<[string, any]>
 
@@ -46,7 +46,6 @@ export function Module<T = any>(options: ModuleOptions = {}) {
 export function PreServiceInit() {
 	return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
 		// The target will never be primitive, so this argument is actually safe.
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		Reflect.defineMetadata(Metadata.METADATA_MODULE_LIFECYCLE_PRE_SERVICE_INIT, propertyKey, target)
 	}
 }
@@ -57,7 +56,6 @@ export function PreServiceInit() {
  */
 export function PostServiceInit() {
 	return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		Reflect.defineMetadata(Metadata.METADATA_MODULE_LIFECYCLE_POST_SERVICE_INIT, propertyKey, target)
 	}
 }
@@ -68,7 +66,6 @@ export function PostServiceInit() {
  */
 export function PreServiceDestroy() {
 	return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		Reflect.defineMetadata(Metadata.METADATA_MODULE_LIFECYCLE_PRE_SERVICE_DESTROY, propertyKey, target)
 	}
 }
@@ -79,7 +76,6 @@ export function PreServiceDestroy() {
  */
 export function PostServiceDestroy() {
 	return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		Reflect.defineMetadata(Metadata.METADATA_MODULE_LIFECYCLE_POST_SERVICE_DESTROY, propertyKey, target)
 	}
 }

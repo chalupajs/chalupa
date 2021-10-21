@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Metadata } from '../metadata/Metadata'
 
 /**

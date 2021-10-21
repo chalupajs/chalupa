@@ -1,6 +1,7 @@
-import { Constructor } from '../index'
+import { Constructor } from '../types'
+import { ILogger } from '../Log/ILogger'
 
-export interface IContextContainer {
+export interface IContainer {
 	/**
 	 * Binds the specified constructor to the accessor. The container will inject
 	 * an instance of the constructor type wherever the accessor is used.
@@ -14,6 +15,10 @@ export interface IContextContainer {
 	 */
 	bindInterface<T>(accessor: string, constructor: Constructor<T>): this
 
+	rebindInterface<T>(accessor: string, constructor: Constructor<T>): this
+
+	isBound(accessor: string | Constructor): boolean
+
 	/**
 	 * Binds the specified constructor to itself: wherever an injection is requested
 	 * with the constructor, the container will inject an instance of the constructor type.
@@ -26,6 +31,8 @@ export interface IContextContainer {
 	 */
 	bindClass<T>(constructor: Constructor<T>): this
 
+	rebindClass<T>(constructor: Constructor<T>): this
+
 	/**
 	 * Binds the specified constant value to the given accessor string
 	 *
@@ -34,7 +41,11 @@ export interface IContextContainer {
 	 */
 	bindConstant<T>(accessor: string, constant: T): this
 
-	bindModule<T>(moduleConstructor: Constructor<T>): this
+	rebindConstant<T>(accessor: string, constant: T): this
+
+	unbind(accessor: string | Constructor): this
 
 	immediate<T>(constructor: Constructor<T>): T
+
+	getLogger<T = any>(key: Constructor<T> | string): ILogger
 }

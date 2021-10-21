@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-unassigned-import
 import 'reflect-metadata'
 
 // ----------- Main -----------//
@@ -13,7 +12,6 @@ export { ConsoleLogger } from './Log/Console/ConsoleLogger'
 export { IConsoleLog, ConsoleLog } from './Log/Console/ConsoleLog'
 
 // ----------- Plugin -----------//
-export { IPlugin } from './Plugin/IPlugin'
-// Configurators
-export { LogProvider } from './Log/Provider/LogProvider'
-export { ConfigSources } from './Configuration/ConfigSources'
+export { LogProvider } from './Plugins/LogProvider'
+export { ConfigSources } from './Plugins/ConfigSources'
+export { EnvPrefix } from './Plugins/EnvPrefix'
