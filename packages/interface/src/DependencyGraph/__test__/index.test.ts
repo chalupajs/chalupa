@@ -1,4 +1,3 @@
-import 'jest'
 import { DependencyGraph, DepGraphCycleError } from '../index'
 
 describe('DepGraph', () => {
@@ -385,7 +384,7 @@ describe('DepGraph', () => {
 	})
 
 	it('should only be a shallow clone', () => {
-		const graph = new DependencyGraph()
+		const graph = new DependencyGraph<{ a: number }>()
 
 		const data = { a: 42 }
 		graph.addNode('a', data)

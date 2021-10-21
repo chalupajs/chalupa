@@ -25,7 +25,10 @@ export { Metadata } from './metadata/Metadata'
 
 // ----------- Container -----------//
 export { Inject, Injectable, MultiInject } from './Container/decorators'
-export { IContextContainer } from './Container/IContextContainer'
+export { IContainer } from './Container/IContainer'
+export { IFacadeContainer } from './Container/IFacadeContainer'
+export { IInjectContainer } from './Container/IInjectContainer'
+export { IPluginContainer } from './Container/IPluginContainer'
 // ----------- External service -----------//
 export {
 	ExternalServiceTemplate,
@@ -62,6 +65,7 @@ export {
 export { IIntermediateService } from './Interpretation/IIntermediateService'
 export { IBuilderStrategy } from './Interpretation/IBuilderStrategy'
 export { IServiceBridge } from './Interpretation/IServiceBridge'
+export { IServiceBridgeOrchestrator } from './Interpretation/IServiceBridgeOrchestrator'
 
 export { AbstractLoggerAdapter, ILoggerCompatibleInstance } from './Log/AbstractLoggerAdapter'
 export { LoggerFactory } from './Log/LoggerFactory'
@@ -77,3 +81,10 @@ export { reconfigureToEnvPrefix, ensureInjectable, isConfiguration, isExternalSe
 export { DependencyGraph, IDependencyGraph, DepGraphCycleError } from './DependencyGraph'
 
 export { ErrorHandler } from './ErrorHandler/decorators'
+
+export { ICommunicationFacade, MethodCallable, EventCallable } from './Communication/ICommunicationFacade'
+export { AbstractCommunicationFacade } from './Communication/AbstractCommunicationFacade'
+export { ServiceDisappearedCallback, ServiceAppearedCallback } from './Communication/NetworkEventCallbacks'
+
+export { IPlugin } from './Plugin/IPlugin'
+export { AbstractPlugin } from './Plugin/AbstractPlugin'

@@ -1,3 +1,7 @@
 module.exports = {
-	extends: '@dwmt'
+	extends: '@dwmt',
+	rules: {
+		'import/no-unassigned-import': [0],
+		'node/file-extension-in-import': [0],
+	},
 }

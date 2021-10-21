@@ -1,6 +1,6 @@
-import { Constructor, IBuilderStrategy } from '@catamaranjs/interface'
-import { IPlugin } from '../Plugin/IPlugin'
+import { Constructor, IBuilderStrategy, IPlugin } from '@catamaranjs/interface'
 import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
+import { ExternalServicePlugin } from '../Plugins/Internal/ExternalServicePlugin'
 
 type ICatamaran = {
 	_plugins: IPlugin[],
@@ -44,7 +44,8 @@ export class CatamaranBuilder implements ICatamaranBuilder {
 	private readonly plugins: IPlugin[]
 
 	constructor() {
-		this.plugins = []
+		const externalServicePlugin = new ExternalServicePlugin()
+		this.plugins = [externalServicePlugin]
 	}
 
 	use(plugin: IPlugin | IPlugin[]): ICatamaranBuilder {
@@ -57,11 +58,11 @@ export class CatamaranBuilder implements ICatamaranBuilder {
 		return this
 	}
 
-	createServiceWithStrategy<T>(
+	async createServiceWithStrategy<T>(
 		serviceEntrypoint: Constructor,
 		builder: Constructor<IBuilderStrategy<T>>
 	): Promise<T> {
-		const intermediateService = buildIntermediateService(serviceEntrypoint, this.plugins)
+		const intermediateService = await buildIntermediateService(serviceEntrypoint, this.plugins)
 		const builderInstance = new builder()
 		return builderInstance.build(intermediateService)
 	}

@@ -1,15 +1,16 @@
 import {
+	AbstractPlugin,
 	Constructor,
 	ContainerConstant,
 	ensureInjectable,
 	ILogProvider,
-	InversifyContainer,
+	InversifyContainer
 } from '@catamaranjs/interface'
-import { IPlugin } from '../../Plugin/IPlugin'
 
-export class LogProvider implements IPlugin {
+export class LogProvider extends AbstractPlugin {
 	private readonly _logProvider: Constructor<ILogProvider>
 	constructor(logProvider: Constructor<ILogProvider>) {
+		super()
 		this._logProvider = logProvider
 	}
 

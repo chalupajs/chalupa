@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment */
 import { Inject, Injectable } from '../Container/decorators'
 import { ContainerConstant } from '../constants'
+import { Metadata } from '../metadata/Metadata'
 import { ICommunicationChannel } from './ICommunicationChannel'
-import {Metadata} from "../metadata/Metadata";
+;
 
 (function assignExternalServiceMetadata() {
 	Reflect.defineMetadata(Metadata.METADATA_EXTERNAL_SERVICE, true, ExternalServiceTemplate)

@@ -1,6 +1,8 @@
 import * as konvenient from 'konvenient'
+import { METADATA_KEY as InversifyMetadata } from 'inversify'
 import { Constructor } from './types'
-import {Injectable, InversifyMetadata, Metadata} from './index'
+import { Injectable } from './Container/decorators'
+import { Metadata } from './metadata/Metadata'
 
 export const isConfiguration = function (constructor: Constructor): boolean {
 	return Reflect.hasMetadata(konvenient.KONVENIENT_CONFIGURATION_CLASS, constructor)
