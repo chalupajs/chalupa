@@ -37,7 +37,7 @@ export class ErrorHandlingPlugin extends AbstractPlugin {
 		scope.prototype[internalName] = async function (...args: unknown[]) {
 			try {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call
-				return await originalFunction(...args)
+				return await originalFunction.apply(this, args)
 			} catch (thrownError) {
 				for (const [errorHandler, handledErrors] of errorHandlers.entries()) {
 					if (handledErrors.some(handledType => thrownError instanceof handledType)) {
