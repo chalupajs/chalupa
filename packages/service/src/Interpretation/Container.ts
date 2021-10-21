@@ -119,9 +119,8 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 			moduleConstructor
 		)
 
-		this._container.bind(processedModuleConstructor).toSelf()
-
 		this._moduleBindingProcessor(processedModuleConstructor, this._parent)
+
 		return this
 	}
 

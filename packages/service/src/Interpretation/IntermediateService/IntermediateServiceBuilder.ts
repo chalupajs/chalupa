@@ -39,29 +39,6 @@ export async function buildIntermediateService<T = any>(
 	const inversifyContainer = new InversifyContainer({
 		defaultScope: 'Singleton',
 	})
-	const contextFactory = function (parent: Constructor | null): Container {
-		return new Container(plugins, inversifyContainer, moduleBindingProcessor, parent)
-	}
-
-	const container = contextFactory(NO_PARENT)
-
-	// Bind the rootClass name to the container
-	container.bindConstant<string>(ContainerConstant.ROOT_CLASS, constructor.name)
-	// Bind the service name to the container
-	container.bindConstant<string>(ContainerConstant.SERVICE_NAME, serviceOptions.name)
-	// Bind the service directory to the container
-	container.bindConstant<string>(ContainerConstant.SERVICE_DIRECTORY, serviceOptions.serviceDirectory)
-
-	// Bind the service to the container
-	container.bindClass<T>(constructor)
-
-	container.bindClass<LogConfig>(LogConfig)
-
-	// Default logProvider
-	container.bindInterface<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE, ConsoleLoggerProvider)
-
-	/// Plugin event: preCreation
-	await Promise.all(plugins.map(plugin => plugin.preCreation(container)))
 
 	const moduleDependencyGraph = new DependencyGraph<Constructor>()
 
@@ -87,6 +64,30 @@ export async function buildIntermediateService<T = any>(
 
 		container.bindClass(current)
 	}
+
+	const contextFactory = function (parent: Constructor | null): Container {
+		return new Container(plugins, inversifyContainer, moduleBindingProcessor, parent)
+	}
+
+	const container = contextFactory(NO_PARENT)
+
+	// Bind the rootClass name to the container
+	container.bindConstant<string>(ContainerConstant.ROOT_CLASS, constructor.name)
+	// Bind the service name to the container
+	container.bindConstant<string>(ContainerConstant.SERVICE_NAME, serviceOptions.name)
+	// Bind the service directory to the container
+	container.bindConstant<string>(ContainerConstant.SERVICE_DIRECTORY, serviceOptions.serviceDirectory)
+
+	// Bind the service to the container
+	container.bindClass<T>(constructor)
+
+	container.bindClass<LogConfig>(LogConfig)
+
+	// Default logProvider
+	container.bindInterface<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE, ConsoleLoggerProvider)
+
+	/// Plugin event: preCreation
+	await Promise.all(plugins.map(plugin => plugin.preCreation(container)))
 
 	const handleInject = function (optionsObject: ServiceOptions | ModuleOptions, parent: Constructor | null) {
 		if (optionsObject.inject) {
