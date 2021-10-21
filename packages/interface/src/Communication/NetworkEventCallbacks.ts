@@ -1,2 +1,2 @@
-export type ServiceAppearedCallback = (serviceName: string) => void
-export type ServiceDisappearedCallback = (serviceName: string) => void
+export type ServiceAppearedCallback = (serviceName: string) => Promise<void>
+export type ServiceDisappearedCallback = (serviceName: string) => Promise<void>

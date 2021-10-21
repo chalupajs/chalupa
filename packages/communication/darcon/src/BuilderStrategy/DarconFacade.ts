@@ -37,7 +37,6 @@ export class DarconFacade extends AbstractCommunicationFacade implements ICommun
 		this._eventHandlers = new Map<string, EventCallable>()
 	}
 
-
 	onServiceDisappeared(_cb: ServiceDisappearedCallback) {
 		this._serviceDisappearedCallback = _cb
 	}
@@ -63,6 +62,7 @@ export class DarconFacade extends AbstractCommunicationFacade implements ICommun
 		const self = this
 		const logger = this._facadeContainer.getLogger('Darcon')
 
+		// eslint-disable-next-line no-warning-comments
 		// TODO: remove it when @imrefazekas merged https://github.com/imrefazekas/darcon/pull/3
 
 		// @ts-expect-error
@@ -142,17 +142,18 @@ export class DarconFacade extends AbstractCommunicationFacade implements ICommun
 
 		this._methodHandlers.forEach((callable, methodName) => {
 			Object.defineProperty(darconEntity, methodName, {
-				value: (...params: any[]) => callable(params.slice(0, -1), params.slice(-1)[0]),
+				value: (...parameters: any[]) => callable(parameters.slice(0, -1), parameters.slice(-1)[0]),
 			})
 		})
 
 		this._eventHandlers.forEach((callable, eventName) => {
 			Object.defineProperty(darconEntity, eventName, {
-				value: (...params: any[]) => {
-					const response = callable(params.slice(0, -1), params.slice(-1)[0])
+				value: (...parameters: any[]) => {
+					const response = callable(parameters.slice(0, -1), parameters.slice(-1)[0])
 					if (typeof response === 'undefined') {
 						return 'OK'
 					}
+
 					return response
 				},
 			})

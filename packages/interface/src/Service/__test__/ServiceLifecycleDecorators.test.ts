@@ -12,6 +12,7 @@ describe('Service lifecycle decorators', () => {
 			}
 			const hasPostInit = Reflect.hasMetadata(Metadata.ServiceLifecycle.PostInit, ToBeDecorated.prototype)
 			expect(hasPostInit).toBeTruthy()
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const postInitMethodName = Reflect.getMetadata(Metadata.ServiceLifecycle.PostInit, ToBeDecorated.prototype)
 			expect(postInitMethodName).toBe('init')
 		})
@@ -25,6 +26,7 @@ describe('Service lifecycle decorators', () => {
 			}
 			const hasPreDestroy = Reflect.hasMetadata(Metadata.ServiceLifecycle.PreDestroy, ToBeDecorated.prototype)
 			expect(hasPreDestroy).toBeTruthy()
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const preDestroyMethodName = Reflect.getMetadata(
 				Metadata.ServiceLifecycle.PreDestroy,
 				ToBeDecorated.prototype

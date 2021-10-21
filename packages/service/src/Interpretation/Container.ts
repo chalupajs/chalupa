@@ -1,11 +1,13 @@
-import { IPlugin } from '@catamaranjs/service'
 import {
 	Constructor,
 	IContainer,
 	IFacadeContainer,
-	IInjectContainer, ILogger,
+	IInjectContainer,
+	ILogger,
 	InversifyContainer,
-	IPluginContainer, LoggerFactory,
+	IPlugin,
+	IPluginContainer,
+	LoggerFactory,
 } from '@catamaranjs/interface'
 
 export class Container implements IContainer, IInjectContainer, IFacadeContainer, IPluginContainer {
@@ -14,8 +16,12 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 	private readonly _moduleBindingProcessor: Function
 	private readonly _parent: Constructor | null
 
-
-	constructor(plugins: IPlugin[], container: InversifyContainer, moduleBindingProcessor: Function, parent: Constructor | null) {
+	constructor(
+		plugins: IPlugin[],
+		container: InversifyContainer,
+		moduleBindingProcessor: Function,
+		parent: Constructor | null
+	) {
 		this._plugins = plugins
 		this._container = container
 		this._moduleBindingProcessor = moduleBindingProcessor
@@ -23,27 +29,31 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 	}
 
 	bindClass<T>(constructor: Constructor<T>): this {
-		const processedConstructor = this._plugins.reduce((previousConstructor: Constructor<T>, plugin: IPlugin) => {
-			return plugin.onBindClass<T>(previousConstructor)
-		}, constructor)
+		const processedConstructor = this._plugins.reduce(
+			(previousConstructor: Constructor<T>, plugin: IPlugin) => plugin.onBindClass<T>(previousConstructor),
+			constructor
+		)
 		this._container.bind<T>(processedConstructor).toSelf().inSingletonScope()
-		return this;
+		return this
 	}
 
 	bindConstant<T>(accessor: string, constant: T): this {
-		const processedConstant = this._plugins.reduce((previousConstant: T, plugin: IPlugin) => {
-			return plugin.onBindConstant<T>(accessor, previousConstant)
-		}, constant)
+		const processedConstant = this._plugins.reduce(
+			(previousConstant: T, plugin: IPlugin) => plugin.onBindConstant<T>(accessor, previousConstant),
+			constant
+		)
 		this._container.bind<T>(accessor).toConstantValue(processedConstant)
-		return this;
+		return this
 	}
 
 	bindInterface<T>(accessor: string, constructor: Constructor<T>): this {
-		const processedConstructor = this._plugins.reduce((previousConstructor: Constructor<T>, plugin: IPlugin) => {
-			return plugin.onBindInterface<T>(accessor, previousConstructor)
-		}, constructor)
+		const processedConstructor = this._plugins.reduce(
+			(previousConstructor: Constructor<T>, plugin: IPlugin) =>
+				plugin.onBindInterface<T>(accessor, previousConstructor),
+			constructor
+		)
 		this._container.bind<T>(accessor).to(processedConstructor).inSingletonScope()
-		return this;
+		return this
 	}
 
 	getLogger<T = any>(key: Constructor<T> | string): ILogger {
@@ -52,61 +62,62 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 	}
 
 	immediate<T>(constructor: Constructor<T>): T {
-		// if (isExternalService(constructor)) {
-		// 	externalServiceConstructors.push(constructor)
-		//
-		// 	container.bind(constructor).toSelf().inSingletonScope()
-		// } else {
-		// 	container.bind<T>(constructor).toSelf().inSingletonScope()
-		// }
-
 		this.bindClass<T>(constructor)
 
 		return this._container.get<T>(constructor)
 	}
 
 	isBound(accessor: string | Constructor): boolean {
-		return this._container.isBound(accessor);
+		return this._container.isBound(accessor)
 	}
 
 	rebindClass<T>(constructor: Constructor<T>): this {
-		const processedConstructor = this._plugins.reduce((previousConstructor: Constructor<T>, plugin: IPlugin) => {
-			return plugin.onRebindClass<T>(previousConstructor)
-		}, constructor)
+		const processedConstructor = this._plugins.reduce(
+			(previousConstructor: Constructor<T>, plugin: IPlugin) => plugin.onRebindClass<T>(previousConstructor),
+			constructor
+		)
 		this._container.rebind<T>(processedConstructor).toSelf()
-		return this;
+		return this
 	}
 
 	rebindConstant<T>(accessor: string, constant: T): this {
-		const processedConstant = this._plugins.reduce((previousConstant: T, plugin: IPlugin) => {
-			return plugin.onRebindConstant<T>(accessor, previousConstant)
-		}, constant)
+		const processedConstant = this._plugins.reduce(
+			(previousConstant: T, plugin: IPlugin) => plugin.onRebindConstant<T>(accessor, previousConstant),
+			constant
+		)
 		this._container.rebind<T>(accessor).toConstantValue(processedConstant)
 		return this
 	}
 
 	rebindInterface<T>(accessor: string, constructor: Constructor<T>): this {
-		const processedConstructor = this._plugins.reduce((previousConstructor: Constructor<T>, plugin: IPlugin) => {
-			return plugin.onRebindInterface<T>(accessor, previousConstructor)
-		}, constructor)
+		const processedConstructor = this._plugins.reduce(
+			(previousConstructor: Constructor<T>, plugin: IPlugin) =>
+				plugin.onRebindInterface<T>(accessor, previousConstructor),
+			constructor
+		)
 		this._container.rebind<T>(accessor).to(processedConstructor)
 		return this
 	}
 
 	unbind(accessor: string | Constructor): this {
-		if(!this._plugins.reduce((previousBool: boolean, plugin: IPlugin) => {
-			return plugin.onUnbind(accessor) && previousBool
-		}, true)) {
+		if (
+			!this._plugins.reduce(
+				(previousBool: boolean, plugin: IPlugin) => plugin.onUnbind(accessor) && previousBool,
+				true
+			)
+		) {
 			return this
 		}
+
 		this._container.unbind(accessor)
 		return this
 	}
 
 	bindModule<T>(moduleConstructor: Constructor<T>): IInjectContainer {
-		const processedModuleConstructor: Constructor<T> = this._plugins.reduce((previousConstructor: Constructor<T>, plugin: IPlugin) => {
-			return plugin.onBindModule(previousConstructor)
-		}, moduleConstructor)
+		const processedModuleConstructor: Constructor<T> = this._plugins.reduce(
+			(previousConstructor: Constructor<T>, plugin: IPlugin) => plugin.onBindModule(previousConstructor),
+			moduleConstructor
+		)
 
 		this._container.bind(processedModuleConstructor).toSelf()
 
@@ -116,8 +127,9 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 
 	get<T>(accessor: string | Constructor): T {
 		const instance: T = this._container.get<T>(accessor)
-		return this._plugins.reduce((prevInstance: T, plugin: IPlugin) => {
-			return plugin.onGet<T>(accessor, prevInstance)
-		}, instance)
+		return this._plugins.reduce(
+			(previousInstance: T, plugin: IPlugin) => plugin.onGet<T>(accessor, previousInstance),
+			instance
+		)
 	}
 }

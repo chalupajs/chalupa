@@ -19,16 +19,10 @@ export class InMemoryFacade extends AbstractCommunicationFacade {
 
 	private _memoryService?: IMemoryService
 
-	private _methodHandlers: Map<string, MethodCallable>
-	private _eventHandlers: Map<string, EventCallable>
-
 	constructor(facadeContainer: IFacadeContainer) {
 		super()
 		this._facadeContainer = facadeContainer
-		this._methodHandlers = new Map<string, MethodCallable>()
-		this._eventHandlers = new Map<string, EventCallable>()
 	}
-
 
 	onServiceDisappeared(cb: ServiceDisappearedCallback) {
 		InMemoryOrchestrator.onServiceDisappeared(async (serviceName: string) => {
@@ -54,15 +48,18 @@ export class InMemoryFacade extends AbstractCommunicationFacade {
 
 	async connectToNetwork() {
 		this._memoryService = InMemoryOrchestrator.createService(this._serviceName!)
+		return Promise.resolve()
 	}
 
 	async publishSelf(): Promise<void> {
 		this._memoryService?.connect()
 		InMemoryOrchestrator.keepServiceAlive()
+		return Promise.resolve()
 	}
 
 	async closeSelf() {
 		InMemoryOrchestrator.close()
+		return Promise.resolve()
 	}
 
 	addEventHandler(eventName: string, callable: EventCallable): void {

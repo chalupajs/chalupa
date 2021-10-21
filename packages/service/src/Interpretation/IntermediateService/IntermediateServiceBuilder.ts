@@ -10,13 +10,14 @@ import {
 	LoggerFactory,
 	Errors,
 	Metadata,
-	DependencyGraph, IPlugin,
+	DependencyGraph,
+	IPlugin,
 } from '@catamaranjs/interface'
 
 import { ConsoleLoggerProvider } from '../../Log/Console/ConsoleLoggerProvider'
 import { extractServiceOptions } from '../annotation_utils'
-import { IntermediateService } from './IntermediateService'
 import { Container } from '../Container'
+import { IntermediateService } from './IntermediateService'
 
 const NO_PARENT = null
 
@@ -30,7 +31,6 @@ export async function buildIntermediateService<T = any>(
 	constructor: Constructor<T>,
 	plugins: IPlugin[]
 ): Promise<IIntermediateService> {
-
 	guardServiceDecorator(constructor)
 
 	const serviceOptions = extractServiceOptions(constructor)
@@ -61,7 +61,7 @@ export async function buildIntermediateService<T = any>(
 	container.bindInterface<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE, ConsoleLoggerProvider)
 
 	/// Plugin event: preCreation
-	await Promise.all([...plugins.map(plugin => plugin.preCreation(container))])
+	await Promise.all(plugins.map(plugin => plugin.preCreation(container)))
 
 	const moduleDependencyGraph = new DependencyGraph<Constructor>()
 
@@ -69,7 +69,7 @@ export async function buildIntermediateService<T = any>(
 		const errorHandlers: Map<string, Constructor<Error>[]> | null = Reflect.getMetadata(
 			Metadata.METADATA_ERROR_HANDLER_MAP,
 			scope.prototype
-		)
+		) as Map<string, Constructor<Error>[]> | null
 
 		if (!errorHandlers) {
 			return
@@ -78,13 +78,13 @@ export async function buildIntermediateService<T = any>(
 		const serviceMethods: Map<string, string> | null = Reflect.getMetadata(
 			Metadata.METADATA_SERVICE_MAP,
 			scope.prototype
-		)
+		) as Map<string, string> | null
 		serviceMethods?.forEach(internalName => wrapWithErrorHandling(scope, internalName, errorHandlers))
 
 		const serviceEvents: Map<string, string> | null = Reflect.getMetadata(
 			Metadata.METADATA_EVENT_MAP,
 			scope.prototype
-		)
+		) as Map<string, string> | null
 		serviceEvents?.forEach(internalName => wrapWithErrorHandling(scope, internalName, errorHandlers))
 	}
 
@@ -93,14 +93,18 @@ export async function buildIntermediateService<T = any>(
 		internalName: string,
 		errorHandlers: Map<string, Constructor<Error>[]>
 	) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
 		const originalFunction = scope.prototype[internalName]
 
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 		scope.prototype[internalName] = async function (...args: unknown[]) {
 			try {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call
 				return await originalFunction(...args)
 			} catch (thrownError) {
 				for (const [errorHandler, handledErrors] of errorHandlers.entries()) {
-					if (handledErrors.find(handledType => thrownError instanceof handledType)) {
+					if (handledErrors.some(handledType => thrownError instanceof handledType)) {
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-return,no-await-in-loop,@typescript-eslint/no-unsafe-call,no-return-await,@typescript-eslint/no-unsafe-member-access
 						return await scope.prototype[errorHandler](thrownError, args)
 					}
 				}
@@ -119,7 +123,10 @@ export async function buildIntermediateService<T = any>(
 			moduleDependencyGraph.addDependency(parent.name, current.name)
 		}
 
-		const moduleOptions: ModuleOptions = Reflect.getMetadata(Metadata.METADATA_MODULE_OPTIONS, current)
+		const moduleOptions: ModuleOptions = Reflect.getMetadata(
+			Metadata.METADATA_MODULE_OPTIONS,
+			current
+		) as ModuleOptions
 
 		handleInject(moduleOptions, current)
 
@@ -157,7 +164,6 @@ export async function buildIntermediateService<T = any>(
 	const handleModules = function (modules: Constructor[] | undefined, parent: Constructor | null) {
 		modules?.forEach(current => moduleBindingProcessor(current, parent))
 	}
-
 
 	// Inject LoggerFactory
 	container.bindClass<LoggerFactory>(LoggerFactory)

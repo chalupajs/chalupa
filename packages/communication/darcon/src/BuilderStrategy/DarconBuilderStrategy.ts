@@ -1,7 +1,4 @@
-import {
-	IBuilderStrategy,
-	IIntermediateService,
-} from '@catamaranjs/interface'
+import { IBuilderStrategy, IIntermediateService } from '@catamaranjs/interface'
 
 import { ConstructedService } from './ConstructedService'
 import { DarconFacade } from './DarconFacade'
@@ -21,6 +18,6 @@ export class DarconBuilderStrategy implements IBuilderStrategy<ConstructedServic
 			return orchesrator.close()
 		}
 
-		return { start, close }
+		return Promise.resolve({ start, close })
 	}
 }

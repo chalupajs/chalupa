@@ -2,7 +2,8 @@ import {
 	AbstractPlugin,
 	Constructor,
 	ensureInjectable,
-	isConfiguration, reconfigureToEnvPrefix
+	isConfiguration,
+	reconfigureToEnvPrefix,
 } from '@catamaranjs/interface'
 
 export class EnvPrefix extends AbstractPlugin {
@@ -18,10 +19,14 @@ export class EnvPrefix extends AbstractPlugin {
 	}
 
 	onBindClass<T>(constructor: Constructor<T>): Constructor<T> {
-		return isConfiguration(constructor) ? reconfigureToEnvPrefix(this.prefix, ensureInjectable(constructor)) : constructor
+		return isConfiguration(constructor)
+			? reconfigureToEnvPrefix<T>(this.prefix, ensureInjectable(constructor))
+			: constructor
 	}
 
 	onRebindClass<T>(constructor: Constructor<T>): Constructor<T> {
-		return isConfiguration(constructor) ? reconfigureToEnvPrefix(this.prefix, ensureInjectable(constructor)) : constructor
+		return isConfiguration(constructor)
+			? reconfigureToEnvPrefix<T>(this.prefix, ensureInjectable(constructor))
+			: constructor
 	}
 }

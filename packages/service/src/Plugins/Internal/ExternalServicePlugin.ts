@@ -1,7 +1,10 @@
 import {
 	AbstractPlugin,
-	Constructor, ExternalServiceOptions, IPluginContainer,
-	isExternalService, Metadata,
+	Constructor,
+	ExternalServiceOptions,
+	IPluginContainer,
+	isExternalService,
+	Metadata,
 } from '@catamaranjs/interface'
 import { timeout } from '../../util'
 
@@ -17,12 +20,13 @@ export class ExternalServicePlugin extends AbstractPlugin {
 				constructor
 			) as Required<ExternalServiceOptions>
 
-			if(this.dependsOn.has(accessor)) {
+			if (this.dependsOn.has(accessor)) {
 				this.dependsOn.get(accessor)!.push(externalServiceOptions.name)
 			} else {
 				this.dependsOn.set(accessor, [externalServiceOptions.name])
 			}
 		}
+
 		return constructor
 	}
 
@@ -34,6 +38,7 @@ export class ExternalServicePlugin extends AbstractPlugin {
 			) as Required<ExternalServiceOptions>
 			this.dependsOn.set(accessor, [externalServiceOptions.name])
 		}
+
 		return constructor
 	}
 
@@ -49,12 +54,13 @@ export class ExternalServicePlugin extends AbstractPlugin {
 				constructor
 			) as Required<ExternalServiceOptions>
 
-			if(this.dependsOn.has(constructor)) {
+			if (this.dependsOn.has(constructor)) {
 				this.dependsOn.get(constructor)!.push(externalServiceOptions.name)
 			} else {
 				this.dependsOn.set(constructor, [externalServiceOptions.name])
 			}
 		}
+
 		return constructor
 	}
 
@@ -67,6 +73,7 @@ export class ExternalServicePlugin extends AbstractPlugin {
 
 			this.dependsOn.set(constructor, [externalServiceOptions.name])
 		}
+
 		return constructor
 	}
 
@@ -77,13 +84,16 @@ export class ExternalServicePlugin extends AbstractPlugin {
 
 	async preStart(container: IPluginContainer): Promise<void> {
 		const logger = container.getLogger('ExternalServicePlugin')
-		for(let dependsArray of this.dependsOn.values()) {
+		for (const dependsArray of this.dependsOn.values()) {
 			dependsArray.forEach(depends => this.depends.add(depends))
 		}
-		while(this.depends.size > 0) {
-			logger.info(`Waiting for ${Array.from(this.depends).join(', ')} to be present!`)
+
+		while (this.depends.size > 0) {
+			logger.info(`Waiting for ${[...this.depends].join(', ')} to be present!`)
+			// eslint-disable-next-line no-await-in-loop
 			await timeout(2000)
 		}
+
 		return Promise.resolve()
 	}
 }

@@ -4,7 +4,7 @@ import {
 	ContainerConstant,
 	ensureInjectable,
 	ILogProvider,
-	InversifyContainer
+	InversifyContainer,
 } from '@catamaranjs/interface'
 
 export class LogProvider extends AbstractPlugin {

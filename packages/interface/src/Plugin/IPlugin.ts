@@ -24,5 +24,4 @@ export interface IPlugin {
 	onUnbind(accessor: string | Constructor): boolean
 	onBindModule(moduleConstructor: Constructor): Constructor
 	onGet<T>(accessor: Constructor<T> | string, instance: T): T
-
 }

@@ -1,10 +1,10 @@
 import { Constructor, IBuilderStrategy, IPlugin } from '@catamaranjs/interface'
-import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
 import { ExternalServicePlugin } from '../Plugins/Internal/ExternalServicePlugin'
+import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
 
 type ICatamaran = {
-	_plugins: IPlugin[],
-	globalUse(plugin: IPlugin | IPlugin[]): void,
+	_plugins: IPlugin[]
+	globalUse(plugin: IPlugin | IPlugin[]): void
 	builder(): ICatamaranBuilder
 }
 
@@ -15,14 +15,14 @@ type ICatamaran = {
 export const Catamaran: ICatamaran = {
 	_plugins: [],
 	globalUse(plugin: IPlugin | IPlugin[]): void {
-		if(Array.isArray(plugin)) {
+		if (Array.isArray(plugin)) {
 			this._plugins.push(...plugin)
 		} else {
 			this._plugins.push(plugin)
 		}
 	},
 	builder(): ICatamaranBuilder {
-		return (new CatamaranBuilder()).use(this._plugins)
+		return new CatamaranBuilder().use(this._plugins)
 	},
 }
 
@@ -49,7 +49,7 @@ export class CatamaranBuilder implements ICatamaranBuilder {
 	}
 
 	use(plugin: IPlugin | IPlugin[]): ICatamaranBuilder {
-		if(Array.isArray(plugin)) {
+		if (Array.isArray(plugin)) {
 			this.plugins.push(...plugin)
 		} else {
 			this.plugins.push(plugin)

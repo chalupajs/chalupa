@@ -69,7 +69,6 @@ export function Service<T = any>(options: Partial<ServiceOptions> = {}) {
 export function PostInit() {
 	return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
 		// The target will never be primitive, so this argument is actually safe.
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		Reflect.defineMetadata(Metadata.ServiceLifecycle.PostInit, propertyKey, target)
 	}
 }
@@ -82,7 +81,6 @@ export function PostInit() {
 export function PreDestroy() {
 	return function (target: any, propertyKey: string, _descriptor: PropertyDescriptor) {
 		// The target will never be primitive, so this argument is actually safe.
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 		Reflect.defineMetadata(Metadata.ServiceLifecycle.PreDestroy, propertyKey, target)
 	}
 }

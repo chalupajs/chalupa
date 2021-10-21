@@ -1,8 +1,4 @@
-import {
-	AbstractPlugin,
-	configurator,
-	IPluginContainer
-} from '@catamaranjs/interface'
+import { AbstractPlugin, configurator, IPluginContainer } from '@catamaranjs/interface'
 
 export class ConfigSources extends AbstractPlugin {
 	private readonly _configSources: string[]
@@ -18,5 +14,6 @@ export class ConfigSources extends AbstractPlugin {
 
 	async preCreation(_container: IPluginContainer): Promise<void> {
 		configurator.withSources(this._configSources)
+		return Promise.resolve()
 	}
 }

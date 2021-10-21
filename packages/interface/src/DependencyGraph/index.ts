@@ -222,6 +222,7 @@ export class DependencyGraph<T = any> implements IDependencyGraph<T> {
 	 * Check if a node exists in the graph
 	 */
 	hasNode(nodeName: string): boolean {
+		// eslint-disable-next-line no-prototype-builtins
 		return this.nodes.hasOwnProperty(nodeName)
 	}
 

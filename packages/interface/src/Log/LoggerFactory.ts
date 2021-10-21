@@ -44,7 +44,6 @@ export class LoggerFactory {
 
 		// The root logger is created in the constructor, thus
 		// this null-assertion is always safe.
-		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		const childLogger = this.loggers.get(this._rootClass)!.createChildLogger(name)
 		this.loggers.set(name, childLogger)
 		return childLogger

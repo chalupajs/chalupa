@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment */
 import { Inject, Injectable } from '../Container/decorators'
 import { ContainerConstant } from '../constants'
 import { Metadata } from '../metadata/Metadata'
 import { ICommunicationChannel } from './ICommunicationChannel'
-;
 
+// eslint-disable-next-line prettier/prettier,func-names
 (function assignExternalServiceMetadata() {
 	Reflect.defineMetadata(Metadata.METADATA_EXTERNAL_SERVICE, true, ExternalServiceTemplate)
 })()
@@ -113,6 +112,7 @@ export class ExternalServiceEmit<T = any> implements IExternalServiceEmit<T> {
 		return this
 	}
 
+	// eslint-disable-next-line @typescript-eslint/require-await
 	async send(terms?: Record<string, any>): Promise<any> {
 		const finalTerms = { ...this._terms, ...terms }
 		return this._communicationChannel.emit(
@@ -128,6 +128,7 @@ export class ExternalServiceEmit<T = any> implements IExternalServiceEmit<T> {
  * Test double for emitting events that resolve with a pre-set value.
  */
 export class EmitWithResult<T = any> implements IExternalServiceEmit<T> {
+	// eslint-disable-next-line no-useless-constructor
 	private constructor(private readonly result: T) {}
 
 	/**
@@ -207,6 +208,7 @@ export class ExternalServiceCall<T = any> implements IExternalServiceCall<T> {
  * Test double for method calls that respond with a pre-set value.
  */
 export class CallWithResult<T = any> implements IExternalServiceCall<T> {
+	// eslint-disable-next-line no-useless-constructor
 	private constructor(private readonly result: T) {}
 
 	/**
