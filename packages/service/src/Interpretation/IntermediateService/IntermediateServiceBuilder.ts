@@ -65,55 +65,6 @@ export async function buildIntermediateService<T = any>(
 
 	const moduleDependencyGraph = new DependencyGraph<Constructor>()
 
-	const handleErrorHandlers = function (scope: Constructor) {
-		const errorHandlers: Map<string, Constructor<Error>[]> | null = Reflect.getMetadata(
-			Metadata.METADATA_ERROR_HANDLER_MAP,
-			scope.prototype
-		) as Map<string, Constructor<Error>[]> | null
-
-		if (!errorHandlers) {
-			return
-		}
-
-		const serviceMethods: Map<string, string> | null = Reflect.getMetadata(
-			Metadata.METADATA_SERVICE_MAP,
-			scope.prototype
-		) as Map<string, string> | null
-		serviceMethods?.forEach(internalName => wrapWithErrorHandling(scope, internalName, errorHandlers))
-
-		const serviceEvents: Map<string, string> | null = Reflect.getMetadata(
-			Metadata.METADATA_EVENT_MAP,
-			scope.prototype
-		) as Map<string, string> | null
-		serviceEvents?.forEach(internalName => wrapWithErrorHandling(scope, internalName, errorHandlers))
-	}
-
-	const wrapWithErrorHandling = function (
-		scope: Constructor,
-		internalName: string,
-		errorHandlers: Map<string, Constructor<Error>[]>
-	) {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-		const originalFunction = scope.prototype[internalName]
-
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-		scope.prototype[internalName] = async function (...args: unknown[]) {
-			try {
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call
-				return await originalFunction(...args)
-			} catch (thrownError) {
-				for (const [errorHandler, handledErrors] of errorHandlers.entries()) {
-					if (handledErrors.some(handledType => thrownError instanceof handledType)) {
-						// eslint-disable-next-line @typescript-eslint/no-unsafe-return,no-await-in-loop,@typescript-eslint/no-unsafe-call,no-return-await,@typescript-eslint/no-unsafe-member-access
-						return await scope.prototype[errorHandler](thrownError, args)
-					}
-				}
-
-				throw thrownError
-			}
-		}
-	}
-
 	const moduleBindingProcessor = function (current: Constructor, parent: Constructor | null) {
 		if (!moduleDependencyGraph.hasNode(current.name)) {
 			moduleDependencyGraph.addNode(current.name, current)
@@ -131,8 +82,6 @@ export async function buildIntermediateService<T = any>(
 		handleInject(moduleOptions, current)
 
 		handleModules(moduleOptions.modules, current)
-
-		handleErrorHandlers(current)
 
 		handleConstants(moduleOptions.constants)
 
@@ -169,8 +118,6 @@ export async function buildIntermediateService<T = any>(
 	container.bindClass<LoggerFactory>(LoggerFactory)
 
 	handleModules(serviceOptions.modules, NO_PARENT)
-
-	handleErrorHandlers(constructor)
 
 	handleInject(serviceOptions, NO_PARENT)
 
