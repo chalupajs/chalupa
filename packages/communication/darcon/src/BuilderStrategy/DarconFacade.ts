@@ -14,6 +14,17 @@ import {
 import { DarconConfig } from '../Config/DarconConfig'
 import { DarconCommunicationChannel } from './DarconCommunicationChannel'
 
+function filterTerms(terms: Record<string, any>) {
+	const filteredTerms = { ...terms }
+	delete filteredTerms.flowID
+	delete filteredTerms.processID
+	delete filteredTerms.request
+	delete filteredTerms.inform
+	delete filteredTerms.delegate
+	delete filteredTerms.comm
+	return filteredTerms
+}
+
 export class DarconFacade extends AbstractCommunicationFacade implements ICommunicationFacade {
 	// @ts-ignore
 	private _facadeContainer: IFacadeContainer
@@ -142,14 +153,15 @@ export class DarconFacade extends AbstractCommunicationFacade implements ICommun
 
 		this._methodHandlers.forEach((callable, methodName) => {
 			Object.defineProperty(darconEntity, methodName, {
-				value: (...parameters: any[]) => callable(parameters.slice(0, -1), parameters.slice(-1)[0]),
+				value: (...parameters: any[]) =>
+					callable(parameters.slice(0, -1), filterTerms(parameters.slice(-1)[0])),
 			})
 		})
 
 		this._eventHandlers.forEach((callable, eventName) => {
 			Object.defineProperty(darconEntity, eventName, {
 				value: (...parameters: any[]) => {
-					const response = callable(parameters.slice(0, -1), parameters.slice(-1)[0])
+					const response = callable(parameters.slice(0, -1), filterTerms(parameters.slice(-1)[0]))
 					if (typeof response === 'undefined') {
 						return 'OK'
 					}
