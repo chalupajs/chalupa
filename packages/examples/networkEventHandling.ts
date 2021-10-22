@@ -1,14 +1,16 @@
 import {
 	Catamaran,
-	InMemoryStrategy
+	InMemoryStrategy, LogProvider
 } from '@catamaranjs/service'
 import {
 	Service,
 	ILogger,
 	Inject,
 	LoggerFactory,
-	NetworkEvent,
+	ServiceAppeared,
+	ServiceDisappeared
 } from '@catamaranjs/interface'
+import {PinoLogProvider} from "@catamaranjs/logger-pino";
 
 @Service()
 class TestService {
@@ -18,24 +20,22 @@ class TestService {
 		this._logger = loggerFactory.getLogger(TestService)
 	}
 
-	@NetworkEvent()
-	entityAppeared() {
-		this._logger.info('EntityAppeared')
+	@ServiceAppeared()
+	serviceAppeared() {
+		this._logger.info('ServiceAppeared')
 	}
 
-	@NetworkEvent()
-	entityDisappeared() {
-		this._logger.info('EntityDisappeared')
-	}
-
-	@NetworkEvent()
-	entityUpdated() {
-		this._logger.info('EntityUpdated')
+	@ServiceDisappeared()
+	serviceDisappeared() {
+		this._logger.info('ServiceDisappeared')
 	}
 }
 
 async function start() {
-	const service = await Catamaran.createServiceWithStrategy(TestService, InMemoryStrategy)
+	const service = await Catamaran
+		.builder()
+		.use(LogProvider.provider(PinoLogProvider))
+		.createServiceWithStrategy(TestService, InMemoryStrategy)
 	await service.start()
 }
 

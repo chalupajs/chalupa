@@ -1,27 +1,28 @@
 import {
+	Constructor,
 	ContainerConstant,
 	IBuilderStrategy,
 	ICommunicationChannel,
 	IIntermediateService,
-	Metadata,
+	// Metadata,
 } from '@catamaranjs/interface'
 
 import { IntegrationTestArrangement, SystemUnderTest } from './IntegrationTestArrangement'
 import { IntegrationTestCommunicationChannel } from './IntegrationTestCommunicationChannel'
+import {IntegrationTestCommunicationFacade} from "./IntegrationTestCommunicationFacade";
+import IntegrationTestCallbackHandler from "./IntegrationTestCallbackHandler";
 
 /**
  * Strategy creating an integration testing optimized version of the service, which
- * will not make any actual Darcon calls.
+ * will not make any actual communication calls.
  */
 export class IntegrationTestBuilderStrategy implements IBuilderStrategy<IntegrationTestArrangement> {
 	build(intermediateService: IIntermediateService): Promise<IntegrationTestArrangement> {
-		const serviceBridge = intermediateService.bridge()
+		const orchestrator = intermediateService.bridge().useFacade(IntegrationTestCommunicationFacade)
 
 		intermediateService.container
 			.bind<ICommunicationChannel>(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE)
 			.to(IntegrationTestCommunicationChannel)
-
-		const originalEnvValues = new Map<string, string | undefined>()
 
 		const sut: SystemUnderTest = {
 			getComponent(key) {
@@ -32,60 +33,45 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
 				return intermediateService.container.get(key)
 			},
-			async entityAppeared(name) {
-				if (!isItMe(name)) {
-					await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityAppeared, [name])
+			async serviceAppeared(name) {
+				if (IntegrationTestCallbackHandler.onServiceAppeared) {
+					await IntegrationTestCallbackHandler.onServiceAppeared(name)
 				}
+
+				return Promise.resolve()
 			},
-			async entityDisappeared(name) {
-				if (!isItMe(name)) {
-					await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityDisappeared, [name])
+			async serviceDisappeared(name) {
+				if (IntegrationTestCallbackHandler.onServiceDisappeared) {
+					await IntegrationTestCallbackHandler.onServiceDisappeared(name)
 				}
-			},
-			async entityUpdated(name, terms) {
-				if (!isItMe(name)) {
-					await serviceBridge.callNetworkEvent(Metadata.NetworkEvent.EntityUpdated, [name, terms])
-				}
+
+				return Promise.resolve()
 			},
 			async close() {
-				await intermediateService.bridge().callLifecycleMethodOnService(Metadata.ServiceLifecycle.PreDestroy)
-
-				// @ts-ignore
-				for (const [key, value] of originalEnvValues.entries()) {
-					process.env[key] = value
-				}
+				await orchestrator.close()
 			},
 		}
 
-		serviceBridge.suppressEventWarning().suppressMethodWarning().buildDependencyTree()
-
 		const arrangement: IntegrationTestArrangement = {
+			bind(key: string | Constructor, boundValue: any) {
+				intermediateService.container.bind(key).toConstantValue(boundValue)
+
+				return arrangement
+			},
+
 			rebind(key, boundValue) {
 				intermediateService.container.rebind(key).toConstantValue(boundValue)
 
 				return arrangement
 			},
 
-			reconfigure(variable: string, value: any) {
-				originalEnvValues.set(variable, process.env[variable])
-
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				process.env[variable] = value
-
-				return arrangement
-			},
-
 			async start() {
-				await serviceBridge.callLifecycleMethodOnService(Metadata.ServiceLifecycle.PostInit)
+				await orchestrator.start()
 
-				return sut
+				return Promise.resolve(sut)
 			},
 		}
 
 		return Promise.resolve(arrangement)
-
-		function isItMe(name: string) {
-			return name === intermediateService.serviceOptions.name
-		}
 	}
 }

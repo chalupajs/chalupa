@@ -3,128 +3,46 @@ import {
 	InversifyContainer,
 	ContainerConstant,
 	Constructor,
-	ExternalServiceOptions,
 	ModuleOptions,
 	IIntermediateService,
 	LogConfig,
 	ILogProvider,
 	LoggerFactory,
 	Errors,
-	Metadata, reconfigureToEnvPrefix,
-	configurator,
+	Metadata,
 	DependencyGraph,
+	IPlugin,
 } from '@catamaranjs/interface'
 
+import { ConsoleLoggerProvider } from '../../Log/Console/ConsoleLoggerProvider'
+import { extractServiceOptions } from '../annotation_utils'
+import { Container } from '../Container'
+import { IntermediateService } from './IntermediateService'
 
+const NO_PARENT = null
 
-import { ContextContainer, NO_PARENT } from '../../Container/ContextContainer'
-import { ConsoleLoggerProvider } from "../../Log/console-logger/ConsoleLoggerProvider";
-import { extractServiceOptions } from "../annotation_utils";
-import { IntermediateService } from "./IntermediateService";
-import { IConfigurator } from "../../Configurator/IConfigurator";
-import { ensureInjectable } from "@catamaranjs/interface/src/annotation_utils";
-
-
-export function buildIntermediateService<T = any>(
-	constructor: Constructor<T>,
-	configurators: IConfigurator[]
-): IIntermediateService {
+function guardServiceDecorator<T>(constructor: Constructor<T>) {
 	if (!Reflect.hasOwnMetadata(Metadata.SERVICE_OPTIONS, constructor)) {
 		throw new Errors.MissingServiceDecoratorError(constructor.name)
 	}
+}
+
+export async function buildIntermediateService<T = any>(
+	constructor: Constructor<T>,
+	plugins: IPlugin[]
+): Promise<IIntermediateService> {
+	guardServiceDecorator(constructor)
 
 	const serviceOptions = extractServiceOptions(constructor)
 
 	// Create the container for the future
-	const container = new InversifyContainer({
+	const inversifyContainer = new InversifyContainer({
 		defaultScope: 'Singleton',
 	})
 
-	// Bind the rootClass name to the container
-	container.bind<string>(ContainerConstant.ROOT_CLASS).toConstantValue(constructor.name)
-	// Bind the service name to the container
-	container.bind<string>(ContainerConstant.SERVICE_NAME).toConstantValue(serviceOptions.name)
-	// Bind the service directory to the container
-	container
-		.bind<string>(ContainerConstant.SERVICE_DIRECTORY)
-		.toConstantValue(serviceOptions.serviceDirectory)
+	const moduleDependencyGraph = new DependencyGraph<Constructor>()
 
-	// Bind the service to the container
-	container.bind<T>(constructor).toSelf()
-
-	container.bind<LogConfig>(LogConfig).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, LogConfig))
-
-	// Bind config to container
-	if (serviceOptions.config) {
-		container.bind<any>(serviceOptions.config).to(
-			reconfigureToEnvPrefix(
-				serviceOptions.envPrefix,
-				ensureInjectable(serviceOptions.config)
-			)
-		)
-	}
-
-	// Default logProvider
-	container.bind<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE).to(ConsoleLoggerProvider)
-
-	configurators.forEach((configurator: IConfigurator) => configurator.configure(container))
-
-	const hasConfigSources: boolean = container.isBound(ContainerConstant.CONFIG_SOURCES)
-	if (hasConfigSources) {
-		const configSources = container.get<string[]>(ContainerConstant.CONFIG_SOURCES)
-		configurator.withSources(configSources)
-	}
-
-	const handleExternalServices = function (externalServices?: Constructor[]) {
-		externalServices?.forEach(externalService => {
-			container.bind(externalService).toSelf()
-			const externalServiceOptions = Reflect.getMetadata(
-				Metadata.METADATA_EXTERNAL_SERVICE_OPTIONS,
-				externalService
-			) as Required<ExternalServiceOptions>
-			if (!serviceOptions.dependsOn) {
-				serviceOptions.dependsOn = []
-			}
-
-			serviceOptions.dependsOn.push(externalServiceOptions.name)
-		})
-	}
-
-	const moduleDependencyGraph = new DependencyGraph<Constructor>();
-
-	const handleErrorHandlers = function (scope: Constructor) {
-		const errorHandlers: Map<string, Constructor<Error>[]> | null = Reflect.getMetadata(Metadata.METADATA_ERROR_HANDLER_MAP, scope.prototype)
-
-		if (!errorHandlers) {
-			return
-		}
-
-		const serviceMethods: Map<string, string> | null = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, scope.prototype)
-		serviceMethods?.forEach(internalName => wrapWithErrorHandling(scope, internalName, errorHandlers))
-
-		const serviceEvents: Map<string, string> | null = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, scope.prototype)
-		serviceEvents?.forEach(internalName => wrapWithErrorHandling(scope, internalName, errorHandlers))
-	}
-
-	const wrapWithErrorHandling = function (scope: Constructor, internalName: string, errorHandlers: Map<string, Constructor<Error>[]>) {
-		const originalFunction = scope.prototype[internalName]
-
-		scope.prototype[internalName] = async function (...args: unknown[]) {
-			try {
-				return await originalFunction(...args)
-			} catch (thrownError) {
-				for (const [errorHandler, handledErrors] of errorHandlers.entries()) {
-					if (handledErrors.find(handledType => thrownError instanceof handledType)) {
-						return await scope.prototype[errorHandler](thrownError, args)
-					}
-				}
-
-				throw thrownError
-			}
-		}
-	}
-
-	const moduleBindingProcessor = function (current: Constructor, parent: Constructor | null) {
+	function moduleBindingProcessor(current: Constructor, parent: Constructor | null) {
 		if (!moduleDependencyGraph.hasNode(current.name)) {
 			moduleDependencyGraph.addNode(current.name, current)
 		}
@@ -133,37 +51,52 @@ export function buildIntermediateService<T = any>(
 			moduleDependencyGraph.addDependency(parent.name, current.name)
 		}
 
-		const moduleOptions: ModuleOptions = Reflect.getMetadata(Metadata.METADATA_MODULE_OPTIONS, current)
-		if (moduleOptions.config) {
-			container.bind(moduleOptions.config).to(reconfigureToEnvPrefix(serviceOptions.envPrefix, ensureInjectable(moduleOptions.config)))
-		}
-
-		handleExternalServices(moduleOptions.externalServices)
+		const moduleOptions: ModuleOptions = Reflect.getMetadata(
+			Metadata.METADATA_MODULE_OPTIONS,
+			current
+		) as ModuleOptions
 
 		handleInject(moduleOptions, current)
 
 		handleModules(moduleOptions.modules, current)
 
-		handleErrorHandlers(current)
-
 		handleConstants(moduleOptions.constants)
 
-		container.bind(current).toSelf()
+		container.bindClass(current)
 	}
+
+	const contextFactory = function (parent: Constructor | null): Container {
+		return new Container(plugins, inversifyContainer, moduleBindingProcessor, parent)
+	}
+
+	const container = contextFactory(NO_PARENT)
+
+	// Bind the rootClass name to the container
+	container.bindConstant<string>(ContainerConstant.ROOT_CLASS, constructor.name)
+	// Bind the service name to the container
+	container.bindConstant<string>(ContainerConstant.SERVICE_NAME, serviceOptions.name)
+	// Bind the service directory to the container
+	container.bindConstant<string>(ContainerConstant.SERVICE_DIRECTORY, serviceOptions.serviceDirectory)
+
+	// Bind the service to the container
+	container.bindClass<T>(constructor)
+
+	container.bindClass<LogConfig>(LogConfig)
+
+	// Default logProvider
+	container.bindInterface<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE, ConsoleLoggerProvider)
+
+	/// Plugin event: preCreation
+	await Promise.all(plugins.map(plugin => plugin.preCreation(container)))
 
 	const handleInject = function (optionsObject: ServiceOptions | ModuleOptions, parent: Constructor | null) {
 		if (optionsObject.inject) {
 			if (Array.isArray(optionsObject.inject)) {
-				for (const injectable of optionsObject.inject) container.bind(injectable).toSelf()
+				for (const constructor of optionsObject.inject) {
+					container.bindClass<T>(constructor)
+				}
 			} else {
-				optionsObject.inject(
-					new ContextContainer(
-						container,
-						moduleBindingProcessor,
-						parent
-					),
-					optionsObject.config ? container.get<any>(optionsObject.config) : undefined
-				)
+				optionsObject.inject(contextFactory(parent))
 			}
 		}
 	}
@@ -171,9 +104,9 @@ export function buildIntermediateService<T = any>(
 	const handleConstants = function (constants?: Array<[string, any]>) {
 		constants?.forEach(([accessor, constant]) => {
 			if (container.isBound(accessor)) {
-				container.rebind(accessor).toConstantValue(constant)
+				container.rebindConstant(accessor, constant)
 			} else {
-				container.bind(accessor).toConstantValue(constant)
+				container.bindConstant(accessor, constant)
 			}
 		})
 	}
@@ -183,17 +116,13 @@ export function buildIntermediateService<T = any>(
 	}
 
 	// Inject LoggerFactory
-	container.bind<LoggerFactory>(LoggerFactory).toSelf()
+	container.bindClass<LoggerFactory>(LoggerFactory)
 
 	handleModules(serviceOptions.modules, NO_PARENT)
-
-	handleExternalServices(serviceOptions.externalServices)
-
-	handleErrorHandlers(constructor)
 
 	handleInject(serviceOptions, NO_PARENT)
 
 	handleConstants(serviceOptions.constants)
 
-	return new IntermediateService(container, constructor, moduleDependencyGraph)
+	return new IntermediateService(inversifyContainer, constructor, moduleDependencyGraph, plugins)
 }

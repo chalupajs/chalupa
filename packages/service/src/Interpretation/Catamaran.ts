@@ -1,17 +1,34 @@
-import { Constructor, IBuilderStrategy } from '@catamaranjs/interface'
+import { Constructor, IBuilderStrategy, IPlugin } from '@catamaranjs/interface'
+import { ExternalServicePlugin } from '../Plugins/Internal/ExternalServicePlugin'
 import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
-import { IConfigurator } from "../Configurator/IConfigurator";
+import {ErrorHandlingPlugin} from "../Plugins/Internal/ErrorHandlingPlugin";
+
+type ICatamaran = {
+	_plugins: IPlugin[]
+	globalUse(plugin: IPlugin | IPlugin[]): void
+	builder(): ICatamaranBuilder
+}
 
 /**
  * The entrypoint of the framework. Use this object to construct
  * some representation of your service.
  */
-export class Catamaran {
-	static configurators: IConfigurator[] = []
+export const Catamaran: ICatamaran = {
+	_plugins: [],
+	globalUse(plugin: IPlugin | IPlugin[]): void {
+		if (Array.isArray(plugin)) {
+			this._plugins.push(...plugin)
+		} else {
+			this._plugins.push(plugin)
+		}
+	},
+	builder(): ICatamaranBuilder {
+		return new CatamaranBuilder().use(this._plugins)
+	},
+}
 
-	static use(configurator: IConfigurator) {
-		this.configurators.push(configurator)
-	}
+export interface ICatamaranBuilder {
+	use(plugin: IPlugin | IPlugin[]): ICatamaranBuilder
 
 	/**
 	 * Loads, wires up and creates some representation of specified
@@ -21,11 +38,31 @@ export class Catamaran {
 	 * @param serviceEntrypoint A `Service` decorated class.
 	 * @param builder A strategy that determines what is created from the passed structure.
 	 */
-	static async createServiceWithStrategy<T>(
+	createServiceWithStrategy<T>(serviceEntrypoint: Constructor, builder: Constructor<IBuilderStrategy<T>>): Promise<T>
+}
+
+export class CatamaranBuilder implements ICatamaranBuilder {
+	private readonly plugins: IPlugin[]
+
+	constructor() {
+		this.plugins = [new ExternalServicePlugin(), new ErrorHandlingPlugin()]
+	}
+
+	use(plugin: IPlugin | IPlugin[]): ICatamaranBuilder {
+		if (Array.isArray(plugin)) {
+			this.plugins.push(...plugin)
+		} else {
+			this.plugins.push(plugin)
+		}
+
+		return this
+	}
+
+	async createServiceWithStrategy<T>(
 		serviceEntrypoint: Constructor,
 		builder: Constructor<IBuilderStrategy<T>>
 	): Promise<T> {
-		const intermediateService = buildIntermediateService(serviceEntrypoint, this.configurators)
+		const intermediateService = await buildIntermediateService(serviceEntrypoint, this.plugins)
 		const builderInstance = new builder()
 		return builderInstance.build(intermediateService)
 	}

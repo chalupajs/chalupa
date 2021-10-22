@@ -25,7 +25,6 @@ describe('@Service decorator', () => {
 		const options: Partial<ServiceOptions> = {
 			name: 'ASD',
 			serviceDirectory: 'Temporary',
-			envPrefix: 'Hello',
 			dependsOn: ['a', 'b', 'c'],
 			delayStart: 1500,
 		}

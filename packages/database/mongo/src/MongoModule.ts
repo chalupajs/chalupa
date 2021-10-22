@@ -3,7 +3,7 @@ import { Inject, Module, PostServiceDestroy, PreServiceInit } from '@catamaranjs
 import { MongoModuleConfig } from './MongoModuleConfig'
 
 @Module({
-	config: MongoModuleConfig,
+	inject: [MongoModuleConfig],
 })
 export class MongoModule {
 	private readonly _connection: MongoClient

@@ -15,17 +15,20 @@
 		"compile": "tsc -p tsconfig.build.json",
 		"compile:watch": "tsc -p tsconfig.build.json --watch",
 		"docs": "typedoc --out generated-docs src",
-		"lint": "xo",
-		"lint:fix": "xo --fix",
-		"test": "echo TODO",
-		"prepublishOnly": "npm run clean && npm run compile"
+	  	"lint": "eslint ./src",
+	  	"lint:fix": "eslint ./src --fix",
+	  	"prepublishOnly": "pnpm run clean && pnpm run compile",
+		"test": "echo TODO"
 	},
 	"repository": {
-		"type": "git",
-		"url": "git@github.com:dwmt/Catamaran.git"
+	  	"type": "git",
+	  	"url": "git@github.com:dwmt/Catamaran.git"
 	},
 	"license": "MIT",
 	"devDependencies": {
+		"@dwmt/eslint-config": "1.0.0",
+		"eslint": "7.32.0",
+		"prettier": "2.4.1",
 		"@types/node": "16.10.3",
 		"rimraf": "3.0.2",
 		"typedoc": "0.21.0",

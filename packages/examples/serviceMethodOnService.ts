@@ -1,18 +1,11 @@
 import {
-	ILogger,
-	Inject,
-	LoggerFactory,
-	Catamaran,
-	Service,
-	DarconBuilderStrategy,
-	ServiceEvent,
-	ServiceMethod,
+	Catamaran, LogProvider,
 } from '@catamaranjs/service'
 import {PinoLogProvider} from '@catamaranjs/logger-pino'
+import {ILogger, Inject, LoggerFactory, Service, ServiceEvent, ServiceMethod} from "@catamaranjs/interface";
+import {DarconBuilderStrategy} from "@catamaranjs/communication-darcon";
 
-@Service({
-	logProvider: PinoLogProvider
-})
+@Service()
 class TestService {
 	private readonly _logger: ILogger
 
@@ -35,7 +28,10 @@ class TestService {
 }
 
 async function start() {
-	const service = await Catamaran.createServiceWithStrategy(TestService, DarconBuilderStrategy)
+	const service = await Catamaran
+		.builder()
+		.use(LogProvider.provider(PinoLogProvider))
+		.createServiceWithStrategy(TestService, DarconBuilderStrategy)
 	await service.start()
 }
 

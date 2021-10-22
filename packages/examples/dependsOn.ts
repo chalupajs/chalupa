@@ -1,16 +1,13 @@
-import { Catamaran } from '@catamaranjs/service'
+import {Catamaran, LogProvider} from '@catamaranjs/service'
 import { DarconBuilderStrategy } from '@catamaranjs/communication-darcon'
 import { ILogger, LoggerFactory, PostInit, Service } from '@catamaranjs/interface'
 import {PinoLogProvider} from '@catamaranjs/logger-pino'
 
-@Service({
-	logProvider: PinoLogProvider
-})
+@Service()
 class TestIniterService {}
 
 @Service({
 	dependsOn: ['TestIniterService'],
-	logProvider: PinoLogProvider
 })
 class TestService {
 	logger: ILogger
@@ -26,8 +23,16 @@ class TestService {
 }
 
 async function start() {
-	const initer = await Catamaran.createServiceWithStrategy(TestIniterService, DarconBuilderStrategy)
-	const service = await Catamaran.createServiceWithStrategy(TestService, DarconBuilderStrategy)
+	const initer = await Catamaran
+		.builder()
+		.use(LogProvider.provider(PinoLogProvider))
+		.createServiceWithStrategy(TestIniterService, DarconBuilderStrategy)
+
+	const service = await Catamaran
+		.builder()
+		.use(LogProvider.provider(PinoLogProvider))
+		.createServiceWithStrategy(TestService, DarconBuilderStrategy)
+
 	await Promise.all([
 		initer.start(),
 		service.start()

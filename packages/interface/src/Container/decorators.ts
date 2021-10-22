@@ -18,8 +18,8 @@ export function Inject(injectable: string | symbol | Constructor) {
  *   * it can be injected into.
  */
 export function Injectable() {
-	return function (target: any): any {
-		return injectable()(target)
+	return function (target: Constructor): Constructor {
+		return injectable()(target) as Constructor
 	}
 }
 

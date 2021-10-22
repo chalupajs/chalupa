@@ -20,4 +20,5 @@ export {
 	Nested,
 	PredefinedFormat,
 	configurator,
+	KONVENIENT_CONFIGURATION_CLASS as CONFIGURATION_CLASS,
 } from 'konvenient'

@@ -1,12 +1,8 @@
-import { Metadata } from '../metadata/Metadata'
+import { ICommunicationFacade } from '../Communication/ICommunicationFacade'
+import { Constructor } from '../types'
+
+import { IServiceBridgeOrchestrator } from './IServiceBridgeOrchestrator'
 
 export interface IServiceBridge {
-	respectDelayedStart(): Promise<IServiceBridge>
-	callLifecycleMethodOnService(symbol: Metadata.ServiceLifecycle): Promise<IServiceBridge>
-	callNetworkEvent(symbol: Metadata.NetworkEvent, parameters: any[]): Promise<IServiceBridge>
-	serviceMethodHandler(cb: (externalName: string, fn: any) => void): IServiceBridge
-	serviceEventHandler(cb: (externalName: string, fn: any) => void): IServiceBridge
-	buildDependencyTree(): IServiceBridge
-	suppressEventWarning(): IServiceBridge
-	suppressMethodWarning(): IServiceBridge
+	useFacade(facade: Constructor<ICommunicationFacade>): IServiceBridgeOrchestrator
 }

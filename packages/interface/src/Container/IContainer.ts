@@ -1,20 +1,7 @@
-import { InversifyContainer, Constructor, IContextContainer } from '@catamaranjs/interface'
+import { Constructor } from '../types'
+import { ILogger } from '../Log/ILogger'
 
-export type ModuleBindingProcessor = (current: Constructor, parent: Constructor | null) => void;
-
-export const NO_PARENT = null
-
-/**
- * Represents the dependency injection container of a service,
- * containing the bindings used to resolve dependency relations.
- */
-export class ContextContainer implements IContextContainer {
-	constructor(
-		private readonly container: InversifyContainer,
-		private readonly moduleBindingProcessor: ModuleBindingProcessor,
-		private readonly parent: Constructor | null
-	) {}
-
+export interface IContainer {
 	/**
 	 * Binds the specified constructor to the accessor. The container will inject
 	 * an instance of the constructor type wherever the accessor is used.
@@ -26,11 +13,11 @@ export class ContextContainer implements IContextContainer {
 	 * @param constructor A constructor function (or class) which will supply the bound instance.
 	 * @returns The current `ContextContainer` instance for easy chaining of calls-
 	 */
-	bindInterface<T>(accessor: string, constructor: Constructor<T>): this {
-		this.container.bind<T>(accessor).to(constructor).inSingletonScope()
+	bindInterface<T>(accessor: string, constructor: Constructor<T>): this
 
-		return this
-	}
+	rebindInterface<T>(accessor: string, constructor: Constructor<T>): this
+
+	isBound(accessor: string | Constructor): boolean
 
 	/**
 	 * Binds the specified constructor to itself: wherever an injection is requested
@@ -42,11 +29,9 @@ export class ContextContainer implements IContextContainer {
 	 * @param constructor A constructor function (or class) which will supply the bound instance.
 	 * @returns The current `ContextContainer` instance for easy chaining of calls.
 	 */
-	bindClass<T>(constructor: Constructor<T>): this {
-		this.container.bind<T>(constructor).toSelf().inSingletonScope()
+	bindClass<T>(constructor: Constructor<T>): this
 
-		return this
-	}
+	rebindClass<T>(constructor: Constructor<T>): this
 
 	/**
 	 * Binds the specified constant value to the given accessor string
@@ -54,16 +39,13 @@ export class ContextContainer implements IContextContainer {
 	 * @param accessor
 	 * @param constant
 	 */
-	bindConstant<T>(accessor: string, constant: T): this {
-		this.container.bind<T>(accessor).toConstantValue(constant)
-		return this
-	}
+	bindConstant<T>(accessor: string, constant: T): this
 
-	bindModule<T>(moduleConstructor: Constructor<T>): this {
-		// TODO: check if really a module constructor
+	rebindConstant<T>(accessor: string, constant: T): this
 
-		this.moduleBindingProcessor(moduleConstructor, this.parent)
+	unbind(accessor: string | Constructor): this
 
-		return this
-	}
+	immediate<T>(constructor: Constructor<T>): T
+
+	getLogger<T = any>(key: Constructor<T> | string): ILogger
 }

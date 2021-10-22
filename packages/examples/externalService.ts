@@ -1,5 +1,5 @@
 import {
-	Catamaran,
+	Catamaran, LogProvider,
 } from '@catamaranjs/service'
 import {PinoLogProvider} from '@catamaranjs/logger-pino'
 import {
@@ -27,8 +27,7 @@ class TestIniterService extends ExternalServiceTemplate {
 }
 
 @Service({
-	externalServices: [TestIniterService],
-	logProvider: PinoLogProvider
+	inject: [TestIniterService],
 })
 class TestService {
 	private readonly _logger: ILogger
@@ -55,7 +54,10 @@ class TestService {
 }
 
 async function start() {
-	const service = await Catamaran.createServiceWithStrategy(TestService, DarconBuilderStrategy)
+	const service = await Catamaran
+		.builder()
+		.use(LogProvider.provider(PinoLogProvider))
+		.createServiceWithStrategy(TestService, DarconBuilderStrategy)
 	await service.start()
 }
 
