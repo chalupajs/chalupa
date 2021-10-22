@@ -39,7 +39,7 @@ export async function buildIntermediateService<T = any>(
 	const inversifyContainer = new InversifyContainer({
 		defaultScope: 'Singleton',
 	})
-	const contextFactory = function (parent: Constructor | null): Container {
+	function contextFactory(parent: Constructor | null): Container {
 		return new Container(plugins, inversifyContainer, moduleBindingProcessor, parent)
 	}
 
@@ -65,7 +65,7 @@ export async function buildIntermediateService<T = any>(
 
 	const moduleDependencyGraph = new DependencyGraph<Constructor>()
 
-	const moduleBindingProcessor = function (current: Constructor, parent: Constructor | null) {
+	function moduleBindingProcessor(current: Constructor, parent: Constructor | null) {
 		if (!moduleDependencyGraph.hasNode(current.name)) {
 			moduleDependencyGraph.addNode(current.name, current)
 		}

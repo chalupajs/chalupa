@@ -5,8 +5,8 @@ export interface IPlugin {
 	// Lifecycles
 	preCreation(container: IPluginContainer): Promise<void>
 
-	preStart(container: IPluginContainer): Promise<void>
-	postStart(container: IPluginContainer): Promise<void>
+	preStart(container: IPluginContainer): Promise<boolean>
+	postStart(container: IPluginContainer): Promise<boolean>
 	preClose(container: IPluginContainer): Promise<void>
 	postClose(container: IPluginContainer): Promise<void>
 

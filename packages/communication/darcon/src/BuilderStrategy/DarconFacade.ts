@@ -42,7 +42,7 @@ export class DarconFacade extends AbstractCommunicationFacade implements ICommun
 	}
 
 	onServiceAppeared(_cb: ServiceAppearedCallback) {
-		this._serviceDisappearedCallback = _cb
+		this._serviceAppearedCallback = _cb
 	}
 
 	async init(serviceName: string) {

@@ -21,23 +21,24 @@
 		"prepublishOnly": "npm run clean && npm run compile"
 	},
 	"repository": {
-	  	"type": "git",
-	  	"url": "git@github.com:dwmt/Catamaran.git"
+		"type": "git",
+		"url": "git@github.com:dwmt/Catamaran.git"
 	},
 	"license": "MIT",
 	"devDependencies": {
+		"@types/node": "16.10.5",
 		"rimraf": "3.0.2",
+		"ts-node": "10.2.1",
 		"typedoc": "0.21.0",
 		"typescript": "4.3.3",
-		"ts-node": "10.2.1",
-		"@types/node": "16.10.5"
+		"why-is-node-running": "^2.2.0"
 	},
 	"dependencies": {
-		"reflect-metadata": "0.1.13",
-		"@catamaranjs/service": "workspace:*",
+		"@catamaranjs/communication-darcon": "workspace:*",
 		"@catamaranjs/interface": "workspace:*",
 		"@catamaranjs/logger-pino": "workspace:*",
-		"@catamaranjs/communication-darcon": "workspace:*",
-	    "@catamaranjs/test-framework": "workspace:*"
+		"@catamaranjs/service": "workspace:*",
+		"@catamaranjs/test-framework": "workspace:*",
+		"reflect-metadata": "0.1.13"
 	}
 }
