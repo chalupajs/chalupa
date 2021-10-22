@@ -42,7 +42,7 @@ export async function buildIntermediateService<T = any>(
 
 	const moduleDependencyGraph = new DependencyGraph<Constructor>()
 
-	const moduleBindingProcessor = function (current: Constructor, parent: Constructor | null) {
+	function moduleBindingProcessor(current: Constructor, parent: Constructor | null) {
 		if (!moduleDependencyGraph.hasNode(current.name)) {
 			moduleDependencyGraph.addNode(current.name, current)
 		}

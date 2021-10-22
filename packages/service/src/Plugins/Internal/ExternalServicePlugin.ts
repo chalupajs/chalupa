@@ -13,6 +13,18 @@ export class ExternalServicePlugin extends AbstractPlugin {
 
 	private depends: Set<string> = new Set<string>()
 
+	private interrupt: boolean = false
+
+	constructor() {
+		super()
+		process.on('SIGTERM', () => {
+			this.interrupt = true
+		})
+		process.on('SIGINT', () => {
+			this.interrupt = true
+		})
+	}
+
 	onBindInterface<T>(accessor: string, constructor: Constructor<T>): Constructor<T> {
 		if (isExternalService(constructor)) {
 			const externalServiceOptions = Reflect.getMetadata(
@@ -78,22 +90,27 @@ export class ExternalServicePlugin extends AbstractPlugin {
 	}
 
 	onServiceAppeared(serviceName: string): Promise<void> {
+		console.log('External service plugin service appeared...')
 		this.depends.delete(serviceName)
 		return Promise.resolve()
 	}
 
-	async preStart(container: IPluginContainer): Promise<void> {
+	async preStart(container: IPluginContainer): Promise<boolean> {
 		const logger = container.getLogger('ExternalServicePlugin')
 		for (const dependsArray of this.dependsOn.values()) {
 			dependsArray.forEach(depends => this.depends.add(depends))
 		}
 
 		while (this.depends.size > 0) {
+			if (this.interrupt) {
+				return Promise.resolve(false)
+			}
+
 			logger.info(`Waiting for ${[...this.depends].join(', ')} to be present!`)
 			// eslint-disable-next-line no-await-in-loop
 			await timeout(2000)
 		}
 
-		return Promise.resolve()
+		return Promise.resolve(true)
 	}
 }

@@ -41,6 +41,9 @@ namespace Metadata {
 
 	// ErrorHandler
 	export const METADATA_ERROR_HANDLER_MAP = 'Catamaran_Symbol_MetadataErrorHandlerMap'
+
+	// Terms
+	export const METADATA_TERMS_INDEX = 'Catamaran_Symbol_MetadataTermsIndex'
 }
 
 export { Metadata }

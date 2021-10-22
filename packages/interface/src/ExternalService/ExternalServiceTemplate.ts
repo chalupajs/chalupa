@@ -3,11 +3,6 @@ import { ContainerConstant } from '../constants'
 import { Metadata } from '../metadata/Metadata'
 import { ICommunicationChannel } from './ICommunicationChannel'
 
-// eslint-disable-next-line prettier/prettier,func-names
-(function assignExternalServiceMetadata() {
-	Reflect.defineMetadata(Metadata.METADATA_EXTERNAL_SERVICE, true, ExternalServiceTemplate)
-})()
-
 /**
  * Abstract base for classes representing external services.
  */
@@ -228,3 +223,8 @@ export class CallWithResult<T = any> implements IExternalServiceCall<T> {
 		return Promise.resolve(this.result)
 	}
 }
+
+// eslint-disable-next-line prettier/prettier,func-names
+(function assignExternalServiceMetadata() {
+	Reflect.defineMetadata(Metadata.METADATA_EXTERNAL_SERVICE, true, ExternalServiceTemplate)
+})()

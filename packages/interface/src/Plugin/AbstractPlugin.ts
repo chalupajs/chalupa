@@ -7,16 +7,16 @@ export abstract class AbstractPlugin implements IPlugin {
 		return Promise.resolve()
 	}
 
-	preStart(_container: IPluginContainer): Promise<void> {
-		return Promise.resolve()
+	preStart(_container: IPluginContainer): Promise<boolean> {
+		return Promise.resolve(true)
 	}
 
 	postClose(_container: IPluginContainer): Promise<void> {
 		return Promise.resolve(undefined)
 	}
 
-	postStart(_container: IPluginContainer): Promise<void> {
-		return Promise.resolve(undefined)
+	postStart(_container: IPluginContainer): Promise<boolean> {
+		return Promise.resolve(true)
 	}
 
 	preClose(_container: IPluginContainer): Promise<void> {

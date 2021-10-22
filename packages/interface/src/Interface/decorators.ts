@@ -1,4 +1,5 @@
 import { Metadata } from '../metadata/Metadata'
+import { Errors } from '../error'
 
 /**
  * Options for the `ServiceMethod` decorator.
@@ -53,4 +54,14 @@ function registerInMapOnTarget(target: any, mapIdentifier: string, externalName:
 
 	const translatorMap = Reflect.getMetadata(mapIdentifier, target) as Map<string, string>
 	translatorMap.set(externalName, internalName)
+}
+
+export function TermsObject() {
+	return function (target: any, propertyKey: string, parameterIndex: number) {
+		if (Reflect.hasOwnMetadata(Metadata.METADATA_TERMS_INDEX, target, propertyKey)) {
+			throw new Errors.AlreadyDecoratedError(propertyKey, 'TermsObject')
+		}
+
+		Reflect.defineMetadata(Metadata.METADATA_TERMS_INDEX, parameterIndex, target, propertyKey)
+	}
 }

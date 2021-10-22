@@ -13,8 +13,21 @@ import {
 import { Container } from './Container'
 import { extractServiceEventMap, extractServiceMethodMap } from './annotation_utils'
 
-function createCallableMethod(callableFunction: (...parameters: any[]) => Promise<any>) {
-	return (parameters: any[], _terms: Record<string, any>): Promise<any> => callableFunction(...parameters)
+function createCallableMethod(target: any, propertyKey: string, prototype: any) {
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+	const callableFunction: (...parameters: any[]) => Promise<any> = target[propertyKey].bind(target)
+	return (parameters: any[], _terms: Record<string, any>): Promise<any> => {
+		const termsIndex: number | undefined = Reflect.getOwnMetadata(
+			Metadata.METADATA_TERMS_INDEX,
+			prototype,
+			propertyKey
+		) as number | undefined
+		if (typeof termsIndex === 'undefined') {
+			return callableFunction(...parameters)
+		}
+
+		return callableFunction(...parameters.slice(0, termsIndex), _terms)
+	}
 }
 
 export class ServiceBridge implements IServiceBridge {
@@ -64,17 +77,20 @@ export class ServiceBridge implements IServiceBridge {
 
 			self.buildDependencyTree(facadeInstance)
 
-			await Promise.all(self._plugins.map(plugin => plugin.preStart(pluginContainer)))
+			const preStartResponse: boolean[] = await Promise.all(
+				self._plugins.map(plugin => plugin.preStart(pluginContainer))
+			)
+
+			if (!preStartResponse.reduce((previous, curr) => previous && curr, true)) {
+				// eslint-disable-next-line unicorn/no-process-exit
+				process.exit(1)
+			}
 
 			await self.callLifecycleMethodOnService(Metadata.ServiceLifecycle.PostInit)
 
 			await facadeInstance.publishSelf()
 
 			await Promise.all(self._plugins.map(plugin => plugin.postStart(pluginContainer)))
-
-			process.on('SIGINT', () => {
-				void close()
-			})
 		}
 
 		async function close() {
@@ -84,6 +100,13 @@ export class ServiceBridge implements IServiceBridge {
 			await facadeInstance.closeSelf()
 			await Promise.all(self._plugins.map(plugin => plugin.postClose(pluginContainer)))
 		}
+
+		process.on('SIGINT', () => {
+			void close()
+		})
+		process.on('SIGTERM', () => {
+			void close()
+		})
 
 		return {
 			start,
@@ -116,13 +139,11 @@ export class ServiceBridge implements IServiceBridge {
 		const serviceEventMap = extractServiceEventMap(prototype)
 
 		serviceMethodMap?.forEach((propertyKey: string, externalName: string) => {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-			facade.addMethodHandler(externalName, createCallableMethod(target[propertyKey].bind(target)))
+			facade.addMethodHandler(externalName, createCallableMethod(target, propertyKey, prototype))
 		})
 
 		serviceEventMap?.forEach((propertyKey: string, externalName: string) => {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-			facade.addEventHandler(externalName, createCallableMethod(target[propertyKey].bind(target)))
+			facade.addEventHandler(externalName, createCallableMethod(target, propertyKey, prototype))
 		})
 	}
 

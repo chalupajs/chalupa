@@ -19,7 +19,13 @@ export {
 // ----------- Network events -----------//
 export { ServiceAppeared, ServiceDisappeared } from './NetworkEvent/decorators'
 // ----------- Public interfacing -----------//
-export { ServiceMethod, ServiceMethodOptions, ServiceEvent, ServiceEventOptions } from './Interface/decorators'
+export {
+	ServiceMethod,
+	ServiceMethodOptions,
+	ServiceEvent,
+	ServiceEventOptions,
+	TermsObject,
+} from './Interface/decorators'
 
 export { Metadata } from './metadata/Metadata'
 
