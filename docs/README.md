@@ -19,12 +19,12 @@
     * [Class Binding](#class-binding)
     * [Interface Binding](#interface-binding)
     * [Constant Binding](#constant-binding)
-    * [Shorthand Notations](#shorthand-notations)
     * [Configuration-dependent Binding](#configuration-dependent-binding)
     * [Injecting Multiple Values of the Same Type](#injecting-multiple-values-of-the-same-type)
     * [Rebinding](#rebinding)
     * [Unbinding](#unbinding)
     * [Wiring Things Up](#wiring-things-up)
+    * [Shorthand Notations](#shorthand-notations)
   * [Modules](#modules)
   * [Service Communication](#service-communication)
     * [Inbound Communication](#inbound-communication)
@@ -305,9 +305,9 @@ Now, if no [Environment Variable Prefix](#environment-variable-prefix) was set, 
 
 ## Dependency Injection
 
-In the previous sections, we've already shown examples of dependency injection (think of the `@Inject` decorator!). In what follows, we give a detailed description of the DI support of Catamaran.
+In the previous sections, we've already shown examples of dependency injection (think of the `@Inject` decorator and the `inject` property). In what follows, we give a detailed description of the DI support of Catamaran.
 
-> If you're new to Dependency Injection, then these SO answers (and, most importantly, the links within them!) can help to get a quick grasp on the topic:
+> If you're new to Dependency Injection, then these SO answers (and, most importantly, the links within them) can help to get a quick grasp on the topic:
 >
 >  * [What is Dependency Injection?](https://stackoverflow.com/a/140655),
 >  * [Inversion of Control vs Dependency Injection](https://stackoverflow.com/a/6551303).
@@ -320,7 +320,7 @@ Regardless of the exact DI library in question, all implementations revolve arou
 
 ### Class Binding
 
-A class binding is a binding of a concrete type to itself. Which means, that whenever a dependency is found on a *concrete class*, then an instance of the class itself will be used to resolve that dependency.
+A class binding is a binding of a concrete type to itself. Which means, that whenever a dependency is found on a *concrete class*, then an instance of the class itself will be used to resolve that dependency. Instantiation is handled by Catamaran.
 
 Let's declare a class binding!
 
@@ -332,25 +332,25 @@ import { Injectable } from '@catamaranjs/interface'
 class PizzaAggregator {}
 
 @Service({
-  inject(contextContainer) {
+  inject(context) {
     /* 2. */
-    contextContainer.bindClass(PizzaAggregator)
+    context.bindClass(PizzaAggregator)
   }
 })
 class PizzaService {}
 ~~~~
 
-  1. First, we created a new class, `PizzaAggregator` and decorated it with `@Injectable`. This decorator marks a class as both an injection-target (something that can be injected into) and an injection-source (something that can be injected into other injectables).
-  1. Then, in the `inject` function of the `@Service` options, we can access the so-called Context Container, which represents the DI container of our service. Using the Context Container we simply bind the `PizzaAggregator` class, effectively saying that "whenever you find a dependency on `PizzaAggregator`, simply inject an instance".
+  1. First, we created a new class, `PizzaAggregator` and decorated it with `@Injectable`. This decorator marks a class as both an injection-target (something that can be injected into) and an injection-source (something that other injectables can inject into themselves).
+  1. Then, in the `inject` function of the `@Service` options, we can access the context, which represents the DI container of our service. Using the context we simply bind the `PizzaAggregator` class, effectively saying that "whenever you find a dependency on `PizzaAggregator`, simply inject an instance".
 
-Making use of this binding is then super easy: look for the `@Inject` decorator in the constructor.
+Making use of this binding is then super easy, just look at the constructor:
 
 ~~~~TypeScript
 import { Inject } from '@catamaranjs/interface'
 
 @Service({
-  inject(contextContainer) {
-    contextContainer.bindClass(PizzaAggregator)
+  inject(context) {
+    context.bindClass(PizzaAggregator)
   }
 })
 class PizzaService {
@@ -360,11 +360,21 @@ class PizzaService {
 }
 ~~~~
 
-Just add a parameter to your constructor, decorated with `@Inject`. Then, parameterize this decorator with the class itself. And you're done!
+In the case of class bindings, you may also omit the `@Inject` decorator:
+
+~~~TypeScript
+class PizzaService {
+  constructor(pizzaAgg: PizzaAggregator) {
+    console.log('Look, ma, pizza aggregator', pizzaAgg)
+  }
+}
+~~~
+
+See [Shorthand Notations](#shorthand-notations) for a shorter way to declare class bindings.
 
 ### Interface Binding
 
-Binding classes is great, but generally, we want to depend on abstractions rather than concrete implementations. So, let us assume, that we have an interface and a corresponding, implementing class as follows.
+Binding classes is great, but generally, we want to depend on abstractions rather than concrete implementations. So, let us assume, that we have an interface and a corresponding implementing class as follows.
 
 ~~~~TypeScript
 interface IPizzaRepository {
@@ -387,15 +397,15 @@ Therefore, when we want to declare dependency on an interface, we cannot write
 @Inject(IPizzaRepository)
 ~~~~
 
-just as we did in the case of the `PizzaAggregator` class. This is so, because `IPizzaRepository` is not a value and has no representation in JavaScript.
+just as we did in the case of the `PizzaAggregator` class (see [Class Binding](#class-binding)). This is so, because `IPizzaRepository` is not a value and has no representation in JavaScript.
 
 Long story short, if we want to depend on an interface, we have to use a type key in both the binding and the dependency. This type key then can be either a string or a Symbol. Check!
 
 ~~~~TypeScript
 @Service({
-  inject(contextContainer) {
+  inject(context) {
     /* 1. */
-    contextContainer.bindInterface('IPizzaRepository', MongoPizzaRepository)
+    context.bindInterface('IPizzaRepository', MongoPizzaRepository)
   }
 })
 class PizzaService {
@@ -405,7 +415,7 @@ class PizzaService {
 }
 ~~~~
 
-  1. As you can see, in this case, we used the `bindInterface` method of the Context Container. This allows us to define the type key along with the concrete implementation that should be used to resolve dependencies with that very key. Here we essentially said the following to Catamaran: "whenever you find an `@Inject` with the `IPizzaRepository` key, resolve that dependency with a `MongoPizzaRepository` instance".
+  1. As you can see, in this case, we used the `bindInterface` method of the context. This allows us to define the type key along with the concrete implementation that should be used to resolve dependencies with that very key. Here we essentially said the following to Catamaran: "whenever you find an `@Inject` with the `IPizzaRepository` key, resolve that dependency with a `MongoPizzaRepository` instance".
   1. Afterward, in the constructor, we can declare that we depend on the `IPizzaRepository` abstraction by using the same key in the `@Inject` decorator as in the binding.
   1. Then, the type of the parameter is what you'd expect: the `IPizzaRepository` interface.
 
@@ -421,13 +431,13 @@ const TYPES = {
 
 So far, we've left the task of instantiation to the DI container by always binding class constructors (both in the case of [Class Bindings](#class-binding) and [Interface Bindings](#interface-binding)). In numerous situations, however, for example, when we want bind primitive values like a simple string or a number, we want to bind an exact, already available value or instance. This is the problem solved by *constant bindings*.
 
-Similarly to the already known binding techniques, we can use the `inject` function and the Context Container again. Assuming that we want to inject a simple string value into the container, we can write something like below.
+Similarly to the already known binding techniques, we can use the `inject` function and the context again. Assuming that we want to inject a simple string value into the container, we can write something like below.
 
 ~~~~TypeScript
 @Service({
-	inject(contextContainer) {
+	inject(context) {
 		/* 1. */
-		contextContainer.bindConstant('TODAYS_PIZZA_CHEF', 'Giovanni')
+		context.bindConstant('TODAYS_PIZZA_CHEF', 'Giovanni')
 	}
 })
 class PizzaService {
@@ -438,7 +448,7 @@ class PizzaService {
 }
 ~~~~
 
-  1. Using the `bindConstant` method of the Context Container, we bind the primitive value `Giovanni` to the `TODAYS_PIZZA_CHEF` key. This is equivalent to saying the following to Catamaran: "wherever you see a dependency on the `TODAYS_PIZZA_CHEF` key, inject the value `Giovanni`".
+  1. Using the `bindConstant` method of the context, we bind the primitive value `Giovanni` to the `TODAYS_PIZZA_CHEF` key. This is equivalent to saying the following to Catamaran: "wherever you see a dependency on the `TODAYS_PIZZA_CHEF` key, inject the value `Giovanni`".
 	1. We express our dependency on the constant value using the well-known `Inject` decorator and the `TODAYS_PIZZA_CHEF` key.
 	1. `Giovanni` gets injected and printed, just as expected.
 
@@ -450,62 +460,7 @@ const CONSTANTS = {
 }
 ~~~~
 
-### Shorthand Notations
-
-If you only want to perform [Class Bindings](#class-binding) in the `inject` function, then you can use the shorthand array form, as follows.
-
-~~~~TypeScript
-@Injectable() class PizzaOven {}
-
-@Injectable() class DeliveryGuy {}
-
-@Service({
-  inject: [PizzaOven, DeliveryGuy]
-})
-class PizzaShopService {}
-~~~~
-
-The above is the exact same as
-
-~~~~TypeScript
-@Service({
-  inject(contextContainer) {
-    contextContainer
-      .bindClass(PizzaOven)
-      .bindClass(DeliveryGuy)
-  }
-})
-class PizzaShopService {}
-~~~~
-
-but it saves you a few keystrokes.
-
-Additionally, constant bindings have their own shorthand notation, the `constants` option. This option can be used in conjunction with either form of the `inject` option.
-
-~~~~TypeScript
-@Service({
-	constants: [
-		['TODAYS_PIZZA_CHEF', 'Giovanni'],
-		['EXPECTED_DELIVERY_TIME', 69]
-	]
-})
-class PizzaShopService {}
-~~~~
-
-`constants` should be assigned an array of two-element arrays: the first element in the key, while the second element is the value bound to the key. The above is the exact same as
-
-~~~~TypeScript
-@Service({
-	inject(contextContainer) {
-		contextContainer
-			.bindConstant('TODAYS_PIZZA_CHEF', 'Giovanni')
-			.bindConstant('EXPECTED_DELIVERY_TIME', 69)
-	}
-})
-class PizzaShopService {}
-~~~~
-
-<!-- Immediate -->
+See [Shorthand Notations](#shorthand-notations) for a shorter way to declare constant bindings.
 
 ### Configuration-dependent Binding
 
@@ -521,7 +476,7 @@ interface IFileStore {}
 @Injectable() class FsFileStore implements IFileStore {}
 ~~~~
 
-Then, we follow this up by creating a konvenient configuration class with a configurable `env` property. This is where we will be able to choose the actual runtime implementation.
+Then, we follow this up by creating a konvenient configuration class with a configurable `env` property. We will use this property to choose the actual runtime store implementation.
 
 ~~~~TypeScript
 @Configuration()
@@ -538,38 +493,52 @@ class FileStoreConfig {
 }
 ~~~~
 
-Since we will not use [envPrefixing](#envPrefix), the value of this property will be read from the `FILE_STORE_ENV` environment variable.
+By default, the value of this property will be read from the `FILE_STORE_ENV` environment variable (which can be altered by, for example, with an [Environment Variable Prefix](#environment-variable-prefix)).
 
 We reached our last and most important step, the actual binding.
 
-<!-- Frissíteni -->
-
 ~~~~TypeScript
 @Service({
-  /* 1. */
-  config: FileStoreConfig,
-  /* 2. */
-  inject(contextContainer, config: FileStoreConfig) {
+  inject(context) {
+    /* 1. */
+    const fileStoreConfig = context.immediate(FileStoreConfig)
+
+    /* 2. */
+    const fileStoreImpl = fileStoreConfig.isLocalEnv() ? FsFileStore : S3FileStore
+
     /* 3. */
-    if (config.isLocalEnv()) {
-      contextContainer.bindInterface('IFileStore', FsFileStore)
-    } else {
-      contextContainer.bindInterface('IFileStore', S3FileStore)
-    }
+    context.bindInterface('IFileStore', fileStoreImpl)
   }
 })
 class FileStoreService {}
 ~~~~
 
-  1. We have to declare that our service has a configuration class, namely, `FileStoreConfig`.
-  1. Thanks to the above declaration, we will have access to a populated instance of this configuration class as the second parameter of the `inject` function.
-  1. We can then use the `config` object to actually decide which implementation should be bound to the `IFileStore` type key.
+  1. The first step is immediately (haha, got 'em) the most important one. The `immediate` method of the context is a special form of `bindClass`: it creates a [Class Binding](#class-binding), instantiates the class and returns the instance immediately (hence the name).
+  1. Thanks to the `immediate` call, we will have access to a populated instance of the `FileStoreConfig` configuration class. We can then use this instance to actually decide which implementation should be used. The decision will always be made in runtime, based on the value of `fileStoreConfig.isLocalEnv()`, which, in turn, uses `fileStoreConfig.env` (`FILE_STORE_ENV`).
+  1. In the previous step, we selected which implementation should be used. In this step, we make the actual binding, by calling `bindInterface` with the appropriate type key and class.
 
-It could be tempting to use this technique for testing purposes: injecting a test double based on some configuration conditions. However, that would pollute our normal application code with testing related logic. Therefore, Catamaran provides a much more elegant solution, detailed in the [Testing](#testing) section.
+Of course, classes bound using `immedate` can be injected just as if they were bound using `bindClass`.
+
+~~~~TypeScript
+@Service({
+  inject(context) {
+    context.immediate(FileStoreConfig)
+  }
+})
+class FileStoreService {
+  constructor(fileStoreConfig: FileStoreConfig) {
+    console.log('Received FileStoreConfig', fileStoreConfig)
+  }
+}
+~~~~
+
+Since `immediate` calls perform binding and instantiation at the same time, they are best suited for classes with no or isolated dependencies. Great examples are configuration classes, which, in 99% of the time, have no dependencies. While you might find other uses for `immediate`, other than configuration, please keep in mind: wth great power comes great responsibility.
+
+It might be tempting to use this technique for testing purposes: injecting a test double based on some configuration conditions. However, that would pollute our normal application code with testing related logic. Therefore, Catamaran provides a much more elegant solution, detailed in the [Testing](#testing) section.
 
 ### Injecting Multiple Values of the Same Type
 
-In the previous sections, we always assumed singular bindings: that is, that we have a single value bound to a given key or type. In 99% of the cases, this is exactly what we want. Nevertheless, there are situations in which we have an interface with multiple implementations that exist simultaneously, and we want to access every implementation together. Enter *multi-injection*!
+In the previous sections, we always assumed singular bindings: that is, that we have a single value bound to a given key or type. Usually, this is exactly what we want. Nevertheless, there are situations in which we have an interface with multiple implementations that exist simultaneously, and we want to access every implementation together. Enter *multi-injection*!
 
 As a concrete example, let's assume, that we're writing a service that collects the daily offerings of several local restaurants. Each restaurant distributes its daily offering in a different manner, thus, we have to write an implementation on a per-restaurant basis. To make our lives easier, we will extract a common interface for these implementations.
 
@@ -600,9 +569,9 @@ Clearly, if we want to check all the offerings together, then we have to somehow
 import { MultiInject } from '@catamaranjs/Catamaran'
 
 @Service({
-	inject(contextContainer) {
+	inject(context) {
 		/* 1. */
-		contextContainer
+		context
 			.bindInterface('IDailyOfferingScraper', KingPadliDailyOfferingScraper)
 			.bindInterface('IDailyOfferingScraper', BlahaneDailyOfferingScraper)
 	}
@@ -618,6 +587,64 @@ class DailyOfferingService {
 	1. Instead of the usual `@Inject` decorator, we use `@MultiInject` to tell the framework that we are expecting multiple values here. By parameterizing the injection with the `IDailyOfferingScraper` key, we explicitly state what should be injected here.
 	1. The type of the multi-injected parameter is not a singular value, but an array. The framework will populate this array with every instance bound to the `IDailyOfferingScraper` key.
 
+### Rebinding
+
+Given a pre-existing binding for some type or type key (created with a [Class Binding](#class-binding), an [Interface Binding](#interface-binding) or a [Constant Binding](#constant-binding)), it can be replaced by an appropriate `rebind` call: `rebindClass`, `rebindInterface` or `rebindConstant`.
+
+Let's assume, that give some configuration, we want to replace an interface binding with some pre-created, instrumented object. In that case, we can use rebind as follows:
+
+~~~~TypeScript
+@Service({
+	inject(context) {
+		context.bindInterface('TYPE', NormalImplementation)
+
+    if (context.immediate(RebindConfig).shouldReplaceImplementation()) {
+      context.rebindConstant('TYPE', new InstrumentedImplementation())
+    }
+	}
+})
+class RebindService {}
+~~~~
+
+While the above example might seem a little contrived, rebind is a great tool when interfacing with or authoring [Modules](#modules) and plugins (see [Extending Catamaran](#extending-catamaran)).
+
+When rebinding a type key with multiple bound implementations, each previous binding will be dropped:
+
+~~~~TypeScript
+@Service({
+	inject(context) {
+		context
+      .bindInterface('TYPE', ImplOne)
+      .bindInterface('TYPE', ImplTwo)
+
+    context
+      .rebindConstant('TYPE', new RebindImpl())
+	}
+})
+class RebindService {}
+~~~~
+
+In the above case, both the `ImplOne` and `ImplTwo` binding will be dropped, and only the `RebindImpl` instance will be bound to `TYPE`.
+
+### Unbinding
+
+[Rebinding](#rebinding) corresponds to two operations in one: unbinding and binding. Unbinding removes a pre-existing binding for a given class or type key. The existence of an appropriate binding can be checked using the `isBound` method, as shown in the example below.
+
+~~~~TypeScript
+@Service({
+	inject(context) {
+		if (context.isBound('TYPE')) {
+      context.unbind('TYPE')
+    }
+	}
+})
+class RebindService {}
+~~~~
+
+Again, unbinding shines the most when one has to deal with [Modules](#modules) and plugins (see [Extending Catamaran](#extending-catamaran)).
+
+If multiple values are bound to the same type key, then unbinding that very type key will drop each binding (the same way as in the case of [Rebinding](#rebinding)).
+
 ### Wiring Things Up
 
 Dependencies and bindings are all good, but one crucial step is still missing. How do all these things come to life? When and how do our classes get instantiated?
@@ -632,6 +659,74 @@ One question still lingers around. What happens if a class is a dependency of mu
 
   * *Exclusive ownership of resources*. For example, only a single instance will ever exist of your database connection class throughout the lifespan of your application.
   * *Stateless components*. As instances are shared among many dependents, if they are not guarding some resource then it's best to keep them stateless to prevent surprises, when one dependent class sees the effects of another, completely unrelated class.
+
+### Shorthand Notations
+
+If you only want to perform [Class Bindings](#class-binding) in the `inject` function, then you can use the shorthand array form, as follows.
+
+~~~~TypeScript
+@Injectable() class PizzaOven {}
+
+@Injectable() class DeliveryGuy {}
+
+@Service({
+  inject: [PizzaOven, DeliveryGuy]
+})
+class PizzaShopService {}
+~~~~
+
+The above is the exact same as
+
+~~~~TypeScript
+@Service({
+  inject(context) {
+    context
+      .bindClass(PizzaOven)
+      .bindClass(DeliveryGuy)
+  }
+})
+class PizzaShopService {}
+~~~~
+
+but it saves you a few keystrokes.
+
+Additionally, constant bindings have their own shorthand notation, the `constants` option. This option can be used in conjunction with either form of the `inject` property.
+
+~~~~TypeScript
+@Service({
+  inject: [PizzaOven],
+	constants: [
+		['TODAYS_PIZZA_CHEF', 'Giovanni'],
+		['EXPECTED_DELIVERY_TIME', 69]
+	]
+})
+class PizzaShopService {}
+~~~~
+
+`constants` should be assigned an array of two-element arrays: the first element is the key, while the second element is the value bound to the key. The above is the exact same as
+
+~~~~TypeScript
+@Service({
+	inject(context) {
+		context
+			.bindConstant('TODAYS_PIZZA_CHEF', 'Giovanni')
+			.bindConstant('EXPECTED_DELIVERY_TIME', 69)
+	}
+})
+class PizzaShopService {}
+~~~~
+
+[Modules](#modules) also have their own shorthand form, which can be used in conjunction with the `inject` option:
+
+~~~~TypeScript
+@Service({
+  inject: [PizzaOven],
+  modules: [DeliveryModule, PaymentModule]
+})
+class PizzaShopService {}
+~~~~
+
+**Important**: If `inject` is a function, then it will be executed last. Therefore, the bindings created by `constants` and `modules` will be available by the time it runs.
 
 ## Modules
 
