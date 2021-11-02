@@ -4,12 +4,13 @@
   <img height="420" src="./CatamaranHandbookCover.png">
 </div>
 
-> Note: We aimed to keep the code snippets in this handbook short and slim. Therefore, they may not contain every detail needed to compile and run. Nevertheles, we believe that they are easier to read and comprehend this way.
+> Note: We aimed to keep the code snippets in this handbook short and slim. Therefore, they may not contain every detail needed to be compiled and run. Nevertheless, we believe that they are easier to read and comprehend this way.
 
   * [What is Catamaran?](#what-is-Catamaran)
   * [My First Service](#my-first-service)
+  * [Catamaran Packages](#catamaran-packages)
   * [Configuration](#configuration)
-    * [envPrefix](#envPrefix)
+    * [Environment Variable Prefix](#environment-variable-prefix)
     * [Loading Configuration Files](#loading-configuration-files)
   * [Logging](#logging)
     * [Switching the Provider](#switching-the-provider)
@@ -21,24 +22,31 @@
     * [Shorthand Notations](#shorthand-notations)
     * [Configuration-dependent Binding](#configuration-dependent-binding)
     * [Injecting Multiple Values of the Same Type](#injecting-multiple-values-of-the-same-type)
+    * [Rebinding](#rebinding)
+    * [Unbinding](#unbinding)
     * [Wiring Things Up](#wiring-things-up)
   * [Modules](#modules)
   * [Service Communication](#service-communication)
     * [Inbound Communication](#inbound-communication)
     * [Outbound Communication](#outbound-communication)
-    * [Darcon Configuration](#darcon-configuration)
+    * [Appeared and Disappeared Events](#appeared-and-disappeared-events)
   * [Communication Strategies](#communication-strategies)
-  * [Network Events](#network-events)
+    * [Darcon](#darcon)
+    * [In-Memory](#in-memory)
+    * [Inter-process Communication](#inter-process-communication)
   * [Service Lifecycle](#service-lifecycle)
     * [Timing and Order](#timing-and-order)
+  * [Error Handling](#error-handling)
   * [Testing](#testing)
+  * [Extending Catamaran](#extending-catamaran)
 
 ## What is Catamaran?
+
 Catamaran was written to help developers write better software faster.
 
 > Like the idea of "better software faster"?  Check out Dave Farley's (the co-author of the classic Continuous Delivery book) YouTube channel where he talks about various software engineering topics: [Continuous Delivery on YouTube](https://www.youtube.com/c/ContinuousDelivery/featured).
 
-Concretely, Catamaran is a thin layer of abstraction over a communication machinery with dependency injection, configuration handling and external service management baked in. There is more to this than meets the eye, however, since the greatest benefit of even such a thin layer is a clear guidance on the organization of services, enabling:
+Concretely, Catamaran is a thin layer of abstraction over a communication machinery with dependency injection, configuration handling and external service management baked in. There is more to this than meets the eye, however, since the greatest benefit of even such a thin layer is a clear guidance regarding the organization of services, enabling:
 
   * the separation of concerns,
   * modularity and reusability,
@@ -48,42 +56,54 @@ Thus, how your services work stays the same, but the way you write them is going
 
 ## My First Service
 
-> Here we only show a barebones service for the sake of introduction. If you want to generate a service repository with all the bells and whistles, then use `npm init @catamaranjs/service` or `npx @catamaranjs/create-service`
+<!-- Itt írni kellene picit arról, hogy kicserélhető a komm, és lehet, nem is Darcon, hanem in-memory kellene a példába. -->
+
+> Here we only show a barebones service for the sake of introduction. If you want to generate a service repository with all the bells and whistles, then use `npm init @catamaranjs/service` or `npx @catamaranjs/create-service`.
 
 Without further ado, let's jump straight into some code, shall we?
 
 ~~~~TypeScript
-import { Catamaran } from '@catamaranjs/service'
-import { DarconBuilderStrategy } from '@catamaranjs/communication-darcon'
+import { Catamaran, InMemoryStrategy } from '@catamaranjs/service'
 import { Service } from '@catamaranjs/interface'
 
 /* 1. */
 @Service()
-class PizzaService {}
+class PizzaService {
+  /* 2. */
+  @ServiceMethod()
+  async hello(): string {
+    return 'Hello, world!'
+  }
+}
 
 async function start() {
-  /* 2. */
-	const service = await Catamaran.createServiceWithStrategy(PizzaService, DarconBuilderStrategy)
-
   /* 3. */
+	const service = await Catamaran
+    .builder()
+    .createServiceWithStrategy(PizzaService, InMemoryStrategy)
+
+  /* 4. */
 	await service.start()
 }
 
 start().catch(console.error)
 ~~~~
 
-Above, we have a fully functional Catamaran service, which, while doing nothing useful, when started, will publish itself to Darcon.
+Above, we have a fully functional Catamaran service, which, while doing nothing useful, when started, will publish itself to an in-memory event bus.
 
   1. The entrypoint of the service is the `PizzaService` class, decorated with the `@Service` decorator.
-  1. In the `start` function, we pass this class to the `createServiceWithStrategy` function, along with the `DarconBuilderStrategy`. These two produce an executable service from our class, that is able to publish itself to Darcon.
-  1. Then, calling `start` on the produced service actually fires up Darcon.
+  1. Services can expose methods to other services using the `ServiceMethod` decorator. In our case, other services can call the `hello` method on `PizzaService`.
+  1. In the `start` function, we create a new Catamaran builder using the `Catamaran.builder()` call. Then, we pass our service class to the `createServiceWithStrategy` function, along with the `InMemoryStrategy`. These two then produce an executable service from our class, that is able to publish itself to the in-memory event buss.
+  1. Finally, calling `start` on the produced service actually fires up event handling.
 
 > Catamaran makes heavy use of TypeScript decorators. You can use these resources to learn more about them:
 >
 >   * [A Practical Guide to TypeScript Decorators](https://blog.logrocket.com/a-practical-guide-to-typescript-decorators/),
 >   * [TypeScript Documentation - Decorators](https://www.typescriptlang.org/docs/handbook/decorators.html).
 
-In this case, the name of the published service is going to be the name of the class, `PizzaService`. This can be overridden by setting the `name` option of the `@Service` decorator, as follows.
+So, now we know how to create a service, but what is a service exactly? It is an independent component, communicating with other services via a selected [communication strategy](#communication-strategies), in the above case, the built-in [In-Memory Strategy](#in-memory-strategy). The interface of a service (that is made available to other services) is then comprised by its `ServiceMethods` and `ServiceEvents` (see [Service Communication](#service-communication)).
+
+In our current case, the name of the published service is going to be the name of the class, `PizzaService`. This can be overridden by setting the `name` option of the `@Service` decorator, as follows.
 
 ~~~~TypeScript
 @Service({
@@ -92,11 +112,11 @@ In this case, the name of the published service is going to be the name of the c
 class PizzaService {}
 ~~~~
 
-To summarize, a service is a Darcon entity, available for others to call via the network.
-
 ## Configuration
 
 In most cases, our service has some configurable knobs and toggles to alter its behavior. The widely adopted solution to configure these properties is to load their values from environment variables or configuration files. Catamaran supports this by embracing [konvenient](https://github.com/battila7/konvenient) as its configuration solution. However, you don't have to install and import konvenient directly, as Catamaran re-exports the declarations of konvenient for your convenience (haha, got 'em!).
+
+<!-- Jobb megfogalmazás a highly complex helyett -->
 
 > konvenient is a highly complex library, hence, make sure to check out its documentation for more involved examples and recipes. Here we will only scratch the surface of its capabilities.
 
@@ -121,6 +141,8 @@ The `dataDirectory` property has a short documentation string, a format (set to 
 
 Using configuration values is now a breeze.
 
+<!-- Frissíteni -->
+
 ~~~~TypeScript
 @Service({
   config: PizzaConfig
@@ -137,6 +159,8 @@ class PizzaService {
 
 The most notable detail is the `config` option inside the `@Service` annotation. This lets Catamaran know that it has to manage a configuration class.
 
+<!-- Frissíteni -->
+
 ### envPrefix
 
 In what follows, you'll see that several parts of Catamaran can be configured via environment variables, and even so-called [Modules](#modules) can expose configurable values as well. If multiple services were deployed on the same instance and they used configurable properties of the same name, we were unable to individually configure these values because of the colliding environment variable names. A great example for collision is setting a different log level for each deployed service. To remedy such situations, you should always set an environment variable prefix for your service as follows.
@@ -152,6 +176,8 @@ class PizzaService {}
 What previously was `PIZZA_DATA_DIRECTORY` is now `PIZZA_PIZZA_DATA_DIRECTORY` because of the additional `PIZZA` env prefix. Looks pretty dumb, but read on and trust us, as env prefixing will come in handy!
 
 Note, that the value of the `envPrefix` applies to module configs as well (see the [Modules](#modules) section).
+
+<!-- Frissíteni -->
 
 ### Loading Configuration Files
 
@@ -201,6 +227,8 @@ Catamaran.use(ConfigSources.from([`${process.env['NODE_ENV']}.yml`]))
 
 > Configuration sources are loaded in the order they appear in the `configSources` array. Values are loaded on a *last-value-wins* basis, which means that later configuration values overwrite the earlier ones.
 
+<!-- Hozzáadni: immediate -->
+
 ## Logging
 
 A great way to achieve runtime traceability and observability is logging. Catamaran takes an SLF4J-like approach to logging by providing a unified logging facade with pluggable backends, such as [pino](https://github.com/pinojs/pino) and [TSLog](https://github.com/fullstack-build/tslog).
@@ -226,6 +254,8 @@ Notably, when calling `getLogger`, you should pass the enclosing class or its na
 ### Switching the Provider
 
 Out of the box, Catamaran includes three logging backends, console.log(which is the default), pino and TSLog. You can switch between them as follows.
+
+<!-- Frissíteni -->
 
 ~~~~TypeScript
 import { LogProvider, Catamaran } from '@catamaranjs/service'
@@ -455,6 +485,8 @@ class PizzaShopService {}
 class PizzaShopService {}
 ~~~~
 
+<!-- Immediate -->
+
 ### Configuration-dependent Binding
 
 Even when developing simpler services, the situation may arise when you want to conditionally bind a concrete implementation to some abstraction. For example, let's imagine that we're developing a service that needs to store files somewhere. In staging and production, we would like to use S3. However, locally, we don't want to mess around with S3, thus, we decided to write a simple file system-based implementation. Now, how can we select the appropriate implementation based on the current environment?
@@ -489,6 +521,8 @@ class FileStoreConfig {
 Since we will not use [envPrefixing](#envPrefix), the value of this property will be read from the `FILE_STORE_ENV` environment variable.
 
 We reached our last and most important step, the actual binding.
+
+<!-- Frissíteni -->
 
 ~~~~TypeScript
 @Service({
@@ -580,6 +614,8 @@ One question still lingers around. What happens if a class is a dependency of mu
   * *Stateless components*. As instances are shared among many dependents, if they are not guarding some resource then it's best to keep them stateless to prevent surprises, when one dependent class sees the effects of another, completely unrelated class.
 
 ## Modules
+
+<!-- Frissíteni, tree -->
 
 So far, we've seen the two opposite ends of the granularity spectrum. On one end, we find services that are self-contained and executable, offering facilities to other services via Darcon. Then, on the other end, we have individual classes and interfaces. This implies, that there must be something in between, right? Something, that is smaller than a service but larger than an individual class.
 
@@ -705,6 +741,8 @@ The two requirements for external services are
 
 Now you're ready to make calls to the `Cache` service!
 
+<!-- Frissíteni -->
+
 ~~~~TypeScript
 @Service({
   /* 1. */
@@ -732,6 +770,8 @@ Whoa, now, that's a lot, so let's break it down!
   1. Finally, we can make a Darcon request to `Cache.getItem` using the `request` method.
 
 Our dependency on the `Cache` service is now completely apparent. However, the `getItem` call still feels a bit unsafe.
+
+<!-- Frissíteni -->
 
 ~~~~TypeScript
 import { ExternalServiceMethod, IExternalServiceCall, serviceMethodPlaceholder } from '@catamaranjs/Catamaran'
@@ -809,6 +849,8 @@ class DeliveryModule {
 }
 ~~~~
 
+<!-- Frissíteni + ez ne itt legyen -->
+
 ### Darcon Configuration
 
 The configurable properties of the Darcon connection are as follows:
@@ -857,6 +899,8 @@ The configurable properties of the Darcon connection are as follows:
 
 If you want to access the above values directly in your application (for whatever reason), then simply inject an instance of [`DarconConfig`](../src/Darcon/Configuration.ts).
 
+<!-- Frissíteni -->
+
 ## Network Events
 
 *Network events* are emitted by Darcon, and can be listened on by services. The following events are available:
@@ -901,6 +945,8 @@ When declaring event listeners, please be aware of the following limitations:
 
   * The `@NetworkEvent` decorator is not available on [Modules](#modules) yet.
   * On the same service, there can only be a single listener for the same event. For example, you cannot add multiple listeners for the `entityAppeared` event on the same service.
+
+<!-- Nagy frissítés ide -->
 
 ## Service Lifecycle
 
