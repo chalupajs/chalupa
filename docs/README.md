@@ -730,54 +730,53 @@ class PizzaShopService {}
 
 ## Modules
 
-<!-- Frissíteni, tree -->
+So far, we've seen the two opposite ends of the granularity spectrum. On one end, we find services that are self-contained and executable, offering facilities to other services. Then, on the other end, we have individual classes and interfaces. This implies, that there must be something in between, right? Something, that is smaller than a service but larger than an individual class.
 
-So far, we've seen the two opposite ends of the granularity spectrum. On one end, we find services that are self-contained and executable, offering facilities to other services via Darcon. Then, on the other end, we have individual classes and interfaces. This implies, that there must be something in between, right? Something, that is smaller than a service but larger than an individual class.
-
-Enter the notion of *modules*! A module is similar to a service in the sense, that it has its own configuration and own bindings. However, in itself, it does not correspond to an executable, Darcon-ready entity. Before discussing their purpose, let's check out how to declare them.
+Enter the notion of *modules*! A module is similar to a service in the sense, that it has its own bindings, lifecycle phases and such. However, in itself, it does not correspond to an executable entity. Before discussing their purpose, let's check out how to declare them.
 
 ~~~~TypeScript
 import { Module } from '@catamaranjs/interface'
 
-@Configuration()
-class DeliveryConfig {}
-
 /* 1. */
 @Module({
   /* 2. */
-  config: DeliveryConfig,
-  /* 3. */
-  inject(contextContainer, config: DeliveryConfig) {},
+  inject(context) {},
+  constants: [],
+  modules: []
 })
 class DeliveryModule {}
 ~~~~
 
   1. The most important part is the `@Module` decorator which marks a class as a *module*.
-  1. Modules can have their own konvenient configuration, just as services do. Simply use the `config` property to declare the module's configuration type.
-  1. Modules can also declare their own bindings using the very same `inject` facility (yes, the shorthand version is also available).
+  1. Modules can declare their own bindings using the very same `inject`, `constants` and `modules` facilities (see [Dependency Injection](#dependency-injection)).
 
 Once we have a module, let's add it to a service!
 
 ~~~~TypeScript
 @Service({
-  modules: [DeliveryModule]
+  inject(context) {
+    // With Configuration-dependent Bindings, you can even dynamically
+    // bind modules!
+    context.bindModule(DeliveryModule)
+  }
 })
 class PizzaService {}
 ~~~~
 
-By listing a module in the `modules` array of the service options, we achieve the following. When creating and starting the service
+By binding a module in the `inject` function or a `modules` array, we achieve the following.  When creating and starting the service
 
-  * the configuration properties of the module are prefixed by the service's `envPrefix` (see [envPrefix](#envPrefix)) and are loaded by Catamaran,
-  * the bindings of the module are added to the context container of the service (see [Dependency Injection](#dependency-injection)),
-  * the service methods and events of the module are added to the service's Darcon interface (see [Inbound Communication](#inbound-communication))
+  * the bindings of the module are added to the context of the service (see [Dependency Injection](#dependency-injection)),
+  * the service methods and events of the module are added to the service's network interface (see [Inbound Communication](#inbound-communication))
   * the lifecycle methods of the module will be called when appropriate (see [Lifecycle](#lifecycle)).
 
 Overall, modules can be thought of as mini-services that need a host service to actually operate.
 
+Observe, that modules can bind modules too! Therefore, the containing service and the modules form a [directed acyclic graph (DAG)](https://en.wikipedia.org/wiki/Directed_acyclic_graph), in which the nodes are the modules (and the service itself) while the edges are the "who bound who" relationships. We have a DAG, and not a tree, since cases may occur, in which multiple modules bind (and thus, depend on) the same module.
+
 Now, let's look at the elephant in the room: why would you want to create modules? We have at least two great reasons:
 
   * *Splitting up service interfaces.* While you should strive to keep your services thin and focused with as few methods and events as possible, in some situations, a service may need to offer a variety of different methods. In such cases, you can extract each group of logically related methods into their own module. Since modules have their own configuration and bindings, you can even move the necessary configuration and dependencies to the module level. By using this technique, you can separate your service into cohesive subcomponents which can be easily extracted into their own service in the future, if necessary.
-  * *Code reuse.* Modules can be published in npm packages, which allows for cross-service code reuse. Writing a database connector? Slap it into a module! Health check and metrics? Another module! Any Catamaran-specific code should reside in modules, as modules automatically provide configuration, logging, dependency injection, lifecycle and even service methods and events. Code that is independent from Catamaran services should still be placed in ordinary libraries, however, if you plan on integrating with Catamaran, then a module is a perfect choice.
+  * *Code reuse.* Modules can be published in npm packages, which allows for cross-service code reuse. Writing a database connector? Slap it into a module! Health check and metrics? Another module! Any Catamaran-specific code should reside in modules, as modules automatically provide configuration, logging, dependency injection, lifecycles and even service methods and events. Code that is independent from Catamaran services should still be placed in ordinary libraries, however, if you plan on integrating with Catamaran, then a module is a perfect choice.
 
 ## Service Communication
 
