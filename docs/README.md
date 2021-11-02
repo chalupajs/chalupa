@@ -56,8 +56,6 @@ Thus, how your services work stays the same, but the way you write them is going
 
 ## My First Service
 
-<!-- Itt írni kellene picit arról, hogy kicserélhető a komm, és lehet, nem is Darcon, hanem in-memory kellene a példába. -->
-
 > Here we only show a barebones service for the sake of introduction. If you want to generate a service repository with all the bells and whistles, then use `npm init @catamaranjs/service` or `npx @catamaranjs/create-service`.
 
 Without further ado, let's jump straight into some code, shall we?
@@ -114,11 +112,9 @@ class PizzaService {}
 
 ## Configuration
 
-In most cases, our service has some configurable knobs and toggles to alter its behavior. The widely adopted solution to configure these properties is to load their values from environment variables or configuration files. Catamaran supports this by embracing [konvenient](https://github.com/battila7/konvenient) as its configuration solution. However, you don't have to install and import konvenient directly, as Catamaran re-exports the declarations of konvenient for your convenience (haha, got 'em!).
+In most cases, our service has some configurable knobs and toggles to alter its behavior. The widely adopted solution to configure these properties is to load their values from environment variables or configuration files. Catamaran supports this by using [konvenient](https://github.com/dwmt/konvenient) as its configuration solution. However, you don't have to install and import konvenient directly, as Catamaran re-exports the declarations of konvenient for your convenience (haha, got 'em!).
 
-<!-- Jobb megfogalmazás a highly complex helyett -->
-
-> konvenient is a highly complex library, hence, make sure to check out its documentation for more involved examples and recipes. Here we will only scratch the surface of its capabilities.
+> In what follows, we will only scratch the surface of konvenient's capabilities, hence, make sure to check out [its documentation](https://github.com/dwmt/konvenient#--konvenient) for more involved examples and recipes.
 
 Now, let us assume, that we want to save some files into a configurable directory. We can expose this setting via a configuration class as follows.
 
@@ -137,15 +133,13 @@ class PizzaConfig {
 
 As you can see, this is also done via decorators, in this case, `@Configuration`, which is used to mark a class a configuration class, and `@Configurable` which marks configurable properties.
 
-The `dataDirectory` property has a short documentation string, a format (set to `string`) which is used for validation and a default value if nothing is provided. How to provide a value, then? konvenient automatically calculates an environment variable name for configurable properties. The env var for `dataDirectory`, in this case, is `PIZZA_DATA_DIRECTORY`. The `PIZZA_` prefix comes from the name of the configuration class, preceding the `Config` suffix. If we had another property, `timeToBakePizza`, then its env var would be `PIZZA_TIME_TO_BAKE_PIZZA`.
+The `dataDirectory` property has a short documentation string, a format (set to `string`) which is used for validation and a default value if nothing is provided. How to provide a value, then? konvenient automatically computes an environment variable name for configurable properties. The env var for `dataDirectory`, in this case, is `PIZZA_DATA_DIRECTORY`. The `PIZZA_` prefix comes from the name of the configuration class, preceding the `Config` suffix. If we had another property, `timeToBakePizza`, then its env var would be `PIZZA_TIME_TO_BAKE_PIZZA`.
 
 Using configuration values is now a breeze.
 
-<!-- Frissíteni -->
-
 ~~~~TypeScript
 @Service({
-  config: PizzaConfig
+  inject: [PizzaConfig]
 })
 class PizzaService {
   private readonly config: PizzaConfig
@@ -157,27 +151,34 @@ class PizzaService {
 }
 ~~~~
 
-The most notable detail is the `config` option inside the `@Service` annotation. This lets Catamaran know that it has to manage a configuration class.
+By listing `PizzaConfig` in the `inject` array (see [Dependency Injection](#dependency-injection)), Catamaran knows that it has to manage a configuration class.
 
-<!-- Frissíteni -->
+> Here we showed how to use configuration values inside so-called injectable classes (such as the one decorated with `@Service`). If you want to configure how dependency injection works using configuration values, please refer to the [Configuration-dependent Binding](#configuration-dependent-binding) section.
 
-### envPrefix
+### Environment Variable Prefix
 
-In what follows, you'll see that several parts of Catamaran can be configured via environment variables, and even so-called [Modules](#modules) can expose configurable values as well. If multiple services were deployed on the same instance and they used configurable properties of the same name, we were unable to individually configure these values because of the colliding environment variable names. A great example for collision is setting a different log level for each deployed service. To remedy such situations, you should always set an environment variable prefix for your service as follows.
+In what follows, you'll see that several parts of Catamaran can be configured via environment variables, and even so-called [Modules](#modules) can expose configurable values as well. If multiple services were deployed on the same instance and they used configurable properties of the same name (for example, `level` inside tthe `LogConfiguration` class), we were unable to individually configure these values because of the colliding environment variable names (since each one of them would use `LOG_LEVEL`). To remedy such situations, you should always set an environment variable prefix for your service as follows.
 
 ~~~~TypeScript
-@Service({
-  envPrefix: 'PIZZA',
-  config: PizzaConfig
-})
-class PizzaService {}
+import { EnvPrefix } from '@catamaranjs/service'
+
+async function start() {
+	const service = await Catamaran
+    .builder()
+    .use(EnvPrefix.from('PEPPERONI'))
+    .createServiceWithStrategy(PizzaService, InMemoryStrategy)
+
+	await service.start()
+}
+
+start().catch(console.error)
 ~~~~
 
-What previously was `PIZZA_DATA_DIRECTORY` is now `PIZZA_PIZZA_DATA_DIRECTORY` because of the additional `PIZZA` env prefix. Looks pretty dumb, but read on and trust us, as env prefixing will come in handy!
+What previously was `PIZZA_DATA_DIRECTORY` is now `PEPPERONI_PIZZA_DATA_DIRECTORY` because of the additional `PEPPERONI` env prefix. Looks pretty dumb, but read on and trust us, as env prefixing will come in handy!
 
-Note, that the value of the `envPrefix` applies to module configs as well (see the [Modules](#modules) section).
+Note, that env prefixing applies to module configs as well (see the [Modules](#modules) section).
 
-<!-- Frissíteni -->
+Also, what you've just seen is an example of using a plugin. `EnvPrefix.from()` constructs a new plugin instance, which is then passed to the `use()` method on the Catamaran builder. Catamaran will invoke the "used" plugins at various events and lifecycle phases. You can find more information regarding the inner workings of plugins in the [Extending Catamaran](#extending-catamaran) section.
 
 ### Loading Configuration Files
 
@@ -207,27 +208,33 @@ log:
 	pretty: true
 ~~~~
 
-As the last step, we have to declare this file as a configuration source. For that we will use the `use` directive of Catamaran.
-Catamaran has a built in Configurator parser, so we can write globally applied changes. This is needed because configuration source is not service level, instead it is a process level option.
-For change the currently active configuration source, we have to use the `ConfigSources` Configurator class.
+As the last step, we have to declare this file as a configuration source. Just as in the case of the [Environment Variable Prefix](#environment-variable-prefix), we will use a plugin, namely, `ConfigSources`.
 
 ~~~~TypeScript
-import { Catamaran, ConfigSources } from '@catamaranjs/service'
+import { ConfigSources } from '@catamaranjs/service'
 
-Catamaran.use(ConfigSources.from(['local.yml']))
+async function start() {
+	const service = await Catamaran
+    .builder()
+    .use(ConfigSources.from(['local.yml']))
+    .createServiceWithStrategy(PizzaService, InMemoryStrategy)
 
-const service = await Catamaran.createServiceWithStrategy(PizzaService, DarconBuilderStrategy)
+	await service.start()
+}
+
+start().catch(console.error)
 ~~~~
 
 Environment-dependent configuration loading works exactly the way you'd think.
 
 ~~~~TypeScript
-Catamaran.use(ConfigSources.from([`${process.env['NODE_ENV']}.yml`]))
+const service = await Catamaran
+    .builder()
+    .use(ConfigSources.from([`${process.env['NODE_ENV']}.yml`]))
+    .createServiceWithStrategy(PizzaService, InMemoryStrategy)
 ~~~~
 
-> Configuration sources are loaded in the order they appear in the `configSources` array. Values are loaded on a *last-value-wins* basis, which means that later configuration values overwrite the earlier ones.
-
-<!-- Hozzáadni: immediate -->
+Configuration sources are loaded in the order they appear in the `configSources` array. Values are loaded on a *last-value-wins* basis, which means that later configuration values overwrite the earlier ones.
 
 ## Logging
 
@@ -242,7 +249,9 @@ import { LoggerFactory, ILogger } from '@catamaranjs/interface'
 class PizzaService {
   private readonly logger: ILogger
 
-  constructor(@Inject(LoggerFactory) loggerFactory: LoggerFactory) { // Notice, that you dont have to use the @Inject decorator!!
+  // Since LoggerFactory is a concrete class, you don't have
+  // to use the @Inject decorator.
+  constructor(loggerFactory: LoggerFactory) { 
     this.logger = loggerFactory.getLogger(PizzaService)
     logger.info('Yay, I was constructed!')
   }
@@ -253,15 +262,28 @@ Notably, when calling `getLogger`, you should pass the enclosing class or its na
 
 ### Switching the Provider
 
-Out of the box, Catamaran includes three logging backends, console.log(which is the default), pino and TSLog. You can switch between them as follows.
+Out of the box, Catamaran includes three logging backends:
 
-<!-- Frissíteni -->
+  * `console`, which is the default,
+  * [pino](https://github.com/pinojs/pino),
+  * [TSLog](https://github.com/fullstack-build/tslog).
+  
+You can set the desired provider using the `LogProvider` plugin:
 
 ~~~~TypeScript
-import { LogProvider, Catamaran } from '@catamaranjs/service'
+import { LogProvider } from '@catamaranjs/service'
 import { TSLogProvider } from '@catamaranjs/logger-tslog'
 
-Catamaran.use(LogProvider.provider(TSLogProvider))
+async function start() {
+	const service = await Catamaran
+    .builder()
+    .use(LogProvider.provider(TSLogProvider))
+    .createServiceWithStrategy(PizzaService, InMemoryStrategy)
+
+	await service.start()
+}
+
+start().catch(console.error)
 ~~~~
 
 ### Configuring Logging
@@ -279,9 +301,7 @@ The logging API provides two configurable properties on the `LogConfiguration` c
     * Env var: `LOG_PRETTY`.
     * Controls whether the output is optimized for human or machine consumption.
 
-Now, if no `envPrefix` was set in the `@Service` annotation, then these two can be modified via the listed environment variables, `LOG_LEVEL` and `LOG_PRETTY`.
-
-And that's where [envPrefix](#envPrefix) starts to shine. If, for example, you set the `envPrefix` to `PIZZA`, then the respective environment variable names become `PIZZA_LOG_LEVEL` and `PIZZA_LOG_PRETTY`. Thus, you can safely run two services in the same scope and set different log settings for them. Neat, huh?
+Now, if no [Environment Variable Prefix](#environment-variable-prefix) was set, then these two can be modified via the above environment variables, `LOG_LEVEL` and `LOG_PRETTY`. However, if, for example, you use `EnvPrefix.from('PIZZA')`, then the respective environment variable names become `PIZZA_LOG_LEVEL` and `PIZZA_LOG_PRETTY`. Thus, you can safely run two services in the same scope and set different log settings for them. Neat, huh?
 
 ## Dependency Injection
 
