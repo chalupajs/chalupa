@@ -26,6 +26,9 @@
     * [Wiring Things Up](#wiring-things-up)
     * [Shorthand Notations](#shorthand-notations)
   * [Modules](#modules)
+    * [Module Graph](#module-graph)
+    * [Dynamic Modules](#dynamic-modules)
+    * [Altering Module Bindings](#altering-module-bindings)
   * [Service Communication](#service-communication)
     * [Inbound Communication](#inbound-communication)
     * [Outbound Communication](#outbound-communication)
@@ -754,29 +757,131 @@ Once we have a module, let's add it to a service!
 
 ~~~~TypeScript
 @Service({
-  inject(context) {
-    // With Configuration-dependent Bindings, you can even dynamically
-    // bind modules!
-    context.bindModule(DeliveryModule)
-  }
+  modules: [DeliveryModule]
 })
 class PizzaService {}
 ~~~~
 
-By binding a module in the `inject` function or a `modules` array, we achieve the following.  When creating and starting the service
+By binding a module in the `inject` function or the `modules` array, we achieve the following.  When creating and starting the service
 
   * the bindings of the module are added to the context of the service (see [Dependency Injection](#dependency-injection)),
   * the service methods and events of the module are added to the service's network interface (see [Inbound Communication](#inbound-communication))
   * the lifecycle methods of the module will be called when appropriate (see [Lifecycle](#lifecycle)).
 
-Overall, modules can be thought of as mini-services that need a host service to actually operate.
-
-Observe, that modules can bind modules too! Therefore, the containing service and the modules form a [directed acyclic graph (DAG)](https://en.wikipedia.org/wiki/Directed_acyclic_graph), in which the nodes are the modules (and the service itself) while the edges are the "who bound who" relationships. We have a DAG, and not a tree, since cases may occur, in which multiple modules bind (and thus, depend on) the same module.
+Overall, modules can be thought of as mini-services that need a host service to operate.
 
 Now, let's look at the elephant in the room: why would you want to create modules? We have at least two great reasons:
 
   * *Splitting up service interfaces.* While you should strive to keep your services thin and focused with as few methods and events as possible, in some situations, a service may need to offer a variety of different methods. In such cases, you can extract each group of logically related methods into their own module. Since modules have their own configuration and bindings, you can even move the necessary configuration and dependencies to the module level. By using this technique, you can separate your service into cohesive subcomponents which can be easily extracted into their own service in the future, if necessary.
   * *Code reuse.* Modules can be published in npm packages, which allows for cross-service code reuse. Writing a database connector? Slap it into a module! Health check and metrics? Another module! Any Catamaran-specific code should reside in modules, as modules automatically provide configuration, logging, dependency injection, lifecycles and even service methods and events. Code that is independent from Catamaran services should still be placed in ordinary libraries, however, if you plan on integrating with Catamaran, then a module is a perfect choice.
+
+### Module Graph
+
+Observe, that modules can bind other modules too (as the `@Module` decorator has the `modules` option). Therefore, the containing service and the modules form a [directed acyclic graph (DAG)](https://en.wikipedia.org/wiki/Directed_acyclic_graph), in which the nodes are the modules (and the service itself) while the edges are the depedency or "who bound who" relationships. We have a DAG, and not a tree, since cases may occur, in which multiple modules bind (and thus, depend on) the same module.
+
+Let's assume the following scenario:
+
+~~~~TypeScript
+@Module() class A {}
+
+@Module({ modules: [A] }) class B {}
+
+@Module({ modules: [A] }) class C {}
+
+@Service({ modules: [B, C] }) class Root {}
+~~~~
+
+In this case, the module graph looks as below. The arrows point from the dependent item to the dependency.
+
+![Module graph example.](module-graph.png)
+
+Even though two modules listed `A` as a dependency, it will only be instantiated once. This is a general rule for modules: each and every module is a singleton, regardless of how many dependents it has. Consequently, the `inject` function of a module is only executed once (and thus, every binding of the module is added once).
+
+### Dynamic Modules
+
+The `modules` property is not the only way of declaring modules. The context parameter of the `inject` function also provides a `bindModule` method which can be used as follows:
+
+~~~~TypeScript
+@Module({
+  inject(context) {
+    context.bindModule(OtherModule)
+  }
+})
+class SomeModule {}
+~~~~
+
+This method allows for dynamically binding modules, for example, based on configuration values (as in the case of [Configuration-dependent Bindings](#configuration-dependent-binding)).
+
+Returning to a previous example, we want to construct a service which stores files somewhere. In production, we want to use S3, while locally, the file system suffices. We can create two modules along with a configuration class:
+
+~~~~TypeScript
+@Module() class S3FileStoreModule {}
+
+@Module() class FsFileStoreModule {}
+
+@Configuration()
+class FileStoreConfig {
+  @Configurable({
+    doc: 'The environment the application is executing in.',
+    format: ['local', 'staging', 'production'],
+  })
+  env = 'production'
+
+  isLocalEnv() {
+    return this.env === 'local'
+  }
+}
+~~~~
+
+Then, we can conditionally select the appropriate module in the `inject` function of the service:
+
+~~~~TypeScript
+@Service({
+  inject(context) {
+    const fileStoreConfig = context.immediate(FileStoreConfig)
+
+    const fileStoreModule = fileStoreConfig.isLocalEnv() ? FsFileStoreModule : S3FileStoreModule
+
+    context.bindModule(fileStoreModule)
+  }
+})
+class FileStoreService {}
+~~~~
+
+### Altering Module Bindings
+
+Let's assume the following scenario. You want to connect to some HTTP API so you create an interface, named `HttpApi`. To make this machinery reusable across your Catamaran services, you put this interface (along with its implementation) into a new module, `HttpApiModule`. Everything works fine, until the API is changed: the same endpoints still work, however, a client token is now required to avoid getting rate limited. While you can modify your existing implementation, it does not seem to be the most elegant solution: the client token is not absolutely necessary and it is an authentication aspect. What else can be done?
+
+From the [Dependency Injection](#dependency-injection) section, we might remember two more involved facilities: [Rebinding](#rebinding) and [Unbinding](#unbinding). Using these two, we can implement a decorator module, which builds on our pre-existing `HttpApiModule` while extending its functionality.
+
+~~~~TypeScript
+class AuthenticatedHttpApiImpl implements HttpApi /* 1. */ {
+  /* 2. */
+  private readonly impl: OriginalHttpApiImpl;
+
+  constructor()  {
+    this.impl = new OriginalHttpApiImpl()
+  }
+}
+
+@Module({
+  inject(context) {
+    /* 3. */
+    context.bindModule(HttpApiModule)
+
+    /* 4. */
+    context.rebindInterface('HttpApi', AuthenticatedHttpApiImpl)
+  }
+})
+class AuthenticatedHttpApiModule {}
+~~~~
+
+  1. Our new implementation (which adds a client token to each HTTP request) implements the original interface, `HttpApi`. Therefore, dependent classes will see no difference, as they depend on the interface and not the actual implementation.
+  2. Since we do not want to re-implement functionality that worked before, we make use of existing `HttpApi` implementation, called `OriginalHttpApiImpl`. The new implementation will delegate calls to an instance of this class.
+  3. In the `inject` function of the new module, we bind the original module, `HttpApiModule`. After the `bindModule` call returns, we can be sure, that the bindings of `HttpApiModule` are available in the context.
+  4. Therefore, we can rebind the `HttpApi` type key to our new implementation, essentially overriding the previous binding.
+
+The key takeaway here is the fact that once `bindModule` returns, all the bindings of the bound module are available. Which means, that they can be freely rebound or even unbound.
 
 ## Service Communication
 
