@@ -1,5 +1,6 @@
 import * as assert from 'assert'
-import { Catamaran, IntegrationTestBuilderStrategy } from '@catamaranjs/service'
+import { Catamaran } from '@catamaranjs/service'
+import { IntegrationTestBuilderStrategy } from '@catamaranjs/test-framework'
 import { CallWithResult } from '@catamaranjs/interface'
 import { DateTimeService, GreetingService } from './GreetingService'
 
@@ -12,10 +13,10 @@ const tests = [
 			const WHO = 'Jocky'
 			const expected = 'Good morning, Jocky!'
 
-			const arrangement = await Catamaran.createServiceWithStrategy(
-				GreetingService,
-				IntegrationTestBuilderStrategy
-			)
+			const arrangement = await Catamaran
+				.builder()
+				.createServiceWithStrategy(GreetingService, IntegrationTestBuilderStrategy)
+
 			const sut = await arrangement
 				.rebind(DateTimeService, {
 					hours() {

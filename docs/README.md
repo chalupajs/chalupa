@@ -34,8 +34,8 @@
     * [Outbound Communication](#outbound-communication)
     * [Appeared and Disappeared Events](#appeared-and-disappeared-events)
   * [Communication Strategies](#communication-strategies)
-    * [Darcon](#darcon)
     * [In-Memory](#in-memory)
+    * [Darcon](#darcon)
     * [Inter-process Communication](#inter-process-communication)
   * [Service Lifecycle](#service-lifecycle)
     * [Timing and Order](#timing-and-order)
@@ -889,27 +889,30 @@ In what follows, we detail how to accept requests and events from other services
 
 ### Inbound Communication
 
-Communication via Darcon comes in two flavors: request-reply and event-based. Handlers for the former are called *service methods*, while listeners for the latter are *service events* (surprisingly).
+Communication between services comes in two flavors: request-reply and event-based. Handlers for the former are called *service methods*, while listeners for the latter are *service events* (surprisingly).
 
 ~~~~TypeScript
-import { Catamaran } from '@catamaranjs/service'
 import { Service, ServiceMethod, ServiceEvent } from '@catamaranjs/interface'
 
 @Service()
 class PizzaService {
   @ServiceMethod()
-  async getNumberOfOrdersSince(since: number): number {
-    // Do the thing.
+  async getNumberOfOrdersSince(since: number): Promise<number> {
+    // Handle the request and return the reply, in this case,
+    // a Promise<number>.
   }
 
   @ServiceEvent()
   async pizzaOrdered(flavor: string) {
-    // Do the thing.
+    // Handle the event. This method is Promise<void>, as
+    // event handlers do not need to return anything.
   }
 }
 ~~~~
 
-As Catamaran is decorator-driven, service methods and events can be registered using the appropriate decorators: `@ServiceMethod` and `@ServiceEvent`. The external name (visible to other Darcon services) of the method/event is going to be the name of the decorated method, unless otherwise specified. In the case of the above example, other services can call the `PizzaService.getNumberOfOrdersSince` method or emit to the `PizzaService.pizzaOrdered` event.
+As Catamaran is decorator-driven, service methods and events can be registered using the appropriate decorators: `@ServiceMethod` and `@ServiceEvent`. The external name (visible to other services) of the method/event is going to be the name of the decorated method, unless otherwise specified. In the case of the above example, other services can call the `PizzaService.getNumberOfOrdersSince` method or emit to the `PizzaService.pizzaOrdered` event.
+
+The automatically assigned names can be overridden (both for methods and events). In the following example, the method visible to other services will be `ordersSince` instead of `getNumberOfOrdersSince`.
 
 ~~~~TypeScript
 @Service()
@@ -917,13 +920,12 @@ class PizzaService {
   @ServiceMethod({
     name: 'ordersSince'
   })
-  async getNumberOfOrdersSince(since: number): number {
-    // Do the thing.
+  async getNumberOfOrdersSince(since: number): Promise<number> {
+    // Handle the request and return the reply, in this case,
+    // a Promise<number>.
   }
 }
 ~~~~
-
-In the above example, the method visible to other services will be `ordersSince` instead of `getNumberOfOrdersSince`. `@ServiceEvent` also supports name overriding.
 
 [Modules](#modules) also support methods and services, using the same decorators.
 
@@ -931,22 +933,22 @@ In the above example, the method visible to other services will be `ordersSince`
 @Module()
 class DeliveryModule {
   @ServiceMethod()
-  async deliverPizza(pizza: Pizza): Delivery {
-    // Do the thing.
+  async deliverPizza(pizza: Pizza): Promise<Delivery> {
+    // Deliver the pizza!
   }
 }
 ~~~~
 
-When the `DeliveryModule` is declared on a service (in the `modules` array), the above `deliverPizza` method will automatically be available as part of the service's published interface.
+When the `DeliveryModule` is bound in the context, the above `deliverPizza` method will automatically be available as part of the service's published interface. Note, that module methods and events are always published regardless of the actual place where the module was bound. Thus, if a module was bound by another module, the methods and events will still be available.
 
 ### Outbound Communication
 
-Being called is great, but being able to *call* is even more fun! Calling other Darcon services is done through so-called *external services*.
+Being called is great, but being able to *call* is even more fun! Calling other services is done through so-called *external services*.
 
 For each external service, you have to create a corresponding class as follows.
 
 ~~~~TypeScript
-import {ExternalService, ExternalServiceTemplate} from '@catamaranjs/Catamaran'
+import { ExternalService, ExternalServiceTemplate } from '@catamaranjs/interface'
 
 /* 1. */
 @ExternalService()
@@ -960,17 +962,15 @@ The two requirements for external services are
 
 Now you're ready to make calls to the `Cache` service!
 
-<!-- Frissíteni -->
-
 ~~~~TypeScript
 @Service({
   /* 1. */
-  externalServices: [Cache]
+  inject: [Cache]
 })
 class PizzaService {
   private readonly cache: Cache
 
-  constructor(/* 2. */ @Inject(Cache) cache: Cache) {
+  constructor(/* 2. */ cache: Cache) {
     this.cache = cache
   }
 
@@ -984,16 +984,14 @@ class PizzaService {
 
 Whoa, now, that's a lot, so let's break it down!
 
-  1. First, we have to register the `Cache` external service in the `externalServices` array. This tells Catamaran that you depend on the this service (so that your service will wait for `Cache` to show up when started), and it can load and instrument the external service class.
+  1. First, we have to register the `Cache` external service by adding it to the `inject` array (we could've used a `bindClass` [Class Binding](#class-binding) as well). This tells Catamaran that you depend on the Cache service (so that your service will wait for `Cache` to show up when started), and it can load and instrument the external service class.
   1. Then, we have to inject an instance of this external service into our service. This instance will be created by Catamaran and will be automatically injected into our constructor when necessary.
-  1. Finally, we can make a Darcon request to `Cache.getItem` using the `request` method.
+  1. Finally, we can make a network request to `Cache.getItem` (published by the `Cache` service) using the `request` method. The `request` method is provided by te `ExternalServiceTemplate` base class.
 
 Our dependency on the `Cache` service is now completely apparent. However, the `getItem` call still feels a bit unsafe.
 
-<!-- Frissíteni -->
-
 ~~~~TypeScript
-import { ExternalServiceMethod, IExternalServiceCall, serviceMethodPlaceholder } from '@catamaranjs/Catamaran'
+import { ExternalServiceMethod, IExternalServiceCall, serviceMethodPlaceholder } from '@catamaranjs/interface'
 
 @ExternalService()
 class Cache extends ExternalServiceTemplate {
@@ -1002,7 +1000,7 @@ class Cache extends ExternalServiceTemplate {
 }
 ~~~~
 
-By utilizing the `@ExternalServiceMethod`, and placing it on an appropriately typed property, we can instruct Catamaran to automatically generate typed request calls for us. The anatomy of an *external service method* is as follows:
+By utilizing the `@ExternalServiceMethod` decorator, and placing it on an appropriately typed property, we can instruct Catamaran to automatically generate typed request calls for us. The anatomy of an *external service method* is as follows:
 
 ~~~~
 @ExternalServiceMethod()
@@ -1015,12 +1013,12 @@ Now we can call this method as follows.
 
 ~~~~TypeScript
 @Service({
-  externalServices: [Cache]
+  inject: [Cache]
 })
 class PizzaService {
   private readonly cache: Cache
 
-  constructor(@Inject(Cache) cache: Cache) {
+  constructor(cache: Cache) {
     this.cache = cache
   }
 
@@ -1036,7 +1034,7 @@ Be aware of the `send()` call at the end, which actually performs the request an
 Of course, we can also declare events in a fashion similar to requests. Just use the `@ExternalServiceEvent` decorator and its friends, `IExternalServiceEmit` and `serviceEventPlaceholder`.
 
 ~~~~TypeScript
-import { ExternalServiceEvent, IExternalServiceEmit, serviceEventPlaceholder } from '@catamaranjs/Catamaran'
+import { ExternalServiceEvent, IExternalServiceEmit, serviceEventPlaceholder } from '@catamaranjs/interface'
 
 @ExternalService()
 class PizzaAggregator extends ExternalServiceTemplate {
@@ -1056,21 +1054,60 @@ Just as in the case of [Inbound Communication](#inbound-communication), outbound
 
 ~~~~TypeScript
 @Module({
-  externalServices: [Cache]
+  inject: [Cache]
 })
 class DeliveryModule {
   private readonly cache: Cache
 
-  constructor(@Inject(Cache) cache: Cache) {
+  constructor(cache: Cache) {
     this.cache = cache
     console.log('Ready to cache!', Cache)
   }
 }
 ~~~~
 
-<!-- Frissíteni + ez ne itt legyen -->
+## Appeared and Disappeared Events
 
-### Darcon Configuration
+When services become available (or, the opposite, unavailable), Catamaran emits the following events across the available services:
+
+  * `ServiceAppeared(name)`
+    * Emitted when the `name` service becomes available on the network.
+  * `ServiceDisappeared(name)`
+    * Emitted when the `name` service becomes unavailable on the network.
+
+Subscribing to these events can be done via the appropriate decorators.
+
+~~~~TypeScript
+import { ServiceAppeared, ServiceDisappeared } from '@catamaranjs/interface'
+
+@Service()
+class PizzaService {
+  @ServiceAppeared()
+	async appeared(name: string) {
+    console.log(`Hello, ${name}!`)
+  }
+
+	@ServiceDisappeared()
+	async disappeared(name: string) {
+    console.log(`Goodbye, ${name}!`)
+  }
+}
+~~~~
+
+When declaring listeners, please be aware of the following limitations:
+
+  * These decorators are not available on [Modules](#modules) yet.
+  * On the same service, there can only be a single listener for the same event. This means, that you cannot add multiple listeners for the `ServiceAppeared` event on the same service.
+
+These limitations might be lifted in the future.
+
+## Communication Strategies
+
+## In-Memory
+
+In-memory strategy.
+
+### Darcon
 
 The configurable properties of the Darcon connection are as follows:
 
@@ -1114,58 +1151,13 @@ The configurable properties of the Darcon connection are as follows:
     * `DARCON_NATS_URL`
     * Default: `'nats://localhost:4222'`
 
-> If you use an [envPrefix](#envPrefix) on your service, then the above environment variables will be prefixed with the chosen value. For example, if the env prefix is `NOTIFICATION`, then `DARCON_NATS_URL` becomes `NOTIFICATION_DARCON_NATS_URL`.
+> If you use an [Environment Variable Prefix](#environment-variable-prefix) on your service, then the above environment variables will be prefixed with the chosen value. For example, if the env prefix is `NOTIFICATION`, then `DARCON_NATS_URL` becomes `NOTIFICATION_DARCON_NATS_URL`.
 
-If you want to access the above values directly in your application (for whatever reason), then simply inject an instance of [`DarconConfig`](../src/Darcon/Configuration.ts).
+If you want to access the above values directly in your application (for whatever reason), then simply inject an instance of [`DarconConfig`](../packages/communication/darcon/src/Config/DarconConfig.ts).
 
-<!-- Frissíteni -->
+### Inter-process Communication
 
-## Network Events
-
-*Network events* are emitted by Darcon, and can be listened on by services. The following events are available:
-
-  * `entityAppeared(name)`
-    * Emitted when the `name` entity (service) publishes itself to Darcon.
-  * `entityLinked(name)`
-    * Laji, please help, I don't know :(
-  * `entityUpdated(name, terms)`
-    * Again, I don't know :(
-  * `entityDisappeared(name)`
-    * The pair of `entityAppeared`, emitted when the `name` entity (or service) closes itself.
-
-Subscribing to these events can be done via the `@NetworkEvent` decorator.
-
-~~~~TypeScript
-import { NetworkEvent } from '@catamaranjs/Catamaran'
-
-@Service()
-class PizzaService {
-  @NetworkEvent()
-	entityAppeared(name: string) {}
-
-	@NetworkEvent({
-    name: 'entityLinked'
-  })
-	linkedWithSillyName(name: string) {}
-
-	@NetworkEvent()
-	entityDisappeared(name: string) {}
-
-	@NetworkEvent({
-    name: 'entityUpdated'
-  })
-	onEntityUpdated(name: string, terms: any) {}
-}
-~~~~
-
-As you can see, the same decorator is used for each event listener. It is the name of the event listener method or the `name` option of the `@NetworkOption` decorator which decides which event the method is bound to.
-
-When declaring event listeners, please be aware of the following limitations:
-
-  * The `@NetworkEvent` decorator is not available on [Modules](#modules) yet.
-  * On the same service, there can only be a single listener for the same event. For example, you cannot add multiple listeners for the `entityAppeared` event on the same service.
-
-<!-- Nagy frissítés ide -->
+IPC strategy.
 
 ## Service Lifecycle
 
@@ -1174,7 +1166,7 @@ When implementing more involved services, we regularly want to perform additiona
 Fortunately, Catamaran provides facilities for both services and [Modules](#modules) to perform both initialization and teardown. Let's first see the case of services.
 
 ~~~~TypeScript
-import { PostInit, PreDestroy } from '@catamaranjs/Catamaran'
+import { PostInit, PreDestroy } from '@catamaranjs/interface'
 
 @Service()
 class PizzaService {
@@ -1189,7 +1181,7 @@ class PizzaService {
 Then, the options for modules.
 
 ~~~~TypeScript
-import { PreServiceInit, PostServiceInit, PreServiceDestroy, PostServiceDestroy } from '@catamaranjs/Catamaran'
+import { PreServiceInit, PostServiceInit, PreServiceDestroy, PostServiceDestroy } from '@catamaranjs/interface'
 
 @Module()
 class DeliveryModule {
@@ -1228,6 +1220,10 @@ Please be aware of the following limitations regarding lifecycle methods:
   * The order in which the same lifecycle method is called on the declared modules is *not* stable and should not be depended upon.
   * In a given module or service, each lifecycle method can only be used at most once.
 
+## Error Handling
+
+TBD
+
 ## Testing
 
 While unit testing is rather straightforward (just import the appropriate unit into the test and replace its dependencies with test doubles), higher level tests are not necessarily so. To increase our confidence in the correctness of our service, we may want to perform narrow integration tests against it: using its public API, but replacing its external dependencies with doubles.
@@ -1237,7 +1233,7 @@ While unit testing is rather straightforward (just import the appropriate unit i
 >   * [Martin Fowler: IntegrationTest](https://martinfowler.com/bliki/IntegrationTest.html)
 >   * [John Mikael Gundersen: Patterns of Narrow Integration Testing](https://www.jmgundersen.net/blog/patterns-of-narrow-integration-testing)
 
-In this process, we want to make sure that our service behaves the same way as if it was deployed to Darcon by Catamaran:
+In this process, we want to make sure that our service behaves the same way as if it was made available on the network by Catamaran:
 
   * modules are correctly attached,
   * configuration is loaded,
@@ -1262,12 +1258,12 @@ class DateTime extends ExternalServiceTemplate {
 }
 
 @Service({
-	externalServices: [DateTime],
+	inject: [DateTime],
 })
 class GreetingService {
 	private readonly dateTime: DateTime
 
-	constructor(@Inject(DateTime) dateTime: DateTime) {
+	constructor(dateTime: DateTime) {
 		this.dateTime = dateTime
 	}
 
@@ -1289,7 +1285,6 @@ describe('GreetingService.greet', () => {
     // When
 
     // Then
-
   })
 })
 ~~~~
@@ -1307,10 +1302,9 @@ const WHO = 'Jocky'
 const expected = 'Good morning, Jocky!'
 
 /* 2. */
-const arrangement = await Catamaran.createServiceWithStrategy(
-  GreetingService,
-  IntegrationTestBuilderStrategy
-)
+const arrangement = await Catamaran
+  .builder()
+  .createServiceWithStrategy(GreetingService, IntegrationTestBuilderStrategy)
 
 const sut = await arrangement
   /* 3. */
@@ -1327,12 +1321,12 @@ const sut = await arrangement
 Let's break this down, step by step!
 
   1. First, we declare the test data: the hour which will be returned by our `DateTime` double, the name passed to the `greet` method and the expected output.
-  1. This is followed by the creation of our test arrangement. We use the `createServiceWithStrategy` function with the `IntegrationTestBuilderStrategy` to create a representation of the service, which is optimized for testing. This is called an arrangement, and allows us for reconfiguring environment variables (using the `reconfigure` method) and rebinding container types (through the `rebind` method).
+  1. This is followed by the creation of our test arrangement. We use the `createServiceWithStrategy` method with the `IntegrationTestBuilderStrategy` to create a representation of the service, which is optimized for testing. This is called an arrangement, and allows us for rebinding container types (through the `rebind` method).
   1. Using the `rebind` method of the arrangement, we bind a test double to the `DateTime` external service. Thus, when we start the service in step 5, the container will inject our double, instead of the original implementation.
-  1. The double will respond with the same value to each `hours` call. Remember, that external service methods return `IExternalServiceCall<T>`-s, hence, we have to use the `CallWithResult` helper type.
-  1. As the last step of our `Given` block, we call the `start` method of our arrangement, producing a testable *system under test*. The call to the `start` method will actually kick-off the service but will not publish it to Darcon.
+  1. The double will respond with the same value to each `hours` call. Remember, that external service methods return `IExternalServiceCall<T>`'s, hence, we have to use the `CallWithResult` helper type.
+  1. As the last step of our `Given` block, we call the `start` method of our arrangement, producing a testable *system under test*. The call to the `start` method will actually kick-off the service but will not publish it on the network.
 
-We're now in place to make a test call!
+We're now ready to make a test call!
 
 ~~~~TypeScript
 // When
@@ -1343,7 +1337,7 @@ const actual = await sut
   .greet(WHO)
 ~~~~
 
-  1. Using the `getServiceOrModule` method, we retrieve an instance of `GreetingService` from the context container. As the name of the method implies, you can also retrieve any module from the container.
+  1. Using the `getServiceOrModule` method, we retrieve an instance of `GreetingService` from the context. As the name of the method implies, you can also retrieve any module from the context.
   1. Then, we simply call the `greet` method as we would do in the case of an ordinary TypeScript method, and record its return value.
 
 Finally, let's check if our expectation holds.
@@ -1355,4 +1349,8 @@ assert.strictEqual(actual, expected)
 await sut.close()
 ~~~~
 
-We simply assert, whether the actual answer is equal to the expected one. Then, we do not forget to close the system by calling the `close` method.
+We simply assert whether the actual answer is equal to the expected one. Then, we do not forget to close the system by calling the `close` method.
+
+## Extending Catamaran
+
+This one's tough :(
