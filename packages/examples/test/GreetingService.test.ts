@@ -1,8 +1,9 @@
 import * as assert from 'assert'
 import { Catamaran } from '@catamaranjs/service'
-import { IntegrationTestBuilderStrategy } from '@catamaranjs/test-framework'
+import {ClassLevelOverrides, IntegrationTestBuilderStrategy, OverrideConfig} from '@catamaranjs/test-framework'
 import { CallWithResult } from '@catamaranjs/interface'
 import { DateTimeService, GreetingService } from './GreetingService'
+import {DarconConfig} from "@catamaranjs/communication-darcon";
 
 const tests = [
 	{
@@ -15,6 +16,15 @@ const tests = [
 
 			const arrangement = await Catamaran
 				.builder()
+				.use(OverrideConfig.with([
+					{
+						config: DarconConfig,
+						overrides: {
+							division: 'a',
+							connectionPatience: 'b'
+						}
+					} as ClassLevelOverrides<DarconConfig>
+				]))
 				.createServiceWithStrategy(GreetingService, IntegrationTestBuilderStrategy)
 
 			const sut = await arrangement
