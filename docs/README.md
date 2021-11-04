@@ -1706,6 +1706,68 @@ Now, the `isLocalEnv` function will always return `true`.
 
 ### Testing Modules
 
+As written in the [Modules](#section), modules are not executable by themselves: they need a containing or hosting service to operate. Even if that's the case, we still need to integration test them somehow. Fortunately, Catamaran provides facilities to test not only services, but individual modules as well.
+
+Let's assume, that we have a module which provides a version method as follows:
+
+~~~~TypeScript
+@Module()
+class VersionModule() {
+  private readonly _version: string
+
+  constructor(@Inject('VERSION') version: string) {
+    this._version = version
+  }
+
+  @ServiceMethod()
+  async version(): Promise<string> {
+    return this._version
+  }
+}
+~~~~
+
+We can use the `ModuleHost` class to create a containing or hosting service for this module for testing purposes:
+
+~~~~TypeScript
+import { ModuleHost } from '@catamaranjs/test-framework`
+
+const arrangement = await Catamaran
+  .builder()
+  .createServiceWithStrategy(ModuleHost.fromModule(VersionModule), IntegrationTestBuilderStrategy)
+~~~~
+
+Then, we can use this arrangement to write tests the same way as in the case of services:
+
+~~~~TypeScript
+// Given
+const expected = '1.0.0'
+const sut = arrangement
+  .bind('VERSION', expected)
+  .start()
+
+// When
+const actual = await sut
+  .getServiceOrModule(VersionModule)
+  .version()
+
+// Then
+assert.strictEqual(actual, expected)
+
+await sut.close()
+~~~~
+
+If we want to customize the host service, then we can use the `fromServiceOptions` method, which accepts an object with the same properties as the `@Service` decorator.
+
+~~~~TypeScript
+const host = ModuleHost.fromServiceOptions({
+  modules: [VersionModule]
+})
+
+const arrangement = await Catamaran
+  .builder()
+  .createServiceWithStrategy(host, IntegrationTestBuilderStrategy)
+~~~~
+
 ## Extending Catamaran
 
 This one's tough :(
