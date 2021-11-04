@@ -1217,12 +1217,150 @@ The order then is as follows:
 
 Please be aware of the following limitations regarding lifecycle methods:
 
-  * The order in which the same lifecycle method is called on the declared modules is *not* stable and should not be depended upon.
   * In a given module or service, each lifecycle method can only be used at most once.
 
 ## Error Handling
 
-TBD
+Frequently, we start by implementing the happy case of our business logic first. Then, by the time we add error handling for each and every failure scenario, the original happy path is almost impossible to recognize and follow. Catamaran attempts to help you in decluttering your code and extracting cross-cutting concerns by providing support for framework-level error handling.
+
+Let's assume that we have some service method, `orderPizza`, which accepts the flavor of the pizza. Now, if we receive an unknown failure, then we would like to return an error response. The simplest solution can be something like this:
+
+~~~~TypeScript
+@Service()
+class PizzaService {
+  @ServiceMethod()
+  async orderPizza(flavor: string): Promise<string> {
+    if (!['margherita', 'hawaii'].includes(flavor)) {
+      return `Unknown flavor: ${flavor}`
+    }
+
+    return 'enjoy your pizza!'
+  }
+}
+~~~~
+
+This solution is great, however, it does not scale very well (what if we want to reuse this validation logic?) and the body of our `orderPizza` method much longer than needed.
+
+Let's try something else! We can introduce a custom error for unknown flavors:
+
+~~~~TypeScript
+class UnknownFlavorError extends Error {
+  constructor(readonly flavor: string) {
+    super(`Unknown flavor: ${flavor}`)
+  }
+}
+~~~~
+
+Follow this up by extracting the validation code into a separate method:
+
+~~~~TypeScript
+@Service()
+class PizzaService {
+  @ServiceMethod()
+  async orderPizza(flavor: string): Promise<string> {
+    guardPizzaFlavor(flavor)
+
+    return 'enjoy your pizza!'
+  }
+
+  private guardPizzaFlavor(flavor: string) {
+    if (!['margherita', 'hawaii'].includes(flavor)) {
+      throw new UnknownFlavorError(flavor)
+    }
+  }
+}
+~~~~
+
+The code feels much cleaner now: `guardPizza` does exactly one thing, and the level of abstraction in `orderPizza` is consistent. However, there's one, not-so-little problem still: who's going to handle the `UnknownFlavorError`, thrown from `guardPizzaFlavor`? That's where Catamaran's support for error handling comes into the picture. Watch!
+
+~~~~TypeScript
+import { ErrorHandler } from '@catamaranjs/interface'
+
+@Service()
+class PizzaService {
+  @ServiceMethod()
+  async orderPizza(flavor: string): Promise<string> {
+    guardPizzaFlavor(flavor)
+
+    return 'enjoy your pizza!'
+  }
+
+  /* 1. */
+  @ErrorHandler(/* 2. */ UnknownPizzaFlavorError)
+  private async onUnknownPizzaFlavor(/* 3. */ error: UnknownPizzaFlavorError): Promise<String> {
+    return error.message
+  }
+
+  private guardPizzaFlavor(flavor: string) {
+    if (!['margherita', 'hawaii'].includes(flavor)) {
+      throw new UnknownFlavorError(flavor)
+    }
+  }
+}
+~~~~
+
+  1. We created a new method in `PizzaService` and decorated it with `@ErrorHandler`.
+  1. We passed the error type that we want to handle as an argument to the `@ErrorHandler` decorator. Every time an error is thrown from a service method or a service event (see [Outbound Communication](#outbound-communication)), Catamaran will inspect the error handlers in the same service/module class. If the thrown error is an instance of the handled type of some error handler, then that handler will be called.
+  1. The type of the parameter is `UnknownPizzaFlavorError` as we can be sure, that we always receive an instance of that type.
+
+Please be aware of the following gotchas regarding error handling:
+
+  * Scoped
+    * Error handlers are scoped. This means, that a given error handler can only catch errors thrown in the same class. Therefore, this will not work:
+      ~~~~TypeScript
+      @Module()
+      class A {
+        @ServiceMethod()
+        async throwing() {
+          throw new Error()
+        }
+      }
+
+      @Module()
+      class B {
+        @ErrorHandler(Error)
+        async globalHandler(error: Error) {
+          console.log(error)
+        }
+      }
+      ~~~~
+      In the future, this limitation is going to be lifted in some way, allowing for global error handlers.
+  * Catch multiple types.
+    * An error handler can catch multiple error types. Simply use an array parameter in the `@ErrorHandler` decorator.
+      ~~~~TypeScript
+      @Service()
+      class SomeService {
+        @ErrorHandler([SomeError, OtherError])
+        private async onSomeOrOtherError(error: SomeError | OtherError) {
+          console.log(error)
+        }
+      }
+      ~~~~
+  * Ordered
+    * When attempting to find an error handler for a thrown error, Catamaran will enumerate the error handlers in the order of their declaration. Therefore, this is correct:
+      ~~~~TypeScript
+      @Service()
+      class SomeService {
+        @ErrorHandler(SomeError)
+        private async onSomeError() {}
+
+        @ErrorHandler(Error)
+        private async onError() {}
+      }
+      ~~~~
+      While this is most likely not what you want (since `onSomeError` will never be called):
+      ~~~~TypeScript
+      @Service()
+      class SomeService {
+        @ErrorHandler(Error)
+        private async onError() {}
+        
+        @ErrorHandler(SomeError)
+        private async onSomeError() {}
+      }
+      ~~~~
+  * Async
+    * Error handlers can be asynchronous.
 
 ## Testing
 
