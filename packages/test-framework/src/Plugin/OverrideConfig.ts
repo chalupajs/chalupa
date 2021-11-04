@@ -5,14 +5,32 @@ export interface ClassLevelOverrides<T = any> {
 	overrides: Partial<Record<keyof T, unknown>>
 }
 
-export class OverrideConfig extends AbstractPlugin {
-	private readonly overrides: [ClassLevelOverrides]
+export class OverrideConfigBuilder {
+	private readonly overrides: ClassLevelOverrides[]
 
-	static with(overrides: [ClassLevelOverrides]): OverrideConfig {
-		return new OverrideConfig(overrides)
+	constructor() {
+		this.overrides = []
 	}
 
-	private constructor(overrides: [ClassLevelOverrides]) {
+	add<T>(config: Constructor<T>, overrides: Partial<Record<keyof T, unknown>>): this {
+		this.overrides.push({ config, overrides })
+
+		return this
+	}
+
+	build(): OverrideConfig {
+		return new OverrideConfig(this.overrides)
+	}
+}
+
+export class OverrideConfig extends AbstractPlugin {
+	private readonly overrides: ClassLevelOverrides[]
+
+	static builder(): OverrideConfigBuilder {
+		return new OverrideConfigBuilder()
+	}
+
+	constructor(overrides: ClassLevelOverrides[]) {
 		super()
 		this.overrides = overrides
 	}
