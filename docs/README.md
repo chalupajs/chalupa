@@ -15,6 +15,7 @@
   * [Logging](#logging)
     * [Switching the Provider](#switching-the-provider)
     * [Configuring Logging](#configuring-logging)
+  * [Plugins](#plugins)
   * [Dependency Injection](#dependency-injection)
     * [Class Binding](#class-binding)
     * [Interface Binding](#interface-binding)
@@ -41,6 +42,7 @@
     * [Timing and Order](#timing-and-order)
   * [Error Handling](#error-handling)
   * [Testing](#testing)
+    * [Module Testing](#module-testing)
   * [Extending Catamaran](#extending-catamaran)
 
 ## What is Catamaran?
@@ -112,6 +114,25 @@ In our current case, the name of the published service is going to be the name o
 })
 class PizzaService {}
 ~~~~
+
+## Catamaran Packages
+
+Catamaran is developed in a monorepo (https://github.com/dwmt/Catamaran) and consists of several smaller packages. What are these and when should you use them?
+
+  * `@cataramanjs/interface`
+    * The core decorators and types used by Catamaran. Writing a module, a plugin or something along those lines? This package is a must then for you.
+  * `@catamaranjs/service`
+    * As its name suggests, `interface` is mostly the public interface of Catamaran. The actual implementation, the classes that make ue of the decorators and such reside in the `service` module. Thus, if you want to create an executable service, then use this package.
+  * `@catamaranjs/test-framework`
+    * Integration test support for Catamaran (see [Testing](#testing)). If you want to test your modules or services, then this is your package.
+  * `@catamaranjs/logger-pino`
+    * [pino](https://github.com/pinojs/pino) logging backend. See [Switching the Provider](#switching-the-provider) on how to make use of the non-default logging backend.
+  * `@catamaranjs/logger-tslog`
+    * [tslog](https://github.com/fullstack-build/tslog) logging backend. See [Switching the Provider](#switching-the-provider) on how to make use of the non-default logging backend.
+  * `@catamaranjs/communication-darcon`
+    * [Darcon](https://github.com/imrefazekas/darcon)-based communication layer. Use this package if you want your services to talk to each other via Darcon.
+  * `@catamaranjs/db-mongo`
+    * Module for connecting to [MongoDB](https://www.mongodb.com/) via [node-mongodb-native](https://github.com/mongodb/node-mongodb-native).
 
 ## Configuration
 
