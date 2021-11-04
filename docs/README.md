@@ -15,6 +15,7 @@
   * [Logging](#logging)
     * [Switching the Provider](#switching-the-provider)
     * [Configuring Logging](#configuring-logging)
+  * [Plugins](#plugins)
   * [Dependency Injection](#dependency-injection)
     * [Class Binding](#class-binding)
     * [Interface Binding](#interface-binding)
@@ -41,6 +42,10 @@
     * [Timing and Order](#timing-and-order)
   * [Error Handling](#error-handling)
   * [Testing](#testing)
+    * [Invoking Appeared Events](#invoking-appeared-events)
+    * [Accessing the Context](#accessing-the-context)
+    * [Overriding Configurations](#overriding-configurations)
+    * [Testing Modules](#testing-modules)
   * [Extending Catamaran](#extending-catamaran)
 
 ## What is Catamaran?
@@ -112,6 +117,10 @@ In our current case, the name of the published service is going to be the name o
 })
 class PizzaService {}
 ~~~~
+
+## Catamaran Packages
+
+
 
 ## Configuration
 
@@ -305,6 +314,8 @@ The logging API provides two configurable properties on the `LogConfiguration` c
     * Controls whether the output is optimized for human or machine consumption.
 
 Now, if no [Environment Variable Prefix](#environment-variable-prefix) was set, then these two can be modified via the above environment variables, `LOG_LEVEL` and `LOG_PRETTY`. However, if, for example, you use `EnvPrefix.from('PIZZA')`, then the respective environment variable names become `PIZZA_LOG_LEVEL` and `PIZZA_LOG_PRETTY`. Thus, you can safely run two services in the same scope and set different log settings for them. Neat, huh?
+
+## Plugins
 
 ## Dependency Injection
 
@@ -1354,7 +1365,7 @@ Please be aware of the following gotchas regarding error handling:
       class SomeService {
         @ErrorHandler(Error)
         private async onError() {}
-        
+
         @ErrorHandler(SomeError)
         private async onSomeError() {}
       }
@@ -1464,6 +1475,8 @@ Let's break this down, step by step!
   1. The double will respond with the same value to each `hours` call. Remember, that external service methods return `IExternalServiceCall<T>`'s, hence, we have to use the `CallWithResult` helper type.
   1. As the last step of our `Given` block, we call the `start` method of our arrangement, producing a testable *system under test*. The call to the `start` method will actually kick-off the service but will not publish it on the network.
 
+> Note: in the above example, we use [Rebinding](#rebinding) to completely replace the binding for `DateTime`. If you want to create new bindings in the context of the tested service, then use the `bind` method of the arrangement.
+
 We're now ready to make a test call!
 
 ~~~~TypeScript
@@ -1488,6 +1501,132 @@ await sut.close()
 ~~~~
 
 We simply assert whether the actual answer is equal to the expected one. Then, we do not forget to close the system by calling the `close` method.
+
+### Invoking Appeared Events 
+
+Let's assume, that we want to test our handlers for the [Appeared and Disappeared Events](#appeared-and-disappeared-events). First, let's create the actual implementation:
+
+~~~~TypeScript
+@Service()
+class HandlerService {
+  @ServiceAppeared()
+  async onAppeared(name: string) {}
+}
+~~~~
+
+Then, as usual, we follow this up, by creating a test arrangement and a system under test:
+
+~~~~TypeScript
+const arrangement = await Catamaran
+  .builder()
+  .createServiceWithStrategy(HandlerService, IntegrationTestBuilderStrategy)
+
+const sut = await arrangement.start()
+~~~~
+
+Actually invoking the appropriate event is then as easy as:
+
+~~~~TypeScript
+await sut.serviceAppeared('name of the appeared service')
+await sut.serviceDisappeared('name of the disappeared service')
+~~~~
+
+### Accessing the Context
+
+When testing our service, situations may arise, when we want to assert on the state of some component bound inside the context of the service. We already saw how to retrieve services and modules from the context using the `getServiceOrModule` method. The former, retrieving an arbitrary binding can be done via the `getComponent` method, as follows:
+
+~~~~TypeScript
+const arrangement = await Catamaran
+  .builder()
+  .createServiceWithStrategy(GreeterService, IntegrationTestBuilderStrategy)
+
+const sut = await arrangement.start()
+
+const greeter = sut.getComponent('Greeter Type Key')
+~~~~
+
+### Overriding Configurations
+
+Previously, we saw how to alter the context of the tested service by rebinding existing bindings. However, this is not the only area we need to control: configuration also plays a crucial role in the behavior of our service (through, for example, [Configuration-dependent Bindings](#configuration-dependent-binding)), and thus should be modifiable in tests.
+
+Without explicit framework, support, we might think of the following two solutions:
+
+  * Overwriting `process.env`.
+    * This is a great quick and dirty solution which gets the job done. However, modifying the global state can introduce subtle bugs (we forget to reset it, for example) as well as hinder our capability for parallel testing in the same process.
+  * Rebinding configuration classes.
+    * We can just use `arrangement.rebind()` and rebind the appropriate configuration class. While this works, it might be too late: by the time `arrangement.rebind()` runs, the `inject` functions have already executed. Hence, you cannot alter dynamic module bindings this way, for example.
+
+Fortunately, Catamaran provides the `OverrideConfig` plugin (see [Plugins](#plugins) and [Extending Catamaran](#extending-catamaran) for more information on plugins) for this use case.
+
+Let's assume, that we have the following configuration class:
+
+~~~~TypeScript
+@Configuration()
+class PizzaConfig {
+  @Configurable({
+    doc: 'The data directory to save files into.',
+    format: 'string',
+  })
+  dataDirectory = '/data/pizza'
+}
+~~~~
+
+By default, the value of the `dataDirectory` property is `/data/pizza`, which can be overwritten by an appropriate environment variable or file source. However, we want to set `dataDirectory` to `/not-pizza` without messing around with those sources. To do so, we just use `OverrideConfig` when creating our service:
+
+~~~~TypeScript
+const arrangement = await Catamaran
+  .builder()
+  .use(/* 1. */ OverrideConfig.builder()
+    /* 2. */
+    .add(PizzaConfig, {
+      /* 3. */
+      dataDirectory: '/not-pizza'
+    })
+    /* 4. */
+    .build()
+  )
+  .createServiceWithStrategy(PizzaService, IntegrationTestBuilderStrategy)
+~~~~
+
+  1. We create an override builder by calling `OverrideConfig.builder()`. This call creates a new builder object on which we can set which configuration properties we want to override.
+  2. For each configuration class on which we want to override properties, we call the `add()` method. The first parameter of this call is the configuration class (`PizzaConfig`, in this case), while the second parameter is an object of name-value pairs, where value is the new, fixed value. Note, that this object is strongly typed (using the [`keyof`](https://www.typescriptlang.org/docs/handbook/2/keyof-types.html) operator of TypeScript), so you can only use valid properties of the configuration class.
+  3. We specify the new value of the `dataDirectory`.
+  4. With `build()` we actually create the plugin instance which will be used.
+
+The very same facilities can be used to override computed values as well. Given the following configuration class:
+
+~~~~TypeScript
+@Configuration()
+class FileStoreConfig {
+  @Configurable({
+    doc: 'The environment the application is executing in.',
+    format: ['local', 'staging', 'production'],
+  })
+  env = 'production'
+
+  isLocalEnv() {
+    return this.env === 'local'
+  }
+}
+~~~~
+
+If we want to override the value of `isLocalEnv`, we can write the following:
+
+~~~~TypeScript
+const arrangement = await Catamaran
+  .builder()
+  .use(OverrideConfig.builder()
+    .add(FileStoreConfig, {
+      isLocalEnv: true
+    })
+    .build()
+  )
+  .createServiceWithStrategy(FileStoreService, IntegrationTestBuilderStrategy)
+~~~~
+
+Now, the `isLocalEnv` function will always return `true`.
+
+### Testing Modules
 
 ## Extending Catamaran
 
