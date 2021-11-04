@@ -16,6 +16,7 @@
     * [Switching the Provider](#switching-the-provider)
     * [Configuring Logging](#configuring-logging)
   * [Plugins](#plugins)
+    * [Global Use](#global-use)
   * [Dependency Injection](#dependency-injection)
     * [Class Binding](#class-binding)
     * [Interface Binding](#interface-binding)
@@ -120,7 +121,22 @@ class PizzaService {}
 
 ## Catamaran Packages
 
+Catamaran is developed in a monorepo (https://github.com/dwmt/Catamaran) and consists of several smaller packages. What are these and when should you use them?
 
+  * `@cataramanjs/interface`
+    * The core decorators and types used by Catamaran. Writing a module, a plugin or something along those lines? This package is a must then for you.
+  * `@catamaranjs/service`
+    * As its name suggests, `interface` is mostly the public interface of Catamaran. The actual implementation, the classes that make ue of the decorators and such reside in the `service` module. Thus, if you want to create an executable service, then use this package.
+  * `@catamaranjs/test-framework`
+    * Integration test support for Catamaran (see [Testing](#testing)). If you want to test your modules or services, then this is your package.
+  * `@catamaranjs/logger-pino`
+    * [pino](https://github.com/pinojs/pino) logging backend. See [Switching the Provider](#switching-the-provider) on how to make use of the non-default logging backend.
+  * `@catamaranjs/logger-tslog`
+    * [tslog](https://github.com/fullstack-build/tslog) logging backend. See [Switching the Provider](#switching-the-provider) on how to make use of the non-default logging backend.
+  * `@catamaranjs/communication-darcon`
+    * [Darcon](https://github.com/imrefazekas/darcon)-based communication layer. Use this package if you want your services to talk to each other via Darcon.
+  * `@catamaranjs/db-mongo`
+    * Module for connecting to [MongoDB](https://www.mongodb.com/) via [node-mongodb-native](https://github.com/mongodb/node-mongodb-native).
 
 ## Configuration
 
@@ -190,7 +206,7 @@ What previously was `PIZZA_DATA_DIRECTORY` is now `PEPPERONI_PIZZA_DATA_DIRECTOR
 
 Note, that env prefixing applies to module configs as well (see the [Modules](#modules) section).
 
-Also, what you've just seen is an example of using a plugin. `EnvPrefix.from()` constructs a new plugin instance, which is then passed to the `use()` method on the Catamaran builder. Catamaran will invoke the "used" plugins at various events and lifecycle phases. You can find more information regarding the inner workings of plugins in the [Extending Catamaran](#extending-catamaran) section.
+Also, what you've just seen is an example of using a [plugin](#plugins). `EnvPrefix.from()` constructs a new plugin instance, which is then passed to the `use()` method on the Catamaran builder. Catamaran will invoke the "used" plugins at various events and lifecycle phases. You can find more information regarding the inner workings of plugins in the [Plugins](#plugins) and the [Extending Catamaran](#extending-catamaran) sections.
 
 ### Loading Configuration Files
 
@@ -220,7 +236,7 @@ log:
 	pretty: true
 ~~~~
 
-As the last step, we have to declare this file as a configuration source. Just as in the case of the [Environment Variable Prefix](#environment-variable-prefix), we will use a plugin, namely, `ConfigSources`.
+As the last step, we have to declare this file as a configuration source. Just as in the case of the [Environment Variable Prefix](#environment-variable-prefix), we will use a [plugin](#plugins), namely, `ConfigSources`.
 
 ~~~~TypeScript
 import { ConfigSources } from '@catamaranjs/service'
@@ -316,6 +332,68 @@ The logging API provides two configurable properties on the `LogConfiguration` c
 Now, if no [Environment Variable Prefix](#environment-variable-prefix) was set, then these two can be modified via the above environment variables, `LOG_LEVEL` and `LOG_PRETTY`. However, if, for example, you use `EnvPrefix.from('PIZZA')`, then the respective environment variable names become `PIZZA_LOG_LEVEL` and `PIZZA_LOG_PRETTY`. Thus, you can safely run two services in the same scope and set different log settings for them. Neat, huh?
 
 ## Plugins
+
+In the previous sections (such as [Environment Variable Prefix](#environment-variable-prefix) and [Loading Configuration Files](#loading-configuration-files)) we already made use of plugins (think `EnvPrefix` or `ConfigSources`) without knowing what they were and how they worked.
+
+Simply put, plugins extend and alter the behavior of the framework itself. To give a taste, they can do the following:
+
+  * hook into the [Service Lifecycle](#service-lifecycle),
+  * add, replace, remove or inspect [Dependency Injection](#dependency-injection) bindings,
+  * inspect and proxy instances in the dependency injection context,
+  * and much more!
+
+If you want a more involved description (because, for example, you want to write your own plugins), then make sure to check the [Extending Catamaran](#extending-catamaran) section. Here we will only cover their usage.
+
+You can attach plugins to a service prior it's created. This is done via the `use()` method of the Catamaran service builder, which accepts one or more plugin instances. Therefore, the following two examples are equivalent:
+
+~~~~TypeScript
+await Catamaran.builder()
+  .use(new PluginA())
+  .use(new PluginB())
+  .createServiceWithStrategy(SomeService, SomeStrategy)
+~~~~
+
+~~~~TypeScript
+await Catamaran.builder()
+  .use([new PluginA(), new PluginB()])
+  .createServiceWithStrategy(SomeService, SomeStrategy)
+~~~~
+
+When using plugins, be aware of the following gotchas:
+
+  * Order
+    * Plugins will be applied in the order they are `use`'d. This is relevant if the correct behavior of a plugin depends on some other plugin.
+  * State
+    * You can share a plugin instance between multiple services. However, in that case, make sure to handle plugin state correctly, to prevent surprises (and painful hours of debugging). Thus, this is completely fine, if the plugin is stateless (or handles per-service state correctly):
+      ~~~~TypeScript
+      const sharedPlugin = new SharedPlugin()
+
+      await Catamaran.builder()
+        .use(sharedPlugin)
+        .createServiceWithStrategy(SomeService, SomeStrategy)
+
+      await Catamaran.builder()
+        .use(sharedPlugin)
+        .createServiceWithStrategy(OtherService, SomeStrategy)
+      ~~~~
+
+### Global Use
+
+If you're creating multiple services in the same process that share many plugins, then it might become cumbersome to use the same set of plugins for each. That's when `globalUse` comes handy:
+
+~~~~TypeScript
+/* 1. */
+Catamaran.globalUse([new PluginA(), new PluginB()])
+
+/* 2. */
+await Catamaran.builder().createServiceWithStrategy(SomeService, SomeStrategy)
+await Catamaran.builder().createServiceWithStrategy(OtherService, SomeStrategy)
+~~~~
+
+  1. `globalUse` has the same signature, as the service builder's `use` method. Therefore, you can pass a single plugin or event multiple ones to it. You can call `globalUse` multiple times to add new plugins (subsequent invocations will extend the list o globall used plugins).
+  2. Both `SomeService` and `OtherService` will use the globally added `PluginA` and `PluginB` instance.
+
+> Note that gloal use'd plugins will precede the ones use'd on the service builder. This is relevant for order-sensitive plugins.
 
 ## Dependency Injection
 
@@ -620,7 +698,7 @@ Let's assume, that give some configuration, we want to replace an interface bind
 class RebindService {}
 ~~~~
 
-While the above example might seem a little contrived, rebind is a great tool when interfacing with or authoring [Modules](#modules) and plugins (see [Extending Catamaran](#extending-catamaran)).
+While the above example might seem a little contrived, rebind is a great tool when interfacing with or authoring [Modules](#modules) and plugins (see [Plugins](#plugins) and [Extending Catamaran](#extending-catamaran)).
 
 When rebinding a type key with multiple bound implementations, each previous binding will be dropped:
 
@@ -655,7 +733,7 @@ In the above case, both the `ImplOne` and `ImplTwo` binding will be dropped, and
 class RebindService {}
 ~~~~
 
-Again, unbinding shines the most when one has to deal with [Modules](#modules) and plugins (see [Extending Catamaran](#extending-catamaran)).
+Again, unbinding shines the most when one has to deal with [Modules](#modules) and plugins (see [Plugins](#plugins) and [Extending Catamaran](#extending-catamaran)).
 
 If multiple values are bound to the same type key, then unbinding that very type key will drop each binding (the same way as in the case of [Rebinding](#rebinding)).
 
