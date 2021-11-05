@@ -1,4 +1,4 @@
-import {ServiceAppearedCallback, ServiceDisappearedCallback} from "@catamaranjs/interface";
+import {ServiceAppearedCallback, ServiceDisappearedCallback} from "@chalupajs/interface";
 
 export interface IntegrationTestCallbackHandler {
 	onServiceAppeared?: ServiceAppearedCallback,

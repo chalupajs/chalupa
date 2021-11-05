@@ -1,5 +1,5 @@
 import pino from 'pino'
-import { ILogger, ILogProvider, LogConfig, Inject, Injectable } from '@catamaranjs/interface'
+import { ILogger, ILogProvider, LogConfig, Inject, Injectable } from '@chalupajs/interface'
 import { PinoLogger } from './PinoLogger'
 
 @Injectable()

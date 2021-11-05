@@ -1,4 +1,4 @@
-import { Constructor } from '@catamaranjs/interface'
+import { Constructor } from '@chalupajs/interface'
 
 /**
  * Produced by the `IntegrationTestBuilderStrategy`, allows for

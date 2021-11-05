@@ -1,6 +1,6 @@
 import {
 	Catamaran, LogProvider,
-} from '@catamaranjs/service'
+} from '@chalupajs/service'
 import {Service,
 	ExternalServiceTemplate,
 	serviceMethodPlaceholder,
@@ -9,9 +9,9 @@ import {Service,
 	ILogger,
 	LoggerFactory,
 	Inject,
-	IExternalServiceCall} from '@catamaranjs/interface'
-import {PinoLogProvider} from '@catamaranjs/logger-pino'
-import {DarconBuilderStrategy} from "@catamaranjs/communication-darcon";
+	IExternalServiceCall} from '@chalupajs/interface'
+import {PinoLogProvider} from '@chalupajs/logger-pino'
+import {DarconBuilderStrategy} from "@chalupajs/communication-darcon";
 
 @ExternalService()
 export class DateTimeService extends ExternalServiceTemplate {

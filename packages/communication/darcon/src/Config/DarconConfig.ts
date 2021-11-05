@@ -1,4 +1,4 @@
-import { Configurable, Configuration } from '@catamaranjs/interface'
+import { Configurable, Configuration } from '@chalupajs/interface'
 
 /**
  * Configuration for the underlying Darcon instance of the service.

@@ -1,4 +1,4 @@
-import { ICommunicationChannel, Injectable } from '@catamaranjs/interface'
+import { ICommunicationChannel, Injectable } from '@chalupajs/interface'
 import InMemoryOrchestrator from './InMemoryOrchestrator'
 
 @Injectable()

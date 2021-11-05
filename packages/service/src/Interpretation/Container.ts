@@ -8,7 +8,7 @@ import {
 	IPlugin,
 	IPluginContainer,
 	LoggerFactory,
-} from '@catamaranjs/interface'
+} from '@chalupajs/interface'
 
 export class Container implements IContainer, IInjectContainer, IFacadeContainer, IPluginContainer {
 	private readonly _plugins: IPlugin[]

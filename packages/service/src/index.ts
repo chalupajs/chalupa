@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 
 // ----------- Main -----------//
-export { Catamaran, ICatamaranBuilder } from './Interpretation/Catamaran'
+export { Chalupa, IChalupaBuilder } from './Interpretation/Chalupa'
 
 // ----------- BuilderStrategies -----------//
 export { InMemoryStrategy } from './Communication/InMemory/InMemoryStrategy'

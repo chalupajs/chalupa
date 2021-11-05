@@ -5,7 +5,7 @@ import {
 	ensureInjectable,
 	ILogProvider,
 	InversifyContainer,
-} from '@catamaranjs/interface'
+} from '@chalupajs/interface'
 
 export class LogProvider extends AbstractPlugin {
 	private readonly _logProvider: Constructor<ILogProvider>

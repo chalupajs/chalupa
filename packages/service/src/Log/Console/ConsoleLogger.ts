@@ -1,4 +1,4 @@
-import { ILogger, AbstractLoggerAdapter } from '@catamaranjs/interface'
+import { ILogger, AbstractLoggerAdapter } from '@chalupajs/interface'
 import { IConsoleLog } from './ConsoleLog'
 
 export class ConsoleLogger extends AbstractLoggerAdapter {

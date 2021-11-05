@@ -1,4 +1,4 @@
-import {AbstractPlugin, Constructor} from "@catamaranjs/interface";
+import {AbstractPlugin, Constructor} from "@chalupajs/interface";
 
 export interface ClassLevelOverrides<T = any> {
 	config: Constructor<T>,

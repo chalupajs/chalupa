@@ -1,4 +1,4 @@
-import { Catamaran } from '@catamaranjs/service'
+import { Catamaran } from '@chalupajs/service'
 import {
 	ExternalService,
 	ExternalServiceEvent,
@@ -11,8 +11,8 @@ import {
 	Service, ServiceEvent,
 	serviceEventPlaceholder, ServiceMethod,
 	serviceMethodPlaceholder, TermsObject
-} from '@catamaranjs/interface'
-import { DarconBuilderStrategy } from "@catamaranjs/communication-darcon";
+} from '@chalupajs/interface'
+import { DarconBuilderStrategy } from "@chalupajs/communication-darcon";
 
 @ExternalService({
 	name: 'TestIniterService'

@@ -5,7 +5,7 @@ import {
 	IPluginContainer,
 	isExternalService,
 	Metadata,
-} from '@catamaranjs/interface'
+} from '@chalupajs/interface'
 import { timeout } from '../../util'
 
 export class ExternalServicePlugin extends AbstractPlugin {

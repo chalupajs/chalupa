@@ -1,6 +1,6 @@
 import {
 	Catamaran, LogProvider,
-} from '@catamaranjs/service'
+} from '@chalupajs/service'
 import {
 	ILogger,
 	Inject,
@@ -8,9 +8,9 @@ import {
 	LoggerFactory,
 	Module, PostInit, PostServiceDestroy, PreDestroy,
 	PreServiceInit, Service
-} from "@catamaranjs/interface";
-import { DarconBuilderStrategy } from "@catamaranjs/communication-darcon";
-import {PinoLogProvider} from "@catamaranjs/logger-pino";
+} from "@chalupajs/interface";
+import { DarconBuilderStrategy } from "@chalupajs/communication-darcon";
+import {PinoLogProvider} from "@chalupajs/logger-pino";
 
 @Injectable()
 class SubclassOne {}

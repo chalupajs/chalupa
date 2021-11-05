@@ -1,4 +1,4 @@
-import { IBuilderStrategy, IIntermediateService } from '@catamaranjs/interface'
+import { IBuilderStrategy, IIntermediateService } from '@chalupajs/interface'
 
 import { ConstructedService } from './ConstructedService'
 import { DarconFacade } from './DarconFacade'

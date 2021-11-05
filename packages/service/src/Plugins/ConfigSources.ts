@@ -1,4 +1,4 @@
-import { AbstractPlugin, configurator, IPluginContainer } from '@catamaranjs/interface'
+import { AbstractPlugin, configurator, IPluginContainer } from '@chalupajs/interface'
 
 export class ConfigSources extends AbstractPlugin {
 	private readonly _configSources: string[]

@@ -1,7 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@catamaranjs/interface': workspace:*
+  '@chalupajs/interface': workspace:*
   '@dwmt/eslint-config': 1.0.0
   '@types/node': 16.10.3
   eslint: 7.32.0
@@ -12,7 +12,7 @@ specifiers:
   typescript: 4.3.3
 
 dependencies:
-  '@catamaranjs/interface': link:../interface
+  '@chalupajs/interface': link:../interface
   reflect-metadata: 0.1.13
 
 devDependencies:

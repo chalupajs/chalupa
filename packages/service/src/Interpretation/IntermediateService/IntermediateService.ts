@@ -7,8 +7,8 @@ import {
 	ServiceOptions,
 	IDependencyGraph,
 	IPlugin,
-} from '@catamaranjs/interface'
-import { IServiceBridge } from '@catamaranjs/interface/src/Interpretation/IServiceBridge'
+} from '@chalupajs/interface'
+import { IServiceBridge } from '@chalupajs/interface/src/Interpretation/IServiceBridge'
 import { extractServiceOptions } from '../annotation_utils'
 import { ServiceBridge } from '../ServiceBridge'
 

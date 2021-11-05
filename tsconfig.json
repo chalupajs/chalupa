@@ -4,14 +4,14 @@
 	"compilerOptions": {
 		"baseUrl": "./packages",
 		"paths": {
-			"@catamaranjs/service": ["service/src"],
-			"@catamaranjs/interface": ["interface/src"],
-			"@catamaranjs/logger-tslog": ["logger/tslog/src"],
-			"@catamaranjs/logger-pino": ["logger/pinolog/src"],
-			"@catamaranjs/db-mongo": ["database/mongo/src"],
-			"@catamaranjs/examples": ["examples/src"],
-			"@catamaranjs/communication-darcon": ["communication/darcon/src"],
-		    "@catamaranjs/test-framework": ["test-framework/src"]
+			"@chalupajs/service": ["service/src"],
+			"@chalupajs/interface": ["interface/src"],
+			"@chalupajs/logger-tslog": ["logger/tslog/src"],
+			"@chalupajs/logger-pino": ["logger/pinolog/src"],
+			"@chalupajs/db-mongo": ["database/mongo/src"],
+			"@chalupajs/examples": ["examples/src"],
+			"@chalupajs/communication-darcon": ["communication/darcon/src"],
+		    "@chalupajs/test-framework": ["test-framework/src"]
 		}
 	}
 }

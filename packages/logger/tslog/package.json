@@ -1,5 +1,5 @@
 {
-	"name": "@catamaranjs/logger-tslog",
+	"name": "@chalupajs/logger-tslog",
 	"version": "1.0.0",
 	"description": "Service framework",
 	"main": "dist/src/index.js",
@@ -22,7 +22,7 @@
 	},
 	"repository": {
 	  	"type": "git",
-	  	"url": "git@github.com:dwmt/Catamaran.git"
+	  	"url": "git@github.com:chalupajs/chalupa.git"
 	},
 	"license": "MIT",
 	"devDependencies": {
@@ -35,7 +35,7 @@
 		"typescript": "4.3.3"
 	},
 	"dependencies": {
-		"@catamaranjs/interface": "workspace:*",
+		"@chalupajs/interface": "workspace:*",
 		"reflect-metadata": "0.1.13",
 		"tslog": "3.2.2"
 	}

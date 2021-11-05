@@ -7,7 +7,7 @@ import {
 	IFacadeContainer,
 	MethodCallable,
 	EventCallable,
-} from '@catamaranjs/interface'
+} from '@chalupajs/interface'
 import { InMemoryCommunicationChannel } from './InMemoryCommunicationChannel'
 import InMemoryOrchestrator, { IMemoryService } from './InMemoryOrchestrator'
 

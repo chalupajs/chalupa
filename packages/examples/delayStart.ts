@@ -1,7 +1,7 @@
-import {Catamaran, LogProvider} from '@catamaranjs/service'
-import {DarconBuilderStrategy} from '@catamaranjs/communication-darcon'
-import {PinoLogProvider} from '@catamaranjs/logger-pino'
-import { Service } from "@catamaranjs/interface";
+import {Catamaran, LogProvider} from '@chalupajs/service'
+import {DarconBuilderStrategy} from '@chalupajs/communication-darcon'
+import {PinoLogProvider} from '@chalupajs/logger-pino'
+import { Service } from "@chalupajs/interface";
 
 @Service({
 	delayStart: 5000

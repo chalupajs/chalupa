@@ -1,4 +1,4 @@
-import { Constructor, Metadata, ServiceOptions } from '@catamaranjs/interface'
+import { Constructor, Metadata, ServiceOptions } from '@chalupajs/interface'
 
 export const extractServiceOptions = function (constructor: Constructor): ServiceOptions {
 	return Reflect.getMetadata(Metadata.SERVICE_OPTIONS, constructor) as ServiceOptions

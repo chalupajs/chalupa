@@ -1,7 +1,7 @@
 import {
 	Catamaran,
 	InMemoryStrategy, LogProvider
-} from '@catamaranjs/service'
+} from '@chalupajs/service'
 import {
 	Service,
 	ILogger,
@@ -9,8 +9,8 @@ import {
 	LoggerFactory,
 	ServiceAppeared,
 	ServiceDisappeared
-} from '@catamaranjs/interface'
-import {PinoLogProvider} from "@catamaranjs/logger-pino";
+} from '@chalupajs/interface'
+import {PinoLogProvider} from "@chalupajs/logger-pino";
 
 @Service()
 class TestService {

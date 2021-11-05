@@ -4,7 +4,7 @@ import {
 	ensureInjectable,
 	isConfiguration,
 	reconfigureToEnvPrefix,
-} from '@catamaranjs/interface'
+} from '@chalupajs/interface'
 
 export class EnvPrefix extends AbstractPlugin {
 	private readonly prefix: string

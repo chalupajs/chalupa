@@ -1,4 +1,4 @@
-import { ILogger, ILogProvider, LogConfig, Injectable } from '@catamaranjs/interface'
+import { ILogger, ILogProvider, LogConfig, Injectable } from '@chalupajs/interface'
 import { ConsoleLog } from './ConsoleLog'
 import { ConsoleLogger } from './ConsoleLogger'
 

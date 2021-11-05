@@ -1,5 +1,5 @@
 import { Db, MongoClient } from 'mongodb'
-import { Inject, Module, PostServiceDestroy, PreServiceInit } from '@catamaranjs/interface'
+import { Inject, Module, PostServiceDestroy, PreServiceInit } from '@chalupajs/interface'
 import { MongoModuleConfig } from './MongoModuleConfig'
 
 @Module({

@@ -5,7 +5,7 @@ import {
 	ICommunicationChannel,
 	IIntermediateService,
 	// Metadata,
-} from '@catamaranjs/interface'
+} from '@chalupajs/interface'
 
 import { IntegrationTestArrangement, SystemUnderTest } from './IntegrationTestArrangement'
 import { IntegrationTestCommunicationChannel } from './IntegrationTestCommunicationChannel'

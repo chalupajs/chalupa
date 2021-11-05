@@ -1,4 +1,4 @@
-import {AbstractPlugin, Constructor, Metadata} from "@catamaranjs/interface"
+import {AbstractPlugin, Constructor, Metadata} from "@chalupajs/interface"
 
 export class ErrorHandlingPlugin extends AbstractPlugin {
 	onBindClass<T>(constructor: Constructor<T>): Constructor<T> {

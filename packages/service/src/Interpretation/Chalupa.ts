@@ -1,19 +1,19 @@
 import { Constructor, IBuilderStrategy, IPlugin } from '@chalupajs/interface'
 import { ExternalServicePlugin } from '../Plugins/Internal/ExternalServicePlugin'
+import { ErrorHandlingPlugin } from '../Plugins/Internal/ErrorHandlingPlugin'
 import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
-import {ErrorHandlingPlugin} from "../Plugins/Internal/ErrorHandlingPlugin";
 
-type ICatamaran = {
+type IChalupa = {
 	_plugins: IPlugin[]
 	globalUse(plugin: IPlugin | IPlugin[]): void
-	builder(): ICatamaranBuilder
+	builder(): IChalupaBuilder
 }
 
 /**
  * The entrypoint of the framework. Use this object to construct
  * some representation of your service.
  */
-export const Catamaran: ICatamaran = {
+export const Chalupa: IChalupa = {
 	_plugins: [],
 	globalUse(plugin: IPlugin | IPlugin[]): void {
 		if (Array.isArray(plugin)) {
@@ -22,13 +22,13 @@ export const Catamaran: ICatamaran = {
 			this._plugins.push(plugin)
 		}
 	},
-	builder(): ICatamaranBuilder {
-		return new CatamaranBuilder().use(this._plugins)
+	builder(): IChalupaBuilder {
+		return new ChalupaBuilder().use(this._plugins)
 	},
 }
 
-export interface ICatamaranBuilder {
-	use(plugin: IPlugin | IPlugin[]): ICatamaranBuilder
+export interface IChalupaBuilder {
+	use(plugin: IPlugin | IPlugin[]): IChalupaBuilder
 
 	/**
 	 * Loads, wires up and creates some representation of specified
@@ -41,14 +41,14 @@ export interface ICatamaranBuilder {
 	createServiceWithStrategy<T>(serviceEntrypoint: Constructor, builder: Constructor<IBuilderStrategy<T>>): Promise<T>
 }
 
-export class CatamaranBuilder implements ICatamaranBuilder {
+export class ChalupaBuilder implements IChalupaBuilder {
 	private readonly plugins: IPlugin[]
 
 	constructor() {
 		this.plugins = [new ExternalServicePlugin(), new ErrorHandlingPlugin()]
 	}
 
-	use(plugin: IPlugin | IPlugin[]): ICatamaranBuilder {
+	use(plugin: IPlugin | IPlugin[]): IChalupaBuilder {
 		if (Array.isArray(plugin)) {
 			this.plugins.push(...plugin)
 		} else {

@@ -1,14 +1,14 @@
-# The Cruising Catamaranor's Handbook
+# The Cruising Chalupanor's Handbook
 
 <div align="center">
-  <img height="420" src="./CatamaranHandbookCover.png">
+  <img height="420" src="./ChalupaHandbookCover.png">
 </div>
 
 > Note: We aimed to keep the code snippets in this handbook short and slim. Therefore, they may not contain every detail needed to be compiled and run. Nevertheless, we believe that they are easier to read and comprehend this way.
 
-  * [What is Catamaran?](#what-is-Catamaran)
+  * [What is Chalupa?](#what-is-Chalupa)
   * [My First Service](#my-first-service)
-  * [Catamaran Packages](#catamaran-packages)
+  * [Chalupa Packages](#chalupa-packages)
   * [Configuration](#configuration)
     * [Environment Variable Prefix](#environment-variable-prefix)
     * [Loading Configuration Files](#loading-configuration-files)
@@ -47,15 +47,15 @@
     * [Accessing the Context](#accessing-the-context)
     * [Overriding Configurations](#overriding-configurations)
     * [Testing Modules](#testing-modules)
-  * [Extending Catamaran](#extending-catamaran)
+  * [Extending Chalupa](#extending-chalupa)
 
-## What is Catamaran?
+## What is Chalupa?
 
-Catamaran was written to help developers write better software faster.
+Chalupa was written to help developers write better software faster.
 
 > Like the idea of "better software faster"?  Check out Dave Farley's (the co-author of the classic Continuous Delivery book) YouTube channel where he talks about various software engineering topics: [Continuous Delivery on YouTube](https://www.youtube.com/c/ContinuousDelivery/featured).
 
-Concretely, Catamaran is a thin layer of abstraction over a communication machinery with dependency injection, configuration handling and external service management baked in. There is more to this than meets the eye, however, since the greatest benefit of even such a thin layer is a clear guidance regarding the organization of services, enabling:
+Concretely, Chalupa is a thin layer of abstraction over a communication machinery with dependency injection, configuration handling and external service management baked in. There is more to this than meets the eye, however, since the greatest benefit of even such a thin layer is a clear guidance regarding the organization of services, enabling:
 
   * the separation of concerns,
   * modularity and reusability,
@@ -65,13 +65,13 @@ Thus, how your services work stays the same, but the way you write them is going
 
 ## My First Service
 
-> Here we only show a barebones service for the sake of introduction. If you want to generate a service repository with all the bells and whistles, then use `npm init @catamaranjs/service` or `npx @catamaranjs/create-service`.
+> Here we only show a barebones service for the sake of introduction. If you want to generate a service repository with all the bells and whistles, then use `npm init @chalupajs/service` or `npx @chalupajs/create-service`.
 
 Without further ado, let's jump straight into some code, shall we?
 
 ~~~~TypeScript
-import { Catamaran, InMemoryStrategy } from '@catamaranjs/service'
-import { Service } from '@catamaranjs/interface'
+import { Chalupa, InMemoryStrategy } from '@chalupajs/service'
+import { Service } from '@chalupajs/interface'
 
 /* 1. */
 @Service()
@@ -85,7 +85,7 @@ class PizzaService {
 
 async function start() {
   /* 3. */
-	const service = await Catamaran
+	const service = await Chalupa
     .builder()
     .createServiceWithStrategy(PizzaService, InMemoryStrategy)
 
@@ -96,14 +96,14 @@ async function start() {
 start().catch(console.error)
 ~~~~
 
-Above, we have a fully functional Catamaran service, which, while doing nothing useful, when started, will publish itself to an in-memory event bus.
+Above, we have a fully functional Chalupa service, which, while doing nothing useful, when started, will publish itself to an in-memory event bus.
 
   1. The entrypoint of the service is the `PizzaService` class, decorated with the `@Service` decorator.
   1. Services can expose methods to other services using the `ServiceMethod` decorator. In our case, other services can call the `hello` method on `PizzaService`.
-  1. In the `start` function, we create a new Catamaran builder using the `Catamaran.builder()` call. Then, we pass our service class to the `createServiceWithStrategy` function, along with the `InMemoryStrategy`. These two then produce an executable service from our class, that is able to publish itself to the in-memory event buss.
+  1. In the `start` function, we create a new Chalupa builder using the `Chalupa.builder()` call. Then, we pass our service class to the `createServiceWithStrategy` function, along with the `InMemoryStrategy`. These two then produce an executable service from our class, that is able to publish itself to the in-memory event buss.
   1. Finally, calling `start` on the produced service actually fires up event handling.
 
-> Catamaran makes heavy use of TypeScript decorators. You can use these resources to learn more about them:
+> Chalupa makes heavy use of TypeScript decorators. You can use these resources to learn more about them:
 >
 >   * [A Practical Guide to TypeScript Decorators](https://blog.logrocket.com/a-practical-guide-to-typescript-decorators/),
 >   * [TypeScript Documentation - Decorators](https://www.typescriptlang.org/docs/handbook/decorators.html).
@@ -119,35 +119,35 @@ In our current case, the name of the published service is going to be the name o
 class PizzaService {}
 ~~~~
 
-## Catamaran Packages
+## Chalupa Packages
 
-Catamaran is developed in a monorepo (https://github.com/dwmt/Catamaran) and consists of several smaller packages. What are these and when should you use them?
+Chalupa is developed in a monorepo (https://github.com/dwmt/Chalupa) and consists of several smaller packages. What are these and when should you use them?
 
   * `@cataramanjs/interface`
-    * The core decorators and types used by Catamaran. Writing a module, a plugin or something along those lines? This package is a must then for you.
-  * `@catamaranjs/service`
-    * As its name suggests, `interface` is mostly the public interface of Catamaran. The actual implementation, the classes that make ue of the decorators and such reside in the `service` module. Thus, if you want to create an executable service, then use this package.
-  * `@catamaranjs/test-framework`
-    * Integration test support for Catamaran (see [Testing](#testing)). If you want to test your modules or services, then this is your package.
-  * `@catamaranjs/logger-pino`
+    * The core decorators and types used by Chalupa. Writing a module, a plugin or something along those lines? This package is a must then for you.
+  * `@chalupajs/service`
+    * As its name suggests, `interface` is mostly the public interface of Chalupa. The actual implementation, the classes that make ue of the decorators and such reside in the `service` module. Thus, if you want to create an executable service, then use this package.
+  * `@chalupajs/test-framework`
+    * Integration test support for Chalupa (see [Testing](#testing)). If you want to test your modules or services, then this is your package.
+  * `@chalupajs/logger-pino`
     * [pino](https://github.com/pinojs/pino) logging backend. See [Switching the Provider](#switching-the-provider) on how to make use of the non-default logging backend.
-  * `@catamaranjs/logger-tslog`
+  * `@chalupajs/logger-tslog`
     * [tslog](https://github.com/fullstack-build/tslog) logging backend. See [Switching the Provider](#switching-the-provider) on how to make use of the non-default logging backend.
-  * `@catamaranjs/communication-darcon`
+  * `@chalupajs/communication-darcon`
     * [Darcon](https://github.com/imrefazekas/darcon)-based communication layer. Use this package if you want your services to talk to each other via Darcon.
-  * `@catamaranjs/db-mongo`
+  * `@chalupajs/db-mongo`
     * Module for connecting to [MongoDB](https://www.mongodb.com/) via [node-mongodb-native](https://github.com/mongodb/node-mongodb-native).
 
 ## Configuration
 
-In most cases, our service has some configurable knobs and toggles to alter its behavior. The widely adopted solution to configure these properties is to load their values from environment variables or configuration files. Catamaran supports this by using [konvenient](https://github.com/dwmt/konvenient) as its configuration solution. However, you don't have to install and import konvenient directly, as Catamaran re-exports the declarations of konvenient for your convenience (haha, got 'em!).
+In most cases, our service has some configurable knobs and toggles to alter its behavior. The widely adopted solution to configure these properties is to load their values from environment variables or configuration files. Chalupa supports this by using [konvenient](https://github.com/dwmt/konvenient) as its configuration solution. However, you don't have to install and import konvenient directly, as Chalupa re-exports the declarations of konvenient for your convenience (haha, got 'em!).
 
 > In what follows, we will only scratch the surface of konvenient's capabilities, hence, make sure to check out [its documentation](https://github.com/dwmt/konvenient#--konvenient) for more involved examples and recipes.
 
 Now, let us assume, that we want to save some files into a configurable directory. We can expose this setting via a configuration class as follows.
 
 ~~~~TypeScript
-import { Configuration, Configurable } from '@catamaranjs/interface'
+import { Configuration, Configurable } from '@chalupajs/interface'
 
 @Configuration()
 class PizzaConfig {
@@ -179,19 +179,19 @@ class PizzaService {
 }
 ~~~~
 
-By listing `PizzaConfig` in the `inject` array (see [Dependency Injection](#dependency-injection)), Catamaran knows that it has to manage a configuration class.
+By listing `PizzaConfig` in the `inject` array (see [Dependency Injection](#dependency-injection)), Chalupa knows that it has to manage a configuration class.
 
 > Here we showed how to use configuration values inside so-called injectable classes (such as the one decorated with `@Service`). If you want to configure how dependency injection works using configuration values, please refer to the [Configuration-dependent Binding](#configuration-dependent-binding) section.
 
 ### Environment Variable Prefix
 
-In what follows, you'll see that several parts of Catamaran can be configured via environment variables, and even so-called [Modules](#modules) can expose configurable values as well. If multiple services were deployed on the same instance and they used configurable properties of the same name (for example, `level` inside tthe `LogConfiguration` class), we were unable to individually configure these values because of the colliding environment variable names (since each one of them would use `LOG_LEVEL`). To remedy such situations, you should always set an environment variable prefix for your service as follows.
+In what follows, you'll see that several parts of Chalupa can be configured via environment variables, and even so-called [Modules](#modules) can expose configurable values as well. If multiple services were deployed on the same instance and they used configurable properties of the same name (for example, `level` inside tthe `LogConfiguration` class), we were unable to individually configure these values because of the colliding environment variable names (since each one of them would use `LOG_LEVEL`). To remedy such situations, you should always set an environment variable prefix for your service as follows.
 
 ~~~~TypeScript
-import { EnvPrefix } from '@catamaranjs/service'
+import { EnvPrefix } from '@chalupajs/service'
 
 async function start() {
-	const service = await Catamaran
+	const service = await Chalupa
     .builder()
     .use(EnvPrefix.from('PEPPERONI'))
     .createServiceWithStrategy(PizzaService, InMemoryStrategy)
@@ -206,11 +206,11 @@ What previously was `PIZZA_DATA_DIRECTORY` is now `PEPPERONI_PIZZA_DATA_DIRECTOR
 
 Note, that env prefixing applies to module configs as well (see the [Modules](#modules) section).
 
-Also, what you've just seen is an example of using a [plugin](#plugins). `EnvPrefix.from()` constructs a new plugin instance, which is then passed to the `use()` method on the Catamaran builder. Catamaran will invoke the "used" plugins at various events and lifecycle phases. You can find more information regarding the inner workings of plugins in the [Plugins](#plugins) and the [Extending Catamaran](#extending-catamaran) sections.
+Also, what you've just seen is an example of using a [plugin](#plugins). `EnvPrefix.from()` constructs a new plugin instance, which is then passed to the `use()` method on the Chalupa builder. Chalupa will invoke the "used" plugins at various events and lifecycle phases. You can find more information regarding the inner workings of plugins in the [Plugins](#plugins) and the [Extending Chalupa](#extending-chalupa) sections.
 
 ### Loading Configuration Files
 
-While environment variables constitute the preferred source of configuration values (refer to [The Twelve-Factor App: Config](https://12factor.net/config)), there are instances when loading values from files is a better option. For this end, Catamaran comes with support for JSON and YAML configuration files.
+While environment variables constitute the preferred source of configuration values (refer to [The Twelve-Factor App: Config](https://12factor.net/config)), there are instances when loading values from files is a better option. For this end, Chalupa comes with support for JSON and YAML configuration files.
 
 Let's assume, that we have a configuration class as follows.
 
@@ -239,10 +239,10 @@ log:
 As the last step, we have to declare this file as a configuration source. Just as in the case of the [Environment Variable Prefix](#environment-variable-prefix), we will use a [plugin](#plugins), namely, `ConfigSources`.
 
 ~~~~TypeScript
-import { ConfigSources } from '@catamaranjs/service'
+import { ConfigSources } from '@chalupajs/service'
 
 async function start() {
-	const service = await Catamaran
+	const service = await Chalupa
     .builder()
     .use(ConfigSources.from(['local.yml']))
     .createServiceWithStrategy(PizzaService, InMemoryStrategy)
@@ -256,7 +256,7 @@ start().catch(console.error)
 Environment-dependent configuration loading works exactly the way you'd think.
 
 ~~~~TypeScript
-const service = await Catamaran
+const service = await Chalupa
     .builder()
     .use(ConfigSources.from([`${process.env['NODE_ENV']}.yml`]))
     .createServiceWithStrategy(PizzaService, InMemoryStrategy)
@@ -266,12 +266,12 @@ Configuration sources are loaded in the order they appear in the `configSources`
 
 ## Logging
 
-A great way to achieve runtime traceability and observability is logging. Catamaran takes an SLF4J-like approach to logging by providing a unified logging facade with pluggable backends, such as [pino](https://github.com/pinojs/pino) and [TSLog](https://github.com/fullstack-build/tslog).
+A great way to achieve runtime traceability and observability is logging. Chalupa takes an SLF4J-like approach to logging by providing a unified logging facade with pluggable backends, such as [pino](https://github.com/pinojs/pino) and [TSLog](https://github.com/fullstack-build/tslog).
 
 Just grab the `LoggerFactory`, get a logger, and use the log method with the desired log level.
 
 ~~~~TypeScript
-import { LoggerFactory, ILogger } from '@catamaranjs/interface'
+import { LoggerFactory, ILogger } from '@chalupajs/interface'
 
 @Service()
 class PizzaService {
@@ -279,7 +279,7 @@ class PizzaService {
 
   // Since LoggerFactory is a concrete class, you don't have
   // to use the @Inject decorator.
-  constructor(loggerFactory: LoggerFactory) { 
+  constructor(loggerFactory: LoggerFactory) {
     this.logger = loggerFactory.getLogger(PizzaService)
     logger.info('Yay, I was constructed!')
   }
@@ -290,20 +290,20 @@ Notably, when calling `getLogger`, you should pass the enclosing class or its na
 
 ### Switching the Provider
 
-Out of the box, Catamaran includes three logging backends:
+Out of the box, Chalupa includes three logging backends:
 
   * `console`, which is the default,
   * [pino](https://github.com/pinojs/pino),
   * [TSLog](https://github.com/fullstack-build/tslog).
-  
+
 You can set the desired provider using the `LogProvider` plugin:
 
 ~~~~TypeScript
-import { LogProvider } from '@catamaranjs/service'
-import { TSLogProvider } from '@catamaranjs/logger-tslog'
+import { LogProvider } from '@chalupajs/service'
+import { TSLogProvider } from '@chalupajs/logger-tslog'
 
 async function start() {
-	const service = await Catamaran
+	const service = await Chalupa
     .builder()
     .use(LogProvider.provider(TSLogProvider))
     .createServiceWithStrategy(PizzaService, InMemoryStrategy)
@@ -342,19 +342,19 @@ Simply put, plugins extend and alter the behavior of the framework itself. To gi
   * inspect and proxy instances in the dependency injection context,
   * and much more!
 
-If you want a more involved description (because, for example, you want to write your own plugins), then make sure to check the [Extending Catamaran](#extending-catamaran) section. Here we will only cover their usage.
+If you want a more involved description (because, for example, you want to write your own plugins), then make sure to check the [Extending Chalupa](#extending-chalupa) section. Here we will only cover their usage.
 
-You can attach plugins to a service prior it's created. This is done via the `use()` method of the Catamaran service builder, which accepts one or more plugin instances. Therefore, the following two examples are equivalent:
+You can attach plugins to a service prior it's created. This is done via the `use()` method of the Chalupa service builder, which accepts one or more plugin instances. Therefore, the following two examples are equivalent:
 
 ~~~~TypeScript
-await Catamaran.builder()
+await Chalupa.builder()
   .use(new PluginA())
   .use(new PluginB())
   .createServiceWithStrategy(SomeService, SomeStrategy)
 ~~~~
 
 ~~~~TypeScript
-await Catamaran.builder()
+await Chalupa.builder()
   .use([new PluginA(), new PluginB()])
   .createServiceWithStrategy(SomeService, SomeStrategy)
 ~~~~
@@ -368,11 +368,11 @@ When using plugins, be aware of the following gotchas:
       ~~~~TypeScript
       const sharedPlugin = new SharedPlugin()
 
-      await Catamaran.builder()
+      await Chalupa.builder()
         .use(sharedPlugin)
         .createServiceWithStrategy(SomeService, SomeStrategy)
 
-      await Catamaran.builder()
+      await Chalupa.builder()
         .use(sharedPlugin)
         .createServiceWithStrategy(OtherService, SomeStrategy)
       ~~~~
@@ -383,11 +383,11 @@ If you're creating multiple services in the same process that share many plugins
 
 ~~~~TypeScript
 /* 1. */
-Catamaran.globalUse([new PluginA(), new PluginB()])
+Chalupa.globalUse([new PluginA(), new PluginB()])
 
 /* 2. */
-await Catamaran.builder().createServiceWithStrategy(SomeService, SomeStrategy)
-await Catamaran.builder().createServiceWithStrategy(OtherService, SomeStrategy)
+await Chalupa.builder().createServiceWithStrategy(SomeService, SomeStrategy)
+await Chalupa.builder().createServiceWithStrategy(OtherService, SomeStrategy)
 ~~~~
 
   1. `globalUse` has the same signature, as the service builder's `use` method. Therefore, you can pass a single plugin or event multiple ones to it. You can call `globalUse` multiple times to add new plugins (subsequent invocations will extend the list o globall used plugins).
@@ -397,27 +397,27 @@ await Catamaran.builder().createServiceWithStrategy(OtherService, SomeStrategy)
 
 ## Dependency Injection
 
-In the previous sections, we've already shown examples of dependency injection (think of the `@Inject` decorator and the `inject` property). In what follows, we give a detailed description of the DI support of Catamaran.
+In the previous sections, we've already shown examples of dependency injection (think of the `@Inject` decorator and the `inject` property). In what follows, we give a detailed description of the DI support of Chalupa.
 
 > If you're new to Dependency Injection, then these SO answers (and, most importantly, the links within them) can help to get a quick grasp on the topic:
 >
 >  * [What is Dependency Injection?](https://stackoverflow.com/a/140655),
 >  * [Inversion of Control vs Dependency Injection](https://stackoverflow.com/a/6551303).
 
-Before diving in, we would like to start with a quick note. In Catamaran, most of the DI heavy-lifting is done by the excellent [Inversify](https://inversify.io/) library. You can get by perfectly fine without knowing Inversify, since Catamaran provides its own decorators for DI, which are a subset of the Inversify decorators. Nevertheless, if you're limited by Catamaran's decorators, then feel free to use Inversify decorators directly.
+Before diving in, we would like to start with a quick note. In Chalupa, most of the DI heavy-lifting is done by the excellent [Inversify](https://inversify.io/) library. You can get by perfectly fine without knowing Inversify, since Chalupa provides its own decorators for DI, which are a subset of the Inversify decorators. Nevertheless, if you're limited by Chalupa's decorators, then feel free to use Inversify decorators directly.
 
 With all of that out of the way, let's focus on DI now!
 
-Regardless of the exact DI library in question, all implementations revolve around two key concepts: bindings and dependencies. A *dependency* is something that needs to be resolved or fulfilled, while a *binding* is something that can be used to fulfill dependencies. In Catamaran, you're expected to declare dependencies in constructors (and thus, enable *constructor injection*) and declare bindings in appropriate decorators. Let's see how!
+Regardless of the exact DI library in question, all implementations revolve around two key concepts: bindings and dependencies. A *dependency* is something that needs to be resolved or fulfilled, while a *binding* is something that can be used to fulfill dependencies. In Chalupa, you're expected to declare dependencies in constructors (and thus, enable *constructor injection*) and declare bindings in appropriate decorators. Let's see how!
 
 ### Class Binding
 
-A class binding is a binding of a concrete type to itself. Which means, that whenever a dependency is found on a *concrete class*, then an instance of the class itself will be used to resolve that dependency. Instantiation is handled by Catamaran.
+A class binding is a binding of a concrete type to itself. Which means, that whenever a dependency is found on a *concrete class*, then an instance of the class itself will be used to resolve that dependency. Instantiation is handled by Chalupa.
 
 Let's declare a class binding!
 
 ~~~~TypeScript
-import { Injectable } from '@catamaranjs/interface'
+import { Injectable } from '@chalupajs/interface'
 
 /* 1. */
 @Injectable()
@@ -438,7 +438,7 @@ class PizzaService {}
 Making use of this binding is then super easy, just look at the constructor:
 
 ~~~~TypeScript
-import { Inject } from '@catamaranjs/interface'
+import { Inject } from '@chalupajs/interface'
 
 @Service({
   inject(context) {
@@ -507,7 +507,7 @@ class PizzaService {
 }
 ~~~~
 
-  1. As you can see, in this case, we used the `bindInterface` method of the context. This allows us to define the type key along with the concrete implementation that should be used to resolve dependencies with that very key. Here we essentially said the following to Catamaran: "whenever you find an `@Inject` with the `IPizzaRepository` key, resolve that dependency with a `MongoPizzaRepository` instance".
+  1. As you can see, in this case, we used the `bindInterface` method of the context. This allows us to define the type key along with the concrete implementation that should be used to resolve dependencies with that very key. Here we essentially said the following to Chalupa: "whenever you find an `@Inject` with the `IPizzaRepository` key, resolve that dependency with a `MongoPizzaRepository` instance".
   1. Afterward, in the constructor, we can declare that we depend on the `IPizzaRepository` abstraction by using the same key in the `@Inject` decorator as in the binding.
   1. Then, the type of the parameter is what you'd expect: the `IPizzaRepository` interface.
 
@@ -540,7 +540,7 @@ class PizzaService {
 }
 ~~~~
 
-  1. Using the `bindConstant` method of the context, we bind the primitive value `Giovanni` to the `TODAYS_PIZZA_CHEF` key. This is equivalent to saying the following to Catamaran: "wherever you see a dependency on the `TODAYS_PIZZA_CHEF` key, inject the value `Giovanni`".
+  1. Using the `bindConstant` method of the context, we bind the primitive value `Giovanni` to the `TODAYS_PIZZA_CHEF` key. This is equivalent to saying the following to Chalupa: "wherever you see a dependency on the `TODAYS_PIZZA_CHEF` key, inject the value `Giovanni`".
 	1. We express our dependency on the constant value using the well-known `Inject` decorator and the `TODAYS_PIZZA_CHEF` key.
 	1. `Giovanni` gets injected and printed, just as expected.
 
@@ -626,7 +626,7 @@ class FileStoreService {
 
 Since `immediate` calls perform binding and instantiation at the same time, they are best suited for classes with no or isolated dependencies. Great examples are configuration classes, which, in 99% of the time, have no dependencies. While you might find other uses for `immediate`, other than configuration, please keep in mind: wth great power comes great responsibility.
 
-It might be tempting to use this technique for testing purposes: injecting a test double based on some configuration conditions. However, that would pollute our normal application code with testing related logic. Therefore, Catamaran provides a much more elegant solution, detailed in the [Testing](#testing) section.
+It might be tempting to use this technique for testing purposes: injecting a test double based on some configuration conditions. However, that would pollute our normal application code with testing related logic. Therefore, Chalupa provides a much more elegant solution, detailed in the [Testing](#testing) section.
 
 ### Injecting Multiple Values of the Same Type
 
@@ -658,7 +658,7 @@ class BlahaneDailyOfferingScraper implements IDailyOfferingScraper {
 Clearly, if we want to check all the offerings together, then we have to somehow call the `scrapeOffering` method of each implementation. However, how can we access *each implementation*? That's exactly, where multi-injection comes into the picture.
 
 ~~~~TypeScript
-import { MultiInject } from '@catamaranjs/Catamaran'
+import { MultiInject } from '@chalupajs/Chalupa'
 
 @Service({
 	inject(context) {
@@ -698,7 +698,7 @@ Let's assume, that give some configuration, we want to replace an interface bind
 class RebindService {}
 ~~~~
 
-While the above example might seem a little contrived, rebind is a great tool when interfacing with or authoring [Modules](#modules) and plugins (see [Plugins](#plugins) and [Extending Catamaran](#extending-catamaran)).
+While the above example might seem a little contrived, rebind is a great tool when interfacing with or authoring [Modules](#modules) and plugins (see [Plugins](#plugins) and [Extending Chalupa](#extending-chalupa)).
 
 When rebinding a type key with multiple bound implementations, each previous binding will be dropped:
 
@@ -733,7 +733,7 @@ In the above case, both the `ImplOne` and `ImplTwo` binding will be dropped, and
 class RebindService {}
 ~~~~
 
-Again, unbinding shines the most when one has to deal with [Modules](#modules) and plugins (see [Plugins](#plugins) and [Extending Catamaran](#extending-catamaran)).
+Again, unbinding shines the most when one has to deal with [Modules](#modules) and plugins (see [Plugins](#plugins) and [Extending Chalupa](#extending-chalupa)).
 
 If multiple values are bound to the same type key, then unbinding that very type key will drop each binding (the same way as in the case of [Rebinding](#rebinding)).
 
@@ -741,13 +741,13 @@ If multiple values are bound to the same type key, then unbinding that very type
 
 Dependencies and bindings are all good, but one crucial step is still missing. How do all these things come to life? When and how do our classes get instantiated?
 
-The underlying container of Catamaran is *lazy*. This means, that instances are created on-demand, only when requested. Thus, if we want the container to actually create an instance of some type, we have to request that very type from the container. Of course, instances can only be obtained if all of their dependencies are satisfied. Consequently, the container attempts to resolve the dependencies of the requested type first. For this end, it examines the available bindings. If no binding can resolve the dependency, then an error is thrown. However, if an appropriate binding is found, then the container instantiates it, if necessary. The bound type that we want to instantiate, in turn, can have its own dependencies and so on. The chain continues until the container finds a dependency which is already available or can be immediately constructed. Then, the container walks back the chain, instantiating and injecting everything, eventually finishing off with the type that was originally requested.
+The underlying container of Chalupa is *lazy*. This means, that instances are created on-demand, only when requested. Thus, if we want the container to actually create an instance of some type, we have to request that very type from the container. Of course, instances can only be obtained if all of their dependencies are satisfied. Consequently, the container attempts to resolve the dependencies of the requested type first. For this end, it examines the available bindings. If no binding can resolve the dependency, then an error is thrown. However, if an appropriate binding is found, then the container instantiates it, if necessary. The bound type that we want to instantiate, in turn, can have its own dependencies and so on. The chain continues until the container finds a dependency which is already available or can be immediately constructed. Then, the container walks back the chain, instantiating and injecting everything, eventually finishing off with the type that was originally requested.
 
 An important consequence of the lazy behavior is runtime errors: if a given dependency is not satisfied by any of the bindings, then it is only discovered at runtime when we want to resolve the dependency in question. Can we construct containers that perform dependency resolution at compile time? Sure, one example is the [Dagger](https://dagger.dev/) framework for the JVM.
 
-In Catamaran, the class decorated with `@Service` can be thought of as some kind of a root or origin: generally, every other type in the container is reachable from this class through various dependency chains. Therefore, when we request an instance of the `@Service` class from the container, essentially everything gets instantiated and just like in a puzzle, falls into its place.
+In Chalupa, the class decorated with `@Service` can be thought of as some kind of a root or origin: generally, every other type in the container is reachable from this class through various dependency chains. Therefore, when we request an instance of the `@Service` class from the container, essentially everything gets instantiated and just like in a puzzle, falls into its place.
 
-One question still lingers around. What happens if a class is a dependency of multiple classes? How many instances will the container create? In Catamaran, every binding is *singleton*, meaning, that a class is instantiated only once and that one instance is then reused to resolve each and every dependency on the type. This enables two important patterns:
+One question still lingers around. What happens if a class is a dependency of multiple classes? How many instances will the container create? In Chalupa, every binding is *singleton*, meaning, that a class is instantiated only once and that one instance is then reused to resolve each and every dependency on the type. This enables two important patterns:
 
   * *Exclusive ownership of resources*. For example, only a single instance will ever exist of your database connection class throughout the lifespan of your application.
   * *Stateless components*. As instances are shared among many dependents, if they are not guarding some resource then it's best to keep them stateless to prevent surprises, when one dependent class sees the effects of another, completely unrelated class.
@@ -827,7 +827,7 @@ So far, we've seen the two opposite ends of the granularity spectrum. On one end
 Enter the notion of *modules*! A module is similar to a service in the sense, that it has its own bindings, lifecycle phases and such. However, in itself, it does not correspond to an executable entity. Before discussing their purpose, let's check out how to declare them.
 
 ~~~~TypeScript
-import { Module } from '@catamaranjs/interface'
+import { Module } from '@chalupajs/interface'
 
 /* 1. */
 @Module({
@@ -862,7 +862,7 @@ Overall, modules can be thought of as mini-services that need a host service to 
 Now, let's look at the elephant in the room: why would you want to create modules? We have at least two great reasons:
 
   * *Splitting up service interfaces.* While you should strive to keep your services thin and focused with as few methods and events as possible, in some situations, a service may need to offer a variety of different methods. In such cases, you can extract each group of logically related methods into their own module. Since modules have their own configuration and bindings, you can even move the necessary configuration and dependencies to the module level. By using this technique, you can separate your service into cohesive subcomponents which can be easily extracted into their own service in the future, if necessary.
-  * *Code reuse.* Modules can be published in npm packages, which allows for cross-service code reuse. Writing a database connector? Slap it into a module! Health check and metrics? Another module! Any Catamaran-specific code should reside in modules, as modules automatically provide configuration, logging, dependency injection, lifecycles and even service methods and events. Code that is independent from Catamaran services should still be placed in ordinary libraries, however, if you plan on integrating with Catamaran, then a module is a perfect choice.
+  * *Code reuse.* Modules can be published in npm packages, which allows for cross-service code reuse. Writing a database connector? Slap it into a module! Health check and metrics? Another module! Any Chalupa-specific code should reside in modules, as modules automatically provide configuration, logging, dependency injection, lifecycles and even service methods and events. Code that is independent from Chalupa services should still be placed in ordinary libraries, however, if you plan on integrating with Chalupa, then a module is a perfect choice.
 
 ### Module Graph
 
@@ -939,7 +939,7 @@ class FileStoreService {}
 
 ### Altering Module Bindings
 
-Let's assume the following scenario. You want to connect to some HTTP API so you create an interface, named `HttpApi`. To make this machinery reusable across your Catamaran services, you put this interface (along with its implementation) into a new module, `HttpApiModule`. Everything works fine, until the API is changed: the same endpoints still work, however, a client token is now required to avoid getting rate limited. While you can modify your existing implementation, it does not seem to be the most elegant solution: the client token is not absolutely necessary and it is an authentication aspect. What else can be done?
+Let's assume the following scenario. You want to connect to some HTTP API so you create an interface, named `HttpApi`. To make this machinery reusable across your Chalupa services, you put this interface (along with its implementation) into a new module, `HttpApiModule`. Everything works fine, until the API is changed: the same endpoints still work, however, a client token is now required to avoid getting rate limited. While you can modify your existing implementation, it does not seem to be the most elegant solution: the client token is not absolutely necessary and it is an authentication aspect. What else can be done?
 
 From the [Dependency Injection](#dependency-injection) section, we might remember two more involved facilities: [Rebinding](#rebinding) and [Unbinding](#unbinding). Using these two, we can implement a decorator module, which builds on our pre-existing `HttpApiModule` while extending its functionality.
 
@@ -974,14 +974,14 @@ The key takeaway here is the fact that once `bindModule` returns, all the bindin
 
 ## Service Communication
 
-In what follows, we detail how to accept requests and events from other services, as well as, how to invoke them the Catamaran way.
+In what follows, we detail how to accept requests and events from other services, as well as, how to invoke them the Chalupa way.
 
 ### Inbound Communication
 
 Communication between services comes in two flavors: request-reply and event-based. Handlers for the former are called *service methods*, while listeners for the latter are *service events* (surprisingly).
 
 ~~~~TypeScript
-import { Service, ServiceMethod, ServiceEvent } from '@catamaranjs/interface'
+import { Service, ServiceMethod, ServiceEvent } from '@chalupajs/interface'
 
 @Service()
 class PizzaService {
@@ -999,7 +999,7 @@ class PizzaService {
 }
 ~~~~
 
-As Catamaran is decorator-driven, service methods and events can be registered using the appropriate decorators: `@ServiceMethod` and `@ServiceEvent`. The external name (visible to other services) of the method/event is going to be the name of the decorated method, unless otherwise specified. In the case of the above example, other services can call the `PizzaService.getNumberOfOrdersSince` method or emit to the `PizzaService.pizzaOrdered` event.
+As Chalupa is decorator-driven, service methods and events can be registered using the appropriate decorators: `@ServiceMethod` and `@ServiceEvent`. The external name (visible to other services) of the method/event is going to be the name of the decorated method, unless otherwise specified. In the case of the above example, other services can call the `PizzaService.getNumberOfOrdersSince` method or emit to the `PizzaService.pizzaOrdered` event.
 
 The automatically assigned names can be overridden (both for methods and events). In the following example, the method visible to other services will be `ordersSince` instead of `getNumberOfOrdersSince`.
 
@@ -1037,7 +1037,7 @@ Being called is great, but being able to *call* is even more fun! Calling other 
 For each external service, you have to create a corresponding class as follows.
 
 ~~~~TypeScript
-import { ExternalService, ExternalServiceTemplate } from '@catamaranjs/interface'
+import { ExternalService, ExternalServiceTemplate } from '@chalupajs/interface'
 
 /* 1. */
 @ExternalService()
@@ -1073,14 +1073,14 @@ class PizzaService {
 
 Whoa, now, that's a lot, so let's break it down!
 
-  1. First, we have to register the `Cache` external service by adding it to the `inject` array (we could've used a `bindClass` [Class Binding](#class-binding) as well). This tells Catamaran that you depend on the Cache service (so that your service will wait for `Cache` to show up when started), and it can load and instrument the external service class.
-  1. Then, we have to inject an instance of this external service into our service. This instance will be created by Catamaran and will be automatically injected into our constructor when necessary.
+  1. First, we have to register the `Cache` external service by adding it to the `inject` array (we could've used a `bindClass` [Class Binding](#class-binding) as well). This tells Chalupa that you depend on the Cache service (so that your service will wait for `Cache` to show up when started), and it can load and instrument the external service class.
+  1. Then, we have to inject an instance of this external service into our service. This instance will be created by Chalupa and will be automatically injected into our constructor when necessary.
   1. Finally, we can make a network request to `Cache.getItem` (published by the `Cache` service) using the `request` method. The `request` method is provided by te `ExternalServiceTemplate` base class.
 
 Our dependency on the `Cache` service is now completely apparent. However, the `getItem` call still feels a bit unsafe.
 
 ~~~~TypeScript
-import { ExternalServiceMethod, IExternalServiceCall, serviceMethodPlaceholder } from '@catamaranjs/interface'
+import { ExternalServiceMethod, IExternalServiceCall, serviceMethodPlaceholder } from '@chalupajs/interface'
 
 @ExternalService()
 class Cache extends ExternalServiceTemplate {
@@ -1089,7 +1089,7 @@ class Cache extends ExternalServiceTemplate {
 }
 ~~~~
 
-By utilizing the `@ExternalServiceMethod` decorator, and placing it on an appropriately typed property, we can instruct Catamaran to automatically generate typed request calls for us. The anatomy of an *external service method* is as follows:
+By utilizing the `@ExternalServiceMethod` decorator, and placing it on an appropriately typed property, we can instruct Chalupa to automatically generate typed request calls for us. The anatomy of an *external service method* is as follows:
 
 ~~~~
 @ExternalServiceMethod()
@@ -1123,7 +1123,7 @@ Be aware of the `send()` call at the end, which actually performs the request an
 Of course, we can also declare events in a fashion similar to requests. Just use the `@ExternalServiceEvent` decorator and its friends, `IExternalServiceEmit` and `serviceEventPlaceholder`.
 
 ~~~~TypeScript
-import { ExternalServiceEvent, IExternalServiceEmit, serviceEventPlaceholder } from '@catamaranjs/interface'
+import { ExternalServiceEvent, IExternalServiceEmit, serviceEventPlaceholder } from '@chalupajs/interface'
 
 @ExternalService()
 class PizzaAggregator extends ExternalServiceTemplate {
@@ -1157,7 +1157,7 @@ class DeliveryModule {
 
 ## Appeared and Disappeared Events
 
-When services become available (or, the opposite, unavailable), Catamaran emits the following events across the available services:
+When services become available (or, the opposite, unavailable), Chalupa emits the following events across the available services:
 
   * `ServiceAppeared(name)`
     * Emitted when the `name` service becomes available on the network.
@@ -1167,7 +1167,7 @@ When services become available (or, the opposite, unavailable), Catamaran emits 
 Subscribing to these events can be done via the appropriate decorators.
 
 ~~~~TypeScript
-import { ServiceAppeared, ServiceDisappeared } from '@catamaranjs/interface'
+import { ServiceAppeared, ServiceDisappeared } from '@chalupajs/interface'
 
 @Service()
 class PizzaService {
@@ -1202,7 +1202,7 @@ The configurable properties of the Darcon connection are as follows:
 
   * Division
     * `DARCON_DIVISION`
-    * Default: `Catamaran`.
+    * Default: `Chalupa`.
   * Identifier Length
     * `DARCON_ID_LENGTH`
     * Default: `16`
@@ -1252,10 +1252,10 @@ IPC strategy.
 
 When implementing more involved services, we regularly want to perform additional initialization logic before the service is published, and, conversely proper teardown before it stops. A great example is the handling of database connections: we want to open a connection before accepting requests and then want to close it once we're done.
 
-Fortunately, Catamaran provides facilities for both services and [Modules](#modules) to perform both initialization and teardown. Let's first see the case of services.
+Fortunately, Chalupa provides facilities for both services and [Modules](#modules) to perform both initialization and teardown. Let's first see the case of services.
 
 ~~~~TypeScript
-import { PostInit, PreDestroy } from '@catamaranjs/interface'
+import { PostInit, PreDestroy } from '@chalupajs/interface'
 
 @Service()
 class PizzaService {
@@ -1270,7 +1270,7 @@ class PizzaService {
 Then, the options for modules.
 
 ~~~~TypeScript
-import { PreServiceInit, PostServiceInit, PreServiceDestroy, PostServiceDestroy } from '@catamaranjs/interface'
+import { PreServiceInit, PostServiceInit, PreServiceDestroy, PostServiceDestroy } from '@chalupajs/interface'
 
 @Module()
 class DeliveryModule {
@@ -1310,7 +1310,7 @@ Please be aware of the following limitations regarding lifecycle methods:
 
 ## Error Handling
 
-Frequently, we start by implementing the happy case of our business logic first. Then, by the time we add error handling for each and every failure scenario, the original happy path is almost impossible to recognize and follow. Catamaran attempts to help you in decluttering your code and extracting cross-cutting concerns by providing support for framework-level error handling.
+Frequently, we start by implementing the happy case of our business logic first. Then, by the time we add error handling for each and every failure scenario, the original happy path is almost impossible to recognize and follow. Chalupa attempts to help you in decluttering your code and extracting cross-cutting concerns by providing support for framework-level error handling.
 
 Let's assume that we have some service method, `orderPizza`, which accepts the flavor of the pizza. Now, if we receive an unknown failure, then we would like to return an error response. The simplest solution can be something like this:
 
@@ -1360,10 +1360,10 @@ class PizzaService {
 }
 ~~~~
 
-The code feels much cleaner now: `guardPizza` does exactly one thing, and the level of abstraction in `orderPizza` is consistent. However, there's one, not-so-little problem still: who's going to handle the `UnknownFlavorError`, thrown from `guardPizzaFlavor`? That's where Catamaran's support for error handling comes into the picture. Watch!
+The code feels much cleaner now: `guardPizza` does exactly one thing, and the level of abstraction in `orderPizza` is consistent. However, there's one, not-so-little problem still: who's going to handle the `UnknownFlavorError`, thrown from `guardPizzaFlavor`? That's where Chalupa's support for error handling comes into the picture. Watch!
 
 ~~~~TypeScript
-import { ErrorHandler } from '@catamaranjs/interface'
+import { ErrorHandler } from '@chalupajs/interface'
 
 @Service()
 class PizzaService {
@@ -1389,7 +1389,7 @@ class PizzaService {
 ~~~~
 
   1. We created a new method in `PizzaService` and decorated it with `@ErrorHandler`.
-  1. We passed the error type that we want to handle as an argument to the `@ErrorHandler` decorator. Every time an error is thrown from a service method or a service event (see [Outbound Communication](#outbound-communication)), Catamaran will inspect the error handlers in the same service/module class. If the thrown error is an instance of the handled type of some error handler, then that handler will be called.
+  1. We passed the error type that we want to handle as an argument to the `@ErrorHandler` decorator. Every time an error is thrown from a service method or a service event (see [Outbound Communication](#outbound-communication)), Chalupa will inspect the error handlers in the same service/module class. If the thrown error is an instance of the handled type of some error handler, then that handler will be called.
   1. The type of the parameter is `UnknownPizzaFlavorError` as we can be sure, that we always receive an instance of that type.
 
 Please be aware of the following gotchas regarding error handling:
@@ -1426,7 +1426,7 @@ Please be aware of the following gotchas regarding error handling:
       }
       ~~~~
   * Ordered
-    * When attempting to find an error handler for a thrown error, Catamaran will enumerate the error handlers in the order of their declaration. Therefore, this is correct:
+    * When attempting to find an error handler for a thrown error, Chalupa will enumerate the error handlers in the order of their declaration. Therefore, this is correct:
       ~~~~TypeScript
       @Service()
       class SomeService {
@@ -1460,7 +1460,7 @@ While unit testing is rather straightforward (just import the appropriate unit i
 >   * [Martin Fowler: IntegrationTest](https://martinfowler.com/bliki/IntegrationTest.html)
 >   * [John Mikael Gundersen: Patterns of Narrow Integration Testing](https://www.jmgundersen.net/blog/patterns-of-narrow-integration-testing)
 
-In this process, we want to make sure that our service behaves the same way as if it was made available on the network by Catamaran:
+In this process, we want to make sure that our service behaves the same way as if it was made available on the network by Chalupa:
 
   * modules are correctly attached,
   * configuration is loaded,
@@ -1473,7 +1473,7 @@ While, at the same time, we have a bit more control to ease testing:
   * we can modify configuration values (without having to touch the environment variables),
   * we can rebind types in the container to replace them with test doubles.
 
-All of the above can be achieved with the `IntegrationTestBuilderStrategy`, offered by Catamaran. This is an alternative to the ordinarily used `ServiceBuilderStrategy`, which actually publishes a service to Darcon.
+All of the above can be achieved with the `IntegrationTestBuilderStrategy`, offered by Chalupa. This is an alternative to the ordinarily used `ServiceBuilderStrategy`, which actually publishes a service to Darcon.
 
 In what follows, we introduce the testing support through an example. Let's assume, that we're writing a greeting service that exposes a greeter method. This method returns a greeting, appropriate to the current time of day. The current time, in turn, is supplied by an external service, called `DateTime`. All of these can be implemented as shown below.
 
@@ -1529,7 +1529,7 @@ const WHO = 'Jocky'
 const expected = 'Good morning, Jocky!'
 
 /* 2. */
-const arrangement = await Catamaran
+const arrangement = await Chalupa
   .builder()
   .createServiceWithStrategy(GreetingService, IntegrationTestBuilderStrategy)
 
@@ -1580,7 +1580,7 @@ await sut.close()
 
 We simply assert whether the actual answer is equal to the expected one. Then, we do not forget to close the system by calling the `close` method.
 
-### Invoking Appeared Events 
+### Invoking Appeared Events
 
 Let's assume, that we want to test our handlers for the [Appeared and Disappeared Events](#appeared-and-disappeared-events). First, let's create the actual implementation:
 
@@ -1595,7 +1595,7 @@ class HandlerService {
 Then, as usual, we follow this up, by creating a test arrangement and a system under test:
 
 ~~~~TypeScript
-const arrangement = await Catamaran
+const arrangement = await Chalupa
   .builder()
   .createServiceWithStrategy(HandlerService, IntegrationTestBuilderStrategy)
 
@@ -1614,7 +1614,7 @@ await sut.serviceDisappeared('name of the disappeared service')
 When testing our service, situations may arise, when we want to assert on the state of some component bound inside the context of the service. We already saw how to retrieve services and modules from the context using the `getServiceOrModule` method. The former, retrieving an arbitrary binding can be done via the `getComponent` method, as follows:
 
 ~~~~TypeScript
-const arrangement = await Catamaran
+const arrangement = await Chalupa
   .builder()
   .createServiceWithStrategy(GreeterService, IntegrationTestBuilderStrategy)
 
@@ -1634,7 +1634,7 @@ Without explicit framework, support, we might think of the following two solutio
   * Rebinding configuration classes.
     * We can just use `arrangement.rebind()` and rebind the appropriate configuration class. While this works, it might be too late: by the time `arrangement.rebind()` runs, the `inject` functions have already executed. Hence, you cannot alter dynamic module bindings this way, for example.
 
-Fortunately, Catamaran provides the `OverrideConfig` plugin (see [Plugins](#plugins) and [Extending Catamaran](#extending-catamaran) for more information on plugins) for this use case.
+Fortunately, Chalupa provides the `OverrideConfig` plugin (see [Plugins](#plugins) and [Extending Chalupa](#extending-chalupa) for more information on plugins) for this use case.
 
 Let's assume, that we have the following configuration class:
 
@@ -1652,7 +1652,7 @@ class PizzaConfig {
 By default, the value of the `dataDirectory` property is `/data/pizza`, which can be overwritten by an appropriate environment variable or file source. However, we want to set `dataDirectory` to `/not-pizza` without messing around with those sources. To do so, we just use `OverrideConfig` when creating our service:
 
 ~~~~TypeScript
-const arrangement = await Catamaran
+const arrangement = await Chalupa
   .builder()
   .use(/* 1. */ OverrideConfig.builder()
     /* 2. */
@@ -1691,7 +1691,7 @@ class FileStoreConfig {
 If we want to override the value of `isLocalEnv`, we can write the following:
 
 ~~~~TypeScript
-const arrangement = await Catamaran
+const arrangement = await Chalupa
   .builder()
   .use(OverrideConfig.builder()
     .add(FileStoreConfig, {
@@ -1706,7 +1706,7 @@ Now, the `isLocalEnv` function will always return `true`.
 
 ### Testing Modules
 
-As written in the [Modules](#section), modules are not executable by themselves: they need a containing or hosting service to operate. Even if that's the case, we still need to integration test them somehow. Fortunately, Catamaran provides facilities to test not only services, but individual modules as well.
+As written in the [Modules](#section), modules are not executable by themselves: they need a containing or hosting service to operate. Even if that's the case, we still need to integration test them somehow. Fortunately, Chalupa provides facilities to test not only services, but individual modules as well.
 
 Let's assume, that we have a module which provides a version method as follows:
 
@@ -1729,9 +1729,9 @@ class VersionModule() {
 We can use the `ModuleHost` class to create a containing or hosting service for this module for testing purposes:
 
 ~~~~TypeScript
-import { ModuleHost } from '@catamaranjs/test-framework`
+import { ModuleHost } from '@chalupajs/test-framework`
 
-const arrangement = await Catamaran
+const arrangement = await Chalupa
   .builder()
   .createServiceWithStrategy(ModuleHost.fromModule(VersionModule), IntegrationTestBuilderStrategy)
 ~~~~
@@ -1763,11 +1763,11 @@ const host = ModuleHost.fromServiceOptions({
   modules: [VersionModule]
 })
 
-const arrangement = await Catamaran
+const arrangement = await Chalupa
   .builder()
   .createServiceWithStrategy(host, IntegrationTestBuilderStrategy)
 ~~~~
 
-## Extending Catamaran
+## Extending Chalupa
 
 This one's tough :(

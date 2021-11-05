@@ -2,10 +2,10 @@ import {
 	Injectable,
 	MultiInject,
 	Service,
-} from '@catamaranjs/interface'
-import {PinoLogProvider} from '@catamaranjs/logger-pino'
-import {Catamaran, LogProvider} from "@catamaranjs/service";
-import {IntegrationTestBuilderStrategy} from "@catamaranjs/test-framework";
+} from '@chalupajs/interface'
+import {PinoLogProvider} from '@chalupajs/logger-pino'
+import {Catamaran, LogProvider} from "@chalupajs/service";
+import {IntegrationTestBuilderStrategy} from "@chalupajs/test-framework";
 
 interface DailyOffering {
 	restaurant: string

@@ -1,11 +1,11 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@catamaranjs/communication-darcon': workspace:*
-  '@catamaranjs/interface': workspace:*
-  '@catamaranjs/logger-pino': workspace:*
-  '@catamaranjs/service': workspace:*
-  '@catamaranjs/test-framework': workspace:*
+  '@chalupajs/communication-darcon': workspace:*
+  '@chalupajs/interface': workspace:*
+  '@chalupajs/logger-pino': workspace:*
+  '@chalupajs/service': workspace:*
+  '@chalupajs/test-framework': workspace:*
   '@types/node': 16.10.5
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
@@ -15,11 +15,11 @@ specifiers:
   why-is-node-running: ^2.2.0
 
 dependencies:
-  '@catamaranjs/communication-darcon': link:../communication/darcon
-  '@catamaranjs/interface': link:../interface
-  '@catamaranjs/logger-pino': link:../logger/pinolog
-  '@catamaranjs/service': link:../service
-  '@catamaranjs/test-framework': link:../test-framework
+  '@chalupajs/communication-darcon': link:../communication/darcon
+  '@chalupajs/interface': link:../interface
+  '@chalupajs/logger-pino': link:../logger/pinolog
+  '@chalupajs/service': link:../service
+  '@chalupajs/test-framework': link:../test-framework
   reflect-metadata: 0.1.13
 
 devDependencies:

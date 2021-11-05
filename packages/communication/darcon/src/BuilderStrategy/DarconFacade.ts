@@ -10,7 +10,7 @@ import {
 	IFacadeContainer,
 	MethodCallable,
 	EventCallable,
-} from '@catamaranjs/interface'
+} from '@chalupajs/interface'
 import { DarconConfig } from '../Config/DarconConfig'
 import { DarconCommunicationChannel } from './DarconCommunicationChannel'
 

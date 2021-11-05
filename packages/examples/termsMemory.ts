@@ -1,4 +1,4 @@
-import { Catamaran, InMemoryStrategy } from '@catamaranjs/service'
+import { Catamaran, InMemoryStrategy } from '@chalupajs/service'
 import {
 	ExternalService,
 	ExternalServiceEvent,
@@ -11,7 +11,7 @@ import {
 	Service, ServiceEvent,
 	serviceEventPlaceholder, ServiceMethod,
 	serviceMethodPlaceholder, TermsObject
-} from '@catamaranjs/interface'
+} from '@chalupajs/interface'
 
 @ExternalService({
 	name: 'TestIniterService'

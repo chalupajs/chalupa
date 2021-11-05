@@ -1,8 +1,8 @@
 import "reflect-metadata"
 
-import { Service } from '@catamaranjs/interface'
-import { Catamaran, LogProvider } from '@catamaranjs/service'
-import {DarconBuilderStrategy} from '@catamaranjs/communication-darcon'
+import { Service } from '@chalupajs/interface'
+import { Catamaran, LogProvider } from '@chalupajs/service'
+import {DarconBuilderStrategy} from '@chalupajs/communication-darcon'
 import {TSLogProvider} from "../logger/tslog";
 
 @Service()

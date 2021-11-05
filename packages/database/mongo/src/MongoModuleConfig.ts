@@ -1,4 +1,4 @@
-import { Configurable, Configuration } from '@catamaranjs/interface'
+import { Configurable, Configuration } from '@chalupajs/interface'
 
 @Configuration()
 export class MongoModuleConfig {

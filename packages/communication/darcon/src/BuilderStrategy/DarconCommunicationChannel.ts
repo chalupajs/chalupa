@@ -1,4 +1,4 @@
-import { ContainerConstant, ICommunicationChannel, Inject, Injectable } from '@catamaranjs/interface'
+import { ContainerConstant, ICommunicationChannel, Inject, Injectable } from '@chalupajs/interface'
 import { newUID } from '../util'
 
 import Darcon = darcon.Darcon

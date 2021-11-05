@@ -1,4 +1,4 @@
-import { Constructor, Service, ServiceOptions } from '@catamaranjs/interface'
+import { Constructor, Service, ServiceOptions } from '@chalupajs/interface'
 
 export const ModuleHost = {
 	fromModule(constructor: Constructor): Constructor {

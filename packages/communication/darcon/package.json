@@ -1,5 +1,5 @@
 {
-	"name": "@catamaranjs/communication-darcon",
+	"name": "@chalupajs/communication-darcon",
 	"version": "1.0.0",
 	"description": "Service framework",
 	"main": "dist/src/index.js",
@@ -22,7 +22,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:dwmt/Catamaran.git"
+		"url": "git@github.com:chalupajs/chalupa.git"
 	},
 	"license": "MIT",
 	"devDependencies": {
@@ -37,7 +37,7 @@
 	"dependencies": {
 		"reflect-metadata": "0.1.13",
 		"uuid": "8.3.2",
-		"@catamaranjs/interface": "workspace:*",
+		"@chalupajs/interface": "workspace:*",
 		"darcon": "1.5.56"
 	}
 }

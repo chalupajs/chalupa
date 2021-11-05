@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { ICommunicationChannel } from '@catamaranjs/interface'
+import { ICommunicationChannel } from '@chalupajs/interface'
 
 export class IntegrationTestCommunicationChannel implements ICommunicationChannel {
 	broadcast(eventName: string, parameters: any[], _terms: Record<string, any>): void {

@@ -1,4 +1,4 @@
-import { IServiceBridge } from '@catamaranjs/interface/src/Interpretation/IServiceBridge'
+import { IServiceBridge } from '@chalupajs/interface/src/Interpretation/IServiceBridge'
 import {
 	Constructor,
 	ILogger,
@@ -9,7 +9,7 @@ import {
 	ICommunicationFacade,
 	IServiceBridgeOrchestrator,
 	IPlugin,
-} from '@catamaranjs/interface'
+} from '@chalupajs/interface'
 import { Container } from './Container'
 import { extractServiceEventMap, extractServiceMethodMap } from './annotation_utils'
 

@@ -1,8 +1,8 @@
 import {
 	Catamaran,
 	InMemoryStrategy, LogProvider
-} from '@catamaranjs/service'
-import {PinoLogProvider} from '@catamaranjs/logger-pino'
+} from '@chalupajs/service'
+import {PinoLogProvider} from '@chalupajs/logger-pino'
 import {
 	ExternalService,
 	ExternalServiceEvent,
@@ -15,7 +15,7 @@ import {
 	Service, ServiceEvent,
 	serviceEventPlaceholder, ServiceMethod,
 	serviceMethodPlaceholder
-} from "@catamaranjs/interface";
+} from "@chalupajs/interface";
 
 @ExternalService()
 class TestIniterService extends ExternalServiceTemplate {

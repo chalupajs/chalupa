@@ -1,6 +1,6 @@
 import path from 'path'
-import { Catamaran, IntegrationTestBuilderStrategy, ConfigSources } from '@catamaranjs/service'
-import { Configuration, Configurable, Inject, Service } from '@catamaranjs/interface'
+import { Catamaran, IntegrationTestBuilderStrategy, ConfigSources } from '@chalupajs/service'
+import { Configuration, Configurable, Inject, Service } from '@chalupajs/interface'
 
 @Configuration()
 class PizzaConfig {

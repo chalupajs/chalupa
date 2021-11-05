@@ -1,9 +1,9 @@
 import * as assert from 'assert'
-import { Catamaran } from '@catamaranjs/service'
-import {ClassLevelOverrides, IntegrationTestBuilderStrategy, OverrideConfig} from '@catamaranjs/test-framework'
-import { CallWithResult } from '@catamaranjs/interface'
+import { Catamaran } from '@chalupajs/service'
+import {ClassLevelOverrides, IntegrationTestBuilderStrategy, OverrideConfig} from '@chalupajs/test-framework'
+import { CallWithResult } from '@chalupajs/interface'
 import { DateTimeService, GreetingService } from './GreetingService'
-import {DarconConfig} from "@catamaranjs/communication-darcon";
+import {DarconConfig} from "@chalupajs/communication-darcon";
 
 const tests = [
 	{

@@ -1,5 +1,5 @@
 import { Logger, TLogLevelName } from 'tslog'
-import { ILogger, ILogProvider, LogConfig, Inject, Injectable } from '@catamaranjs/interface'
+import { ILogger, ILogProvider, LogConfig, Inject, Injectable } from '@chalupajs/interface'
 import { TSLogger } from './TSLogger'
 
 @Injectable()

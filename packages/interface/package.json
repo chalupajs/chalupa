@@ -1,5 +1,5 @@
 {
-	"name": "@catamaranjs/interface",
+	"name": "@chalupajs/interface",
 	"version": "1.0.0",
 	"description": "Service framework",
 	"main": "dist/src/index.js",
@@ -22,7 +22,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:dwmt/Catamaran.git"
+		"url": "git@github.com:chalupajs/chalupa.git"
 	},
 	"license": "MIT",
 	"devDependencies": {

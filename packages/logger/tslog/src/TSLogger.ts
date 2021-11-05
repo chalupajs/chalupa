@@ -1,5 +1,5 @@
 import { Logger } from 'tslog'
-import { ILogger, AbstractLoggerAdapter } from '@catamaranjs/interface'
+import { ILogger, AbstractLoggerAdapter } from '@chalupajs/interface'
 
 export class TSLogger extends AbstractLoggerAdapter {
 	private readonly loggerInstance: Logger

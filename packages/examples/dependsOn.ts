@@ -1,7 +1,7 @@
-import {Catamaran, LogProvider} from '@catamaranjs/service'
-import { DarconBuilderStrategy } from '@catamaranjs/communication-darcon'
-import { ILogger, LoggerFactory, PostInit, Service } from '@catamaranjs/interface'
-import {PinoLogProvider} from '@catamaranjs/logger-pino'
+import {Catamaran, LogProvider} from '@chalupajs/service'
+import { DarconBuilderStrategy } from '@chalupajs/communication-darcon'
+import { ILogger, LoggerFactory, PostInit, Service } from '@chalupajs/interface'
+import {PinoLogProvider} from '@chalupajs/logger-pino'
 
 @Service()
 class TestIniterService {}

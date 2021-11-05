@@ -1,5 +1,5 @@
 import { Logger as IPinoLogger } from 'pino'
-import { ILogger, AbstractLoggerAdapter } from '@catamaranjs/interface'
+import { ILogger, AbstractLoggerAdapter } from '@chalupajs/interface'
 
 export class PinoLogger extends AbstractLoggerAdapter {
 	private readonly loggerInstance: IPinoLogger

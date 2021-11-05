@@ -12,7 +12,7 @@ import {
 	Metadata,
 	DependencyGraph,
 	IPlugin,
-} from '@catamaranjs/interface'
+} from '@chalupajs/interface'
 
 import { ConsoleLoggerProvider } from '../../Log/Console/ConsoleLoggerProvider'
 import { extractServiceOptions } from '../annotation_utils'
