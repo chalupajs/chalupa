@@ -1,4 +1,4 @@
-import { Constructor, IBuilderStrategy, IPlugin } from '@catamaranjs/interface'
+import { Constructor, IBuilderStrategy, IPlugin } from '@chalupajs/interface'
 import { ExternalServicePlugin } from '../Plugins/Internal/ExternalServicePlugin'
 import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
 import {ErrorHandlingPlugin} from "../Plugins/Internal/ErrorHandlingPlugin";
