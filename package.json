@@ -2,6 +2,7 @@
 	"name": "@chalupajs/chalupa",
 	"version": "0.0.0",
 	"description": "",
+	"private": true,
 	"scripts": {
 		"compile": "pnpm run compile --recursive",
 		"clean": "pnpm run clean --recursive",
