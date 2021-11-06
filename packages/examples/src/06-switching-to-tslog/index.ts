@@ -8,7 +8,7 @@
  * The service will log with WARN and INFO levels on
  * creation and initialization.
  * 
- * Topic: Configuration
+ * Topic: Logging
  * Showcased features:
  *   * Chalupa logging.
  *   * Switching the log provider (using the LogProvider plugin).

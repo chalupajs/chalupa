@@ -596,7 +596,9 @@ We reached our last and most important step, the actual binding.
     const fileStoreConfig = context.immediate(FileStoreConfig)
 
     /* 2. */
-    const fileStoreImpl = fileStoreConfig.isLocalEnv() ? FsFileStore : S3FileStore
+    const fileStoreImpl: Constructor<IFileStore> = fileStoreConfig.isLocalEnv()
+      ? FsFileStore
+      : S3FileStore
 
     /* 3. */
     context.bindInterface('IFileStore', fileStoreImpl)
