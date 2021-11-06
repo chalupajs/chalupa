@@ -5,6 +5,7 @@
  * We have two configuration files, prod.json and staging.json. Our application will
  * load the appropriate one based on the value of the NODE_ENV environment variable.
  * 
+ * Topic: Configuration
  * Showcased features:
  *   * @Configuration and @Configurable.
  *   * Using the ConfigSources plugin.

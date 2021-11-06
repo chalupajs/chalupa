@@ -5,6 +5,7 @@
  * We attach a service-specific prefix to the environment variable names
  * of the configuration properties.
  * 
+ * * Topic: Configuration
  * Showcased features:
  *   * @Configuration and @Configurable.
  *   * Using the EnvPrefix plugin.

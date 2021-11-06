@@ -4,6 +4,7 @@ specifiers:
   '@chalupajs/communication-darcon': workspace:*
   '@chalupajs/interface': workspace:*
   '@chalupajs/logger-pino': workspace:*
+  '@chalupajs/logger-tslog': workspace:*
   '@chalupajs/service': workspace:*
   '@chalupajs/test-framework': workspace:*
   '@types/node': 16.10.5
@@ -18,6 +19,7 @@ dependencies:
   '@chalupajs/communication-darcon': link:../communication/darcon
   '@chalupajs/interface': link:../interface
   '@chalupajs/logger-pino': link:../logger/pinolog
+  '@chalupajs/logger-tslog': link:../logger/tslog
   '@chalupajs/service': link:../service
   '@chalupajs/test-framework': link:../test-framework
   reflect-metadata: 0.1.13

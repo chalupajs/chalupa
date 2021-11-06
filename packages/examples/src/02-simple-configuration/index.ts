@@ -8,6 +8,7 @@
  * Once the service is instantiated, it logs a configuration property to
  * the console.
  * 
+ * Topic: Configuration
  * Showcased features:
  *   * @Configuration and @Configurable.
  *   * The inject array of @Service.

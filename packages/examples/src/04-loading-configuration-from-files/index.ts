@@ -6,6 +6,7 @@
  * ConfigSources plugin, we populate the properties of the PizzaConfig class with
  * the values stored in those files.  
  * 
+ * Topic: Configuration
  * Showcased features:
  *   * @Configuration and @Configurable.
  *   * Using the ConfigSources plugin.

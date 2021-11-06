@@ -37,6 +37,7 @@
 		"@chalupajs/communication-darcon": "workspace:*",
 		"@chalupajs/interface": "workspace:*",
 		"@chalupajs/logger-pino": "workspace:*",
+		"@chalupajs/logger-tslog": "workspace:*",
 		"@chalupajs/service": "workspace:*",
 		"@chalupajs/test-framework": "workspace:*",
 		"reflect-metadata": "0.1.13"

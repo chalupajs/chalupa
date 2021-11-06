@@ -1,0 +1,8 @@
+{
+    "serviceA": {
+        "message": "Hello, Service A!"
+    },
+    "serviceB": {
+        "message": "Hello, Service B!"
+    }
+}
