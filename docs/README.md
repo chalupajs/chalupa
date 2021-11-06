@@ -1,7 +1,7 @@
-# The Cruising Chalupanor's Handbook
+# The Chalupa Cookbook
 
 <div align="center">
-  <img height="420" src="./ChalupaHandbookCover.png">
+  <img height="420" src="./ChalupaCookbookCover.png">
 </div>
 
 > Note: We aimed to keep the code snippets in this handbook short and slim. Therefore, they may not contain every detail needed to be compiled and run. Nevertheless, we believe that they are easier to read and comprehend this way.
@@ -121,9 +121,9 @@ class PizzaService {}
 
 ## Chalupa Packages
 
-Chalupa is developed in a monorepo (https://github.com/dwmt/Chalupa) and consists of several smaller packages. What are these and when should you use them?
+Chalupa is developed in a monorepo (https://github.com/chalupajs/chalupa) and consists of several smaller packages. What are these and when should you use them?
 
-  * `@cataramanjs/interface`
+  * `@chalupajs/interface`
     * The core decorators and types used by Chalupa. Writing a module, a plugin or something along those lines? This package is a must then for you.
   * `@chalupajs/service`
     * As its name suggests, `interface` is mostly the public interface of Chalupa. The actual implementation, the classes that make ue of the decorators and such reside in the `service` module. Thus, if you want to create an executable service, then use this package.
@@ -153,7 +153,7 @@ import { Configuration, Configurable } from '@chalupajs/interface'
 class PizzaConfig {
   @Configurable({
     doc: 'The data directory to save files into.',
-    format: 'string',
+    format: String,
   })
   dataDirectory = '/data/pizza'
 }
