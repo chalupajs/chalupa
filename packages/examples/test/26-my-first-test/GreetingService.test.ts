@@ -1,9 +1,14 @@
+/*
+ * 26. My First Test
+ *
+ *
+ * Topic: Testing
+ */
 import * as assert from 'assert'
-import { Catamaran } from '@chalupajs/service'
-import {ClassLevelOverrides, IntegrationTestBuilderStrategy, OverrideConfig} from '@chalupajs/test-framework'
+import {IntegrationTestBuilderStrategy} from '@chalupajs/test-framework'
 import { CallWithResult } from '@chalupajs/interface'
 import { DateTimeService, GreetingService } from './GreetingService'
-import {DarconConfig} from "@chalupajs/communication-darcon";
+import {Chalupa} from "@chalupajs/service";
 
 const tests = [
 	{
@@ -14,27 +19,17 @@ const tests = [
 			const WHO = 'Jocky'
 			const expected = 'Good morning, Jocky!'
 
-			const arrangement = await Catamaran
+			const arrangement = await Chalupa
 				.builder()
-				.use(OverrideConfig.with([
-					{
-						config: DarconConfig,
-						overrides: {
-							division: 'a',
-							connectionPatience: 'b'
-						}
-					} as ClassLevelOverrides<DarconConfig>
-				]))
 				.createServiceWithStrategy(GreetingService, IntegrationTestBuilderStrategy)
 
 			const sut = await arrangement
-				.rebind(DateTimeService, {
+				.rebindConstant(DateTimeService, {
 					hours() {
 						return CallWithResult.of(HOUR)
 					},
 				})
 				.start()
-
 
 			// When
 			const actual = await sut.getServiceOrModule(GreetingService).greet(WHO)
@@ -50,7 +45,7 @@ const tests = [
 ;(async function () {
 	for (const test of tests) {
 		console.log(`\nExecuting | ${test.name}\n`)
-		// eslint-disable-next-line no-await-in-loop
+
 		await test.execute()
 	}
 })()

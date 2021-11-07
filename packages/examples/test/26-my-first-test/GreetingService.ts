@@ -1,17 +1,15 @@
 import {
-	Catamaran, LogProvider,
-} from '@chalupajs/service'
-import {Service,
+	Service,
 	ExternalServiceTemplate,
 	serviceMethodPlaceholder,
 	ExternalService,
 	ExternalServiceMethod,
 	ILogger,
 	LoggerFactory,
-	Inject,
-	IExternalServiceCall} from '@chalupajs/interface'
+	IExternalServiceCall, ServiceMethod
+} from '@chalupajs/interface'
 import {PinoLogProvider} from '@chalupajs/logger-pino'
-import {DarconBuilderStrategy} from "@chalupajs/communication-darcon";
+import {Chalupa, InMemoryStrategy, LogProvider} from "@chalupajs/service";
 
 @ExternalService()
 export class DateTimeService extends ExternalServiceTemplate {
@@ -27,13 +25,14 @@ export class GreetingService {
 	private readonly dateTime: DateTimeService
 
 	constructor(
-		@Inject(LoggerFactory) loggerFactory: LoggerFactory,
-		@Inject(DateTimeService) dateTime: DateTimeService
+		loggerFactory: LoggerFactory,
+		dateTime: DateTimeService
 	) {
 		this.logger = loggerFactory.getLogger(GreetingService)
 		this.dateTime = dateTime
 	}
 
+	@ServiceMethod()
 	async greet(who: string): Promise<string> {
 		this.logger.info('Greeting requested.', who)
 
@@ -44,10 +43,10 @@ export class GreetingService {
 }
 
 async function start() {
-	const service = await Catamaran
+	const service = await Chalupa
 		.builder()
 		.use(LogProvider.provider(PinoLogProvider))
-		.createServiceWithStrategy(GreetingService, DarconBuilderStrategy)
+		.createServiceWithStrategy(GreetingService, InMemoryStrategy)
 	await service.start()
 }
 

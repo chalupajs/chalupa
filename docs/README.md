@@ -1537,7 +1537,7 @@ const arrangement = await Chalupa
 
 const sut = await arrangement
   /* 3. */
-  .rebind(DateTime, {
+  .rebindConstant(DateTime, {
     hours() {
       /* 4. */
       return CallWithResult.of(HOUR)
@@ -1550,12 +1550,12 @@ const sut = await arrangement
 Let's break this down, step by step!
 
   1. First, we declare the test data: the hour which will be returned by our `DateTime` double, the name passed to the `greet` method and the expected output.
-  1. This is followed by the creation of our test arrangement. We use the `createServiceWithStrategy` method with the `IntegrationTestBuilderStrategy` to create a representation of the service, which is optimized for testing. This is called an arrangement, and allows us for rebinding container types (through the `rebind` method).
-  1. Using the `rebind` method of the arrangement, we bind a test double to the `DateTime` external service. Thus, when we start the service in step 5, the container will inject our double, instead of the original implementation.
+  1. This is followed by the creation of our test arrangement. We use the `createServiceWithStrategy` method with the `IntegrationTestBuilderStrategy` to create a representation of the service, which is optimized for testing. This is called an arrangement, and allows us for binding and rebinding container types.
+  1. Using the `rebindConstant` method of the arrangement, we bind a test double to the `DateTime` external service. Thus, when we start the service in step 5, the container will inject our double, instead of the original implementation.
   1. The double will respond with the same value to each `hours` call. Remember, that external service methods return `IExternalServiceCall<T>`'s, hence, we have to use the `CallWithResult` helper type.
   1. As the last step of our `Given` block, we call the `start` method of our arrangement, producing a testable *system under test*. The call to the `start` method will actually kick-off the service but will not publish it on the network.
 
-> Note: in the above example, we use [Rebinding](#rebinding) to completely replace the binding for `DateTime`. If you want to create new bindings in the context of the tested service, then use the `bind` method of the arrangement.
+> Note: in the above example, we use [Rebinding](#rebinding) to completely replace the binding for `DateTime`. If you want to create new bindings in the context of the tested service, then use the `bind` family of methods on the arrangement.
 
 We're now ready to make a test call!
 
