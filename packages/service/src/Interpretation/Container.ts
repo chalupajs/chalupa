@@ -34,6 +34,10 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 			constructor
 		)
 		this._container.bind<T>(processedConstructor).toSelf().inSingletonScope()
+			.onActivation((_context, value) => this._plugins.reduce(
+				(previousInstance: T, plugin: IPlugin) => plugin.onGet<T>(constructor, previousInstance),
+				value
+			))
 		return this
 	}
 
@@ -43,6 +47,10 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 			constant
 		)
 		this._container.bind<T>(accessor).toConstantValue(processedConstant)
+			.onActivation((_context, value) => this._plugins.reduce(
+				(previousInstance: T, plugin: IPlugin) => plugin.onGet<T>(accessor, previousInstance),
+				value
+			))
 		return this
 	}
 
@@ -53,6 +61,10 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 			constructor
 		)
 		this._container.bind<T>(accessor).to(processedConstructor).inSingletonScope()
+			.onActivation((_context, value) => this._plugins.reduce(
+				(previousInstance: T, plugin: IPlugin) => plugin.onGet<T>(accessor, previousInstance),
+				value
+			))
 		return this
 	}
 
@@ -77,6 +89,10 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 			constructor
 		)
 		this._container.rebind<T>(processedConstructor).toSelf()
+			.onActivation((_context, value) => this._plugins.reduce(
+				(previousInstance: T, plugin: IPlugin) => plugin.onGet<T>(constructor, previousInstance),
+				value
+			))
 		return this
 	}
 
@@ -86,6 +102,10 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 			constant
 		)
 		this._container.rebind<T>(accessor).toConstantValue(processedConstant)
+			.onActivation((_context, value) => this._plugins.reduce(
+				(previousInstance: T, plugin: IPlugin) => plugin.onGet<T>(accessor, previousInstance),
+				value
+			))
 		return this
 	}
 
@@ -96,6 +116,10 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 			constructor
 		)
 		this._container.rebind<T>(accessor).to(processedConstructor)
+			.onActivation((_context, value) => this._plugins.reduce(
+				(previousInstance: T, plugin: IPlugin) => plugin.onGet<T>(constructor, previousInstance),
+				value
+			))
 		return this
 	}
 
@@ -125,10 +149,6 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 	}
 
 	get<T>(accessor: string | Constructor): T {
-		const instance: T = this._container.get<T>(accessor)
-		return this._plugins.reduce(
-			(previousInstance: T, plugin: IPlugin) => plugin.onGet<T>(accessor, previousInstance),
-			instance
-		)
+		return this._container.get<T>(accessor)
 	}
 }
