@@ -1335,7 +1335,7 @@ This solution is great, however, it does not scale very well (what if we want to
 Let's try something else! We can introduce a custom error for unknown flavors:
 
 ~~~~TypeScript
-class UnknownFlavorError extends Error {
+class UnknownPizzaFlavorError extends Error {
   constructor(readonly flavor: string) {
     super(`Unknown flavor: ${flavor}`)
   }
@@ -1356,13 +1356,13 @@ class PizzaService {
 
   private guardPizzaFlavor(flavor: string) {
     if (!['margherita', 'hawaii'].includes(flavor)) {
-      throw new UnknownFlavorError(flavor)
+      throw new UnknownPizzaFlavorError(flavor)
     }
   }
 }
 ~~~~
 
-The code feels much cleaner now: `guardPizza` does exactly one thing, and the level of abstraction in `orderPizza` is consistent. However, there's one, not-so-little problem still: who's going to handle the `UnknownFlavorError`, thrown from `guardPizzaFlavor`? That's where Chalupa's support for error handling comes into the picture. Watch!
+The code feels much cleaner now: `guardPizza` does exactly one thing, and the level of abstraction in `orderPizza` is consistent. However, there's one, not-so-little problem still: who's going to handle the `UnknownPizzaFlavorError`, thrown from `guardPizzaFlavor`? That's where Chalupa's support for error handling comes into the picture. Watch!
 
 ~~~~TypeScript
 import { ErrorHandler } from '@chalupajs/interface'
@@ -1371,7 +1371,7 @@ import { ErrorHandler } from '@chalupajs/interface'
 class PizzaService {
   @ServiceMethod()
   async orderPizza(flavor: string): Promise<string> {
-    guardPizzaFlavor(flavor)
+    this.guardPizzaFlavor(flavor)
 
     return 'enjoy your pizza!'
   }
@@ -1384,7 +1384,7 @@ class PizzaService {
 
   private guardPizzaFlavor(flavor: string) {
     if (!['margherita', 'hawaii'].includes(flavor)) {
-      throw new UnknownFlavorError(flavor)
+      throw new UnknownPizzaFlavorError(flavor)
     }
   }
 }
