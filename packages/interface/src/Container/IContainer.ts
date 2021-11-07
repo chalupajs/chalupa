@@ -39,9 +39,9 @@ export interface IContainer {
 	 * @param accessor
 	 * @param constant
 	 */
-	bindConstant<T>(accessor: string, constant: T): this
+	bindConstant<T>(accessor: string | Constructor<T>, constant: T): this
 
-	rebindConstant<T>(accessor: string, constant: T): this
+	rebindConstant<T>(accessor: string | Constructor<T>, constant: T): this
 
 	unbind(accessor: string | Constructor): this
 

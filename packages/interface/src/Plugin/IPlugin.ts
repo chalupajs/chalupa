@@ -17,10 +17,10 @@ export interface IPlugin {
 	// Binding listeners
 	onBindClass<T>(constructor: Constructor<T>): Constructor<T>
 	onBindInterface<T>(accessor: string, constructor: Constructor<T>): Constructor<T>
-	onBindConstant<T>(accessor: string, constant: T): T
+	onBindConstant<T>(accessor: string | Constructor<T>, constant: T): T
 	onRebindClass<T>(constructor: Constructor<T>): Constructor<T>
 	onRebindInterface<T>(accessor: string, constructor: Constructor<T>): Constructor<T>
-	onRebindConstant<T>(accessor: string, constant: T): T
+	onRebindConstant<T>(accessor: string | Constructor<T>, constant: T): T
 	onUnbind(accessor: string | Constructor): boolean
 	onBindModule(moduleConstructor: Constructor): Constructor
 	onGet<T>(accessor: Constructor<T> | string, instance: T): T

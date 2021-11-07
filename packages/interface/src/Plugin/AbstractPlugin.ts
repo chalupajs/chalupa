@@ -39,7 +39,7 @@ export abstract class AbstractPlugin implements IPlugin {
 		return _constructor
 	}
 
-	onBindConstant<T>(_accessor: string, _constant: T): T {
+	onBindConstant<T>(_accessor: string | Constructor<T>, _constant: T): T {
 		return _constant
 	}
 
@@ -51,7 +51,7 @@ export abstract class AbstractPlugin implements IPlugin {
 		return _constructor
 	}
 
-	onRebindConstant<T>(_accessor: string, _constant: T): T {
+	onRebindConstant<T>(_accessor: string | Constructor<T>, _constant: T): T {
 		return _constant
 	}
 

@@ -130,5 +130,5 @@ export async function buildIntermediateService<T = any>(
 
 	handleConstants(serviceOptions.constants)
 
-	return new IntermediateService(inversifyContainer, constructor, moduleDependencyGraph, plugins)
+	return new IntermediateService(inversifyContainer, container, constructor, moduleDependencyGraph, plugins)
 }

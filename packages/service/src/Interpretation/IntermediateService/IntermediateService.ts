@@ -6,7 +6,7 @@ import {
 	LoggerFactory,
 	ServiceOptions,
 	IDependencyGraph,
-	IPlugin,
+	IPlugin, IInjectContainer,
 } from '@chalupajs/interface'
 import { IServiceBridge } from '@chalupajs/interface/src/Interpretation/IServiceBridge'
 import { extractServiceOptions } from '../annotation_utils'
@@ -14,6 +14,7 @@ import { ServiceBridge } from '../ServiceBridge'
 
 export class IntermediateService implements IIntermediateService {
 	container: InversifyContainer
+	injectContainer: IInjectContainer
 	serviceConstructor: Constructor
 
 	serviceOptions: ServiceOptions
@@ -26,11 +27,13 @@ export class IntermediateService implements IIntermediateService {
 
 	constructor(
 		container: InversifyContainer,
+		injectContainer: IInjectContainer,
 		serviceConstructor: Constructor,
 		public readonly moduleDependencyGraph: IDependencyGraph<Constructor>,
 		plugins: IPlugin[]
 	) {
 		this.container = container
+		this.injectContainer = injectContainer
 		this.serviceConstructor = serviceConstructor
 		this.serviceOptions = extractServiceOptions(serviceConstructor)
 		const loggerFactory = container.get<LoggerFactory>(LoggerFactory)

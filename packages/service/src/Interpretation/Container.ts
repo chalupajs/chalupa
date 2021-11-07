@@ -37,7 +37,7 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 		return this
 	}
 
-	bindConstant<T>(accessor: string, constant: T): this {
+	bindConstant<T>(accessor: string | Constructor<T>, constant: T): this {
 		const processedConstant = this._plugins.reduce(
 			(previousConstant: T, plugin: IPlugin) => plugin.onBindConstant<T>(accessor, previousConstant),
 			constant
@@ -80,7 +80,7 @@ export class Container implements IContainer, IInjectContainer, IFacadeContainer
 		return this
 	}
 
-	rebindConstant<T>(accessor: string, constant: T): this {
+	rebindConstant<T>(accessor: string | Constructor<T>, constant: T): this {
 		const processedConstant = this._plugins.reduce(
 			(previousConstant: T, plugin: IPlugin) => plugin.onRebindConstant<T>(accessor, previousConstant),
 			constant

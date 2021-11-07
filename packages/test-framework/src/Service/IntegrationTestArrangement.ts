@@ -14,22 +14,18 @@ export interface IntegrationTestArrangement {
 	 */
 	start(): Promise<SystemUnderTest>
 
-	/**
-	 * Binds a new value with the specified injection key.
-	 * @param key A string or constructor function to bind to.
-	 * @param boundValue An actual instance to be bound.
-	 * @returns This instance for easy chaining of calls.
-	 */
-	bind(key: string | Constructor, boundValue: any): this
+	isBound(accessor: string | Constructor): boolean
 
-	/**
-	 * Rebinds the specified injection key to a new bound value. Will overwrite
-	 * pre-existing bindings.
-	 * @param key A string or constructor function to bind to.
-	 * @param boundValue An actual instance to be bound.
-	 * @returns This instance for easy chaining of calls.
-	 */
-	rebind(key: string | Constructor, boundValue: any): this
+	bindClass<T>(constructor: Constructor<T>): this
+	rebindClass<T>(constructor: Constructor<T>): this
+
+	bindConstant<T>(accessor: string | Constructor<T>, constant: Partial<T>): this
+	rebindConstant<T>(accessor: string | Constructor<T>, constant: Partial<T>): this
+
+	bindInterface<T>(accessor: string, constructor: Constructor<T>): this
+	rebindInterface<T>(accessor: string, constructor: Constructor<T>): this
+
+	unbind(accessor: string | Constructor): this
 }
 
 /**
