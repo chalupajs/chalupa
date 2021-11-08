@@ -58,7 +58,7 @@ export class InMemoryFacade extends AbstractCommunicationFacade {
 	}
 
 	async closeSelf() {
-		InMemoryOrchestrator.close()
+		InMemoryOrchestrator.close(this._serviceName!)
 		return Promise.resolve()
 	}
 

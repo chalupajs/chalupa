@@ -76,7 +76,7 @@ export interface IInMemoryOrchestrator {
 	createService(serviceName: string): IMemoryService
 	onServiceAppeared(cb: CallableFunction): void
 	onServiceDisappeared(cb: CallableFunction): void
-	close(): void
+	close(serviceName: string): void
 }
 
 class InMemoryOrchestrator implements IInMemoryOrchestrator {
@@ -98,7 +98,13 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 		}
 	}
 
-	close(): void {
+	close(serviceName: string): void {
+		this._services.delete(serviceName)
+		this._messageBus.emit('serviceDisappeared', serviceName)
+		if (this._services.size > 0) {
+			return
+		}
+
 		if (this._keepAlive) {
 			clearInterval(this._keepAlive)
 		}
