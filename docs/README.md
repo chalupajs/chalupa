@@ -85,12 +85,12 @@ class PizzaService {
 
 async function start() {
   /* 3. */
-	const service = await Chalupa
+  const service = await Chalupa
     .builder()
     .createServiceWithStrategy(PizzaService, InMemoryStrategy)
 
   /* 4. */
-	await service.start()
+  await service.start()
 }
 
 start().catch(console.error)
@@ -196,7 +196,7 @@ async function start() {
     .use(EnvPrefix.from('PEPPERONI'))
     .createServiceWithStrategy(PizzaService, InMemoryStrategy)
 
-	await service.start()
+  await service.start()
 }
 
 start().catch(console.error)
@@ -257,9 +257,9 @@ Environment-dependent configuration loading works exactly the way you'd think.
 
 ~~~~TypeScript
 const service = await Chalupa
-    .builder()
-    .use(ConfigSources.from([`${process.env['NODE_ENV']}.yml`]))
-    .createServiceWithStrategy(PizzaService, InMemoryStrategy)
+  .builder()
+  .use(ConfigSources.from([`${process.env['NODE_ENV']}.yml`]))
+  .createServiceWithStrategy(PizzaService, InMemoryStrategy)
 ~~~~
 
 Configuration sources are loaded in the order they appear in the `configSources` array. Values are loaded on a *last-value-wins* basis, which means that later configuration values overwrite the earlier ones.
@@ -308,7 +308,7 @@ async function start() {
     .use(LogProvider.provider(TSLogProvider))
     .createServiceWithStrategy(PizzaService, InMemoryStrategy)
 
-	await service.start()
+  await service.start()
 }
 
 start().catch(console.error)
@@ -789,9 +789,9 @@ Additionally, constant bindings have their own shorthand notation, the `constant
 ~~~~TypeScript
 @Service({
   inject: [PizzaOven],
-    constants: [
-      ['TODAYS_PIZZA_CHEF', 'Giovanni'],
-      ['EXPECTED_DELIVERY_TIME', 69]
+  constants: [
+    ['TODAYS_PIZZA_CHEF', 'Giovanni'],
+    ['EXPECTED_DELIVERY_TIME', 69]
   ]
 })
 class PizzaShopService {}
