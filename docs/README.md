@@ -191,7 +191,7 @@ In what follows, you'll see that several parts of Chalupa can be configured via 
 import { EnvPrefix } from '@chalupajs/service'
 
 async function start() {
-	const service = await Chalupa
+  const service = await Chalupa
     .builder()
     .use(EnvPrefix.from('PEPPERONI'))
     .createServiceWithStrategy(PizzaService, InMemoryStrategy)
@@ -217,10 +217,10 @@ Let's assume, that we have a configuration class as follows.
 ~~~~TypeScript
 @Configuration()
 class PizzaConfig {
-	@Configuration({
-		format: 'nat'
-	})
-	bakingTime = 180
+  @Configuration({
+    format: 'nat'
+  })
+  bakingTime = 180
 }
 ~~~~
 
@@ -228,12 +228,12 @@ Now, let's create a YAML configuration file as  `local.yml`.
 
 ~~~~YAML
 pizza:
-	bakingTime: 269
+  bakingTime: 269
 
 # Let's configure logging as well.
 log:
-	level: info
-	pretty: true
+  level: info
+  pretty: true
 ~~~~
 
 As the last step, we have to declare this file as a configuration source. Just as in the case of the [Environment Variable Prefix](#environment-variable-prefix), we will use a [plugin](#plugins), namely, `ConfigSources`.
@@ -242,12 +242,12 @@ As the last step, we have to declare this file as a configuration source. Just a
 import { ConfigSources } from '@chalupajs/service'
 
 async function start() {
-	const service = await Chalupa
+  const service = await Chalupa
     .builder()
     .use(ConfigSources.from(['local.yml']))
     .createServiceWithStrategy(PizzaService, InMemoryStrategy)
 
-	await service.start()
+  await service.start()
 }
 
 start().catch(console.error)
@@ -303,7 +303,7 @@ import { LogProvider } from '@chalupajs/service'
 import { TSLogProvider } from '@chalupajs/logger-tslog'
 
 async function start() {
-	const service = await Chalupa
+  const service = await Chalupa
     .builder()
     .use(LogProvider.provider(TSLogProvider))
     .createServiceWithStrategy(PizzaService, InMemoryStrategy)
@@ -527,16 +527,16 @@ Similarly to the already known binding techniques, we can use the `inject` funct
 
 ~~~~TypeScript
 @Service({
-	inject(context) {
-		/* 1. */
-		context.bindConstant('TODAYS_PIZZA_CHEF', 'Giovanni')
-	}
+  inject(context) {
+    /* 1. */
+    context.bindConstant('TODAYS_PIZZA_CHEF', 'Giovanni')
+  }
 })
 class PizzaService {
-	constructor(/* 2. */ @Inject('TODAYS_PIZZA_CHEF') chef: string) {
-		/* 3. */
-		console.log(chef)
-	}
+  constructor(/* 2. */ @Inject('TODAYS_PIZZA_CHEF') chef: string) {
+    /* 3. */
+    console.log(chef)
+  }
 }
 ~~~~
 
@@ -548,7 +548,7 @@ Again, to prevent hours of DI debugging, it is a good idea to extract the key in
 
 ~~~~TypeScript
 const CONSTANTS = {
-	TODAYS_PIZZA_CHEF: 'TODAYS_PIZZA_CHEF'
+  TODAYS_PIZZA_CHEF: 'TODAYS_PIZZA_CHEF'
 }
 ~~~~
 
@@ -638,22 +638,22 @@ As a concrete example, let's assume, that we're writing a service that collects 
 
 ~~~~TypeScript
 interface DailyOffering {
-	restaurant: string,
-	items: string[]
+  restaurant: string,
+  items: string[]
 }
 
 interface IDailyOfferingScraper {
-	scrapeOffering(): Promise<DailyOffering>
+  scrapeOffering(): Promise<DailyOffering>
 }
 
 @Injectable()
 class KingPadliDailyOfferingScraper implements IDailyOfferingScraper {
-	async scrapeOffering() { /*...*/ }
+  async scrapeOffering() { /*...*/ }
 }
 
 @Injectable()
 class BlahaneDailyOfferingScraper implements IDailyOfferingScraper {
-	async scrapeOffering() { /*...*/ }
+  async scrapeOffering() { /*...*/ }
 }
 ~~~~
 
@@ -663,17 +663,17 @@ Clearly, if we want to check all the offerings together, then we have to somehow
 import { MultiInject } from '@chalupajs/Chalupa'
 
 @Service({
-	inject(context) {
-		/* 1. */
-		context
-			.bindInterface('IDailyOfferingScraper', KingPadliDailyOfferingScraper)
-			.bindInterface('IDailyOfferingScraper', BlahaneDailyOfferingScraper)
-	}
+  inject(context) {
+    /* 1. */
+    context
+      .bindInterface('IDailyOfferingScraper', KingPadliDailyOfferingScraper)
+      .bindInterface('IDailyOfferingScraper', BlahaneDailyOfferingScraper)
+  }
 })
 class DailyOfferingService {
-	constructor(/* 2. */ @MultiInject('IDailyOfferingScraper') scrapers: IDailyOfferingScraper[] /* 3. */) {
-		console.log(scrapers)
-	}
+  constructor(/* 2. */ @MultiInject('IDailyOfferingScraper') scrapers: IDailyOfferingScraper[] /* 3. */) {
+    console.log(scrapers)
+  }
 }
 ~~~~
 
@@ -689,13 +689,13 @@ Let's assume, that give some configuration, we want to replace an interface bind
 
 ~~~~TypeScript
 @Service({
-	inject(context) {
-		context.bindInterface('TYPE', NormalImplementation)
+  inject(context) {
+    context.bindInterface('TYPE', NormalImplementation)
 
     if (context.immediate(RebindConfig).shouldReplaceImplementation()) {
       context.rebindConstant('TYPE', new InstrumentedImplementation())
     }
-	}
+  }
 })
 class RebindService {}
 ~~~~
@@ -706,14 +706,14 @@ When rebinding a type key with multiple bound implementations, each previous bin
 
 ~~~~TypeScript
 @Service({
-	inject(context) {
-		context
+  inject(context) {
+    context
       .bindInterface('TYPE', ImplOne)
       .bindInterface('TYPE', ImplTwo)
 
     context
       .rebindConstant('TYPE', new RebindImpl())
-	}
+  }
 })
 class RebindService {}
 ~~~~
@@ -726,11 +726,11 @@ In the above case, both the `ImplOne` and `ImplTwo` binding will be dropped, and
 
 ~~~~TypeScript
 @Service({
-	inject(context) {
-		if (context.isBound('TYPE')) {
+  inject(context) {
+    if (context.isBound('TYPE')) {
       context.unbind('TYPE')
     }
-	}
+  }
 })
 class RebindService {}
 ~~~~
@@ -789,10 +789,10 @@ Additionally, constant bindings have their own shorthand notation, the `constant
 ~~~~TypeScript
 @Service({
   inject: [PizzaOven],
-	constants: [
-		['TODAYS_PIZZA_CHEF', 'Giovanni'],
-		['EXPECTED_DELIVERY_TIME', 69]
-	]
+    constants: [
+      ['TODAYS_PIZZA_CHEF', 'Giovanni'],
+      ['EXPECTED_DELIVERY_TIME', 69]
+  ]
 })
 class PizzaShopService {}
 ~~~~
@@ -801,11 +801,11 @@ class PizzaShopService {}
 
 ~~~~TypeScript
 @Service({
-	inject(context) {
-		context
-			.bindConstant('TODAYS_PIZZA_CHEF', 'Giovanni')
-			.bindConstant('EXPECTED_DELIVERY_TIME', 69)
-	}
+  inject(context) {
+    context
+      .bindConstant('TODAYS_PIZZA_CHEF', 'Giovanni')
+      .bindConstant('EXPECTED_DELIVERY_TIME', 69)
+  }
 })
 class PizzaShopService {}
 ~~~~
@@ -931,7 +931,9 @@ Then, we can conditionally select the appropriate module in the `inject` functio
   inject(context) {
     const fileStoreConfig = context.immediate(FileStoreConfig)
 
-    const fileStoreModule = fileStoreConfig.isLocalEnv() ? FsFileStoreModule : S3FileStoreModule
+    const fileStoreModule = fileStoreConfig.isLocalEnv()
+      ? FsFileStoreModule
+      : S3FileStoreModule
 
     context.bindModule(fileStoreModule)
   }
@@ -1174,12 +1176,12 @@ import { ServiceAppeared, ServiceDisappeared } from '@chalupajs/interface'
 @Service()
 class PizzaService {
   @ServiceAppeared()
-	async appeared(name: string) {
+  async appeared(name: string) {
     console.log(`Hello, ${name}!`)
   }
 
-	@ServiceDisappeared()
-	async disappeared(name: string) {
+  @ServiceDisappeared()
+  async disappeared(name: string) {
     console.log(`Goodbye, ${name}!`)
   }
 }
@@ -1482,25 +1484,25 @@ In what follows, we introduce the testing support through an example. Let's assu
 ~~~~TypeScript
 @ExternalService()
 class DateTime extends ExternalServiceTemplate {
-	@ExternalServiceMethod()
-	hours: () => IExternalServiceCall<number> = serviceMethodPlaceholder
+  @ExternalServiceMethod()
+  hours: () => IExternalServiceCall<number> = serviceMethodPlaceholder
 }
 
 @Service({
-	inject: [DateTime],
+  inject: [DateTime],
 })
 class GreetingService {
-	private readonly dateTime: DateTime
+  private readonly dateTime: DateTime
 
-	constructor(dateTime: DateTime) {
-		this.dateTime = dateTime
-	}
+  constructor(dateTime: DateTime) {
+    this.dateTime = dateTime
+  }
 
-	async greet(who: string): Promise<string> {
-		const hours = await this.dateTime.hours().send()
+  async greet(who: string): Promise<string> {
+    const hours = await this.dateTime.hours().send()
 
-		return hours < 12 ? `Good morning, ${who}!` : `Good evening, ${who}!`
-	}
+    return hours < 12 ? `Good morning, ${who}!` : `Good evening, ${who}!`
+  }
 }
 ~~~~
 
@@ -1731,7 +1733,7 @@ class VersionModule() {
 We can use the `ModuleHost` class to create a containing or hosting service for this module for testing purposes:
 
 ~~~~TypeScript
-import { ModuleHost } from '@chalupajs/test-framework`
+import { ModuleHost } from '@chalupajs/test-framework'
 
 const arrangement = await Chalupa
   .builder()
