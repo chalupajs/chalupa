@@ -71,7 +71,7 @@ Without further ado, let's jump straight into some code, shall we?
 
 ~~~~TypeScript
 import { Chalupa, InMemoryStrategy } from '@chalupajs/service'
-import { Service } from '@chalupajs/interface'
+import { Service, ServiceMethod } from '@chalupajs/interface'
 
 /* 1. */
 @Service()
