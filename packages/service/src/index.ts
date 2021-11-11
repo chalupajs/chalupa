@@ -12,6 +12,5 @@ export { ConsoleLogger } from './Log/Console/ConsoleLogger'
 export { IConsoleLog, ConsoleLog } from './Log/Console/ConsoleLog'
 
 // ----------- Plugin -----------//
-export { LogProvider } from './Plugins/LogProvider'
 export { ConfigSources } from './Plugins/ConfigSources'
 export { EnvPrefix } from './Plugins/EnvPrefix'

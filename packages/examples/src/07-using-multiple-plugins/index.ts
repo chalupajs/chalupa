@@ -1,11 +1,11 @@
 /*
  * 07. Using Multiple Plugins
  *
- * 
+ *
  * In the previous example, we used one plugin at a time. In this example,
  * we attach LogProvider and ConfigSources to the same service by multiple
  * use() calls.
- * 
+ *
  * Topic: Plugins
  * Showcased features:
  *   * .use(plugin) and .use([plugins])
@@ -15,7 +15,7 @@ import 'reflect-metadata'
 import path from 'path'
 
 import { ILogger, LoggerFactory, Service, Configuration, Configurable } from '@chalupajs/interface'
-import { Chalupa, InMemoryStrategy, LogProvider, ConfigSources } from '@chalupajs/service'
+import { Chalupa, InMemoryStrategy, ConfigSources } from '@chalupajs/service'
 import { TSLogProvider } from '@chalupajs/logger-tslog'
 
 @Configuration()
@@ -49,10 +49,10 @@ async function start() {
         //
         //   .use([
         //     ConfigSources.from([path.join(__dirname, 'config.json')]),
-        //     LogProvider.provider(TSLogProvider) 
+        //     LogProvider.provider(TSLogProvider)
         //   ])
+        .logProvider(TSLogProvider)
         .use(ConfigSources.from([path.join(__dirname, 'config.json')]))
-        .use(LogProvider.provider(TSLogProvider))
 		.createServiceWithStrategy(UsingMultiplePluginsService, InMemoryStrategy)
 
 	await service.start()

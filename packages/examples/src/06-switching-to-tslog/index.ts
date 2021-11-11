@@ -1,13 +1,13 @@
 /*
  * 06. Switching to TSLog
  *
- * 
+ *
  * Using the LogProvider plugin, we change the logging backend
  * from the default console implementation to TSLog.
- * 
+ *
  * The service will log with WARN and INFO levels on
  * creation and initialization.
- * 
+ *
  * Topic: Logging
  * Showcased features:
  *   * Chalupa logging.
@@ -16,7 +16,7 @@
 import 'reflect-metadata'
 
 import { ILogger, LoggerFactory, PostInit, Service } from '@chalupajs/interface'
-import { Chalupa, InMemoryStrategy, LogProvider } from '@chalupajs/service'
+import { Chalupa, InMemoryStrategy } from '@chalupajs/service'
 import { TSLogProvider } from '@chalupajs/logger-tslog'
 
 // Observe, that the change in the log provider does not
@@ -43,7 +43,7 @@ async function start() {
 		.builder()
         // You can switch the log provider by using the
         // LogProvider plugin.
-        .use(LogProvider.provider(TSLogProvider))
+		.logProvider(TSLogProvider)
 		.createServiceWithStrategy(SwitchingToTSLogService, InMemoryStrategy)
 
 	await service.start()

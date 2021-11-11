@@ -14,7 +14,6 @@ import {
 	IPlugin,
 } from '@chalupajs/interface'
 
-import { ConsoleLoggerProvider } from '../../Log/Console/ConsoleLoggerProvider'
 import { extractServiceOptions } from '../annotation_utils'
 import { Container } from '../Container'
 import { IntermediateService } from './IntermediateService'
@@ -29,7 +28,8 @@ function guardServiceDecorator<T>(constructor: Constructor<T>) {
 
 export async function buildIntermediateService<T = any>(
 	constructor: Constructor<T>,
-	plugins: IPlugin[]
+	plugins: IPlugin[],
+	_logProvider: Constructor<ILogProvider>
 ): Promise<IIntermediateService> {
 	guardServiceDecorator(constructor)
 
@@ -84,16 +84,17 @@ export async function buildIntermediateService<T = any>(
 	// Bind the service directory to the container
 	container.bindConstant<string>(ContainerConstant.SERVICE_DIRECTORY, serviceOptions.serviceDirectory)
 
-	// Bind the service to the container
-	container.bindClass<T>(constructor)
-
 	container.bindClass<LogConfig>(LogConfig)
-
 	// Default logProvider
-	container.bindInterface<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE, ConsoleLoggerProvider)
+	container.bindInterface<ILogProvider>(ContainerConstant.LOG_PROVIDER_INTERFACE, _logProvider)
+	// Inject LoggerFactory
+	container.bindClass<LoggerFactory>(LoggerFactory)
 
 	/// Plugin event: preCreation
 	await Promise.all(plugins.map(plugin => plugin.preCreation(container)))
+
+	// Bind the service to the container
+	container.bindClass<T>(constructor)
 
 	const handleInject = function (optionsObject: ServiceOptions | ModuleOptions, parent: Constructor | null) {
 		if (optionsObject.inject) {
@@ -120,9 +121,6 @@ export async function buildIntermediateService<T = any>(
 	const handleModules = function (modules: Constructor[] | undefined, parent: Constructor | null) {
 		modules?.forEach(current => moduleBindingProcessor(current, parent))
 	}
-
-	// Inject LoggerFactory
-	container.bindClass<LoggerFactory>(LoggerFactory)
 
 	handleModules(serviceOptions.modules, NO_PARENT)
 
