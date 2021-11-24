@@ -1,5 +1,6 @@
 import { Constructor } from '../types'
 import { ILogger } from '../Log/ILogger'
+import { IDynamicValueContext } from './IDynamicValueContext'
 
 export interface IContainer {
 	/**
@@ -42,6 +43,10 @@ export interface IContainer {
 	bindConstant<T>(accessor: string | Constructor<T>, constant: T): this
 
 	rebindConstant<T>(accessor: string | Constructor<T>, constant: T): this
+
+	bindDynamicValue<T>(accessor: string | Constructor<T>, func: (context: IDynamicValueContext) => T): this
+
+	rebindDynamicValue<T>(accessor: string | Constructor<T>, func: (context: IDynamicValueContext) => T): this
 
 	unbind(accessor: string | Constructor): this
 
