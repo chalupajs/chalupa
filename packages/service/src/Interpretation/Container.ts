@@ -67,7 +67,7 @@ implements IContainer, IInjectContainer, IFacadeContainer, IPluginContainer, IDy
 
 	bindDynamicValue<T>(accessor: string | Constructor<T>, func: (context: IDynamicValueContext) => T): this {
 		this._container
-			.rebind<T>(accessor)
+			.bind<T>(accessor)
 			.toDynamicValue(() => func(this))
 			.onActivation((_context, value) =>
 				this._plugins.reduce(
