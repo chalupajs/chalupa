@@ -35,6 +35,7 @@ export { IContainer } from './Container/IContainer'
 export { IFacadeContainer } from './Container/IFacadeContainer'
 export { IInjectContainer } from './Container/IInjectContainer'
 export { IPluginContainer } from './Container/IPluginContainer'
+export { IDynamicValueContext } from './Container/IDynamicValueContext'
 // ----------- External service -----------//
 export {
 	ExternalServiceTemplate,
