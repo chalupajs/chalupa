@@ -1,6 +1,7 @@
 import { Constructor } from '../types'
 import { IPluginContainer } from '../Container/IPluginContainer'
 import { IPlugin } from './IPlugin'
+import { IDynamicValueContext } from '../Container/IDynamicValueContext'
 
 export abstract class AbstractPlugin implements IPlugin {
 	preCreation(_container: IPluginContainer): Promise<void> {
@@ -43,6 +44,10 @@ export abstract class AbstractPlugin implements IPlugin {
 		return _constant
 	}
 
+	onBindDynamicValue<T>(_accessor: string | Constructor<T>, func: (context: IDynamicValueContext) => T): (context: IDynamicValueContext) => T {
+		return func
+	}
+
 	onRebindClass<T>(_constructor: Constructor<T>): Constructor<T> {
 		return _constructor
 	}
@@ -53,6 +58,10 @@ export abstract class AbstractPlugin implements IPlugin {
 
 	onRebindConstant<T>(_accessor: string | Constructor<T>, _constant: T): T {
 		return _constant
+	}
+
+	onRebindDynamicValue<T>(_accessor: string | Constructor<T>, func: (context: IDynamicValueContext) => T): (context: IDynamicValueContext) => T {
+		return func
 	}
 
 	onUnbind(_accessor: string | Constructor): boolean {

@@ -66,9 +66,13 @@ implements IContainer, IInjectContainer, IFacadeContainer, IPluginContainer, IDy
 	}
 
 	bindDynamicValue<T>(accessor: string | Constructor<T>, func: (context: IDynamicValueContext) => T): this {
+		const processedFunc = this._plugins.reduce(
+			(previousFunc: (context: IDynamicValueContext) => T, plugin: IPlugin) => plugin.onBindDynamicValue<T>(accessor, previousFunc),
+			func
+		)
 		this._container
 			.bind<T>(accessor)
-			.toDynamicValue(() => func(this))
+			.toDynamicValue(() => processedFunc(this))
 			.onActivation((_context, value) =>
 				this._plugins.reduce(
 					(previousInstance: T, plugin: IPlugin) => plugin.onGet<T>(accessor, previousInstance),
@@ -79,9 +83,13 @@ implements IContainer, IInjectContainer, IFacadeContainer, IPluginContainer, IDy
 	}
 
 	rebindDynamicValue<T>(accessor: string | Constructor<T>, func: (context: IDynamicValueContext) => T): this {
+		const processedFunc = this._plugins.reduce(
+			(previousFunc: (context: IDynamicValueContext) => T, plugin: IPlugin) => plugin.onBindDynamicValue<T>(accessor, previousFunc),
+			func
+		)
 		this._container
 			.rebind<T>(accessor)
-			.toDynamicValue(() => func(this))
+			.toDynamicValue(() => processedFunc(this))
 			.onActivation((_context, value) =>
 				this._plugins.reduce(
 					(previousInstance: T, plugin: IPlugin) => plugin.onGet<T>(accessor, previousInstance),
