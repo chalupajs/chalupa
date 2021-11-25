@@ -22,6 +22,7 @@
     * [Interface Binding](#interface-binding)
     * [Constant Binding](#constant-binding)
     * [Configuration-dependent Binding](#configuration-dependent-binding)
+    * [Dynamic Value Binding](#dynamic-value-binding)
     * [Injecting Multiple Values of the Same Type](#injecting-multiple-values-of-the-same-type)
     * [Rebinding](#rebinding)
     * [Unbinding](#unbinding)
@@ -629,6 +630,23 @@ class FileStoreService {
 Since `immediate` calls perform binding and instantiation at the same time, they are best suited for classes with no or isolated dependencies. Great examples are configuration classes, which, in 99% of the time, have no dependencies. While you might find other uses for `immediate`, other than configuration, please keep in mind: wth great power comes great responsibility.
 
 It might be tempting to use this technique for testing purposes: injecting a test double based on some configuration conditions. However, that would pollute our normal application code with testing related logic. Therefore, Chalupa provides a much more elegant solution, detailed in the [Testing](#testing) section.
+
+### Dynamic Value Binding
+
+~~~~TypeScript
+@Service({
+  inject(context) {
+    /* 1. */
+    context.bindDynamicValue('TODAYS_PIZZA_CHEF', () => 'Giovanni')
+  }
+})
+class PizzaService {
+  constructor(/* 2. */ @Inject('TODAYS_PIZZA_CHEF') chef: string) {
+    /* 3. */
+    console.log(chef)
+  }
+}
+~~~~
 
 ### Injecting Multiple Values of the Same Type
 

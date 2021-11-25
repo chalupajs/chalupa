@@ -6,7 +6,8 @@ import {
 	LoggerFactory,
 	ServiceOptions,
 	IDependencyGraph,
-	IPlugin, IInjectContainer,
+	IPlugin,
+	IInjectContainer,
 } from '@chalupajs/interface'
 import { IServiceBridge } from '@chalupajs/interface/src/Interpretation/IServiceBridge'
 import { extractServiceOptions } from '../annotation_utils'

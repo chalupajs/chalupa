@@ -1,5 +1,6 @@
 import {
 	Constructor,
+	DynamicValueProvider,
 	IContainer,
 	IDynamicValueContext,
 	IFacadeContainer,
@@ -12,7 +13,8 @@ import {
 } from '@chalupajs/interface'
 
 export class Container
-implements IContainer, IInjectContainer, IFacadeContainer, IPluginContainer, IDynamicValueContext {
+	implements IContainer, IInjectContainer, IFacadeContainer, IPluginContainer, IDynamicValueContext
+{
 	private readonly _plugins: IPlugin[]
 	private readonly _container: InversifyContainer
 	private readonly _moduleBindingProcessor: Function
@@ -65,9 +67,10 @@ implements IContainer, IInjectContainer, IFacadeContainer, IPluginContainer, IDy
 		return this
 	}
 
-	bindDynamicValue<T>(accessor: string | Constructor<T>, func: (context: IDynamicValueContext) => T): this {
+	bindDynamicValue<T>(accessor: string | Constructor<T>, func: DynamicValueProvider<T>): this {
 		const processedFunc = this._plugins.reduce(
-			(previousFunc: (context: IDynamicValueContext) => T, plugin: IPlugin) => plugin.onBindDynamicValue<T>(accessor, previousFunc),
+			(previousFunc: DynamicValueProvider<T>, plugin: IPlugin) =>
+				plugin.onBindDynamicValue<T>(accessor, previousFunc),
 			func
 		)
 		this._container
@@ -82,9 +85,10 @@ implements IContainer, IInjectContainer, IFacadeContainer, IPluginContainer, IDy
 		return this
 	}
 
-	rebindDynamicValue<T>(accessor: string | Constructor<T>, func: (context: IDynamicValueContext) => T): this {
-		const processedFunc = this._plugins.reduce(
-			(previousFunc: (context: IDynamicValueContext) => T, plugin: IPlugin) => plugin.onBindDynamicValue<T>(accessor, previousFunc),
+	rebindDynamicValue<T>(accessor: string | Constructor<T>, func: DynamicValueProvider<T>): this {
+		const processedFunc: DynamicValueProvider<T> = this._plugins.reduce(
+			(previousFunc: DynamicValueProvider<T>, plugin: IPlugin) =>
+				plugin.onRebindDynamicValue<T>(accessor, previousFunc),
 			func
 		)
 		this._container

@@ -1,4 +1,4 @@
-import {AbstractPlugin, Constructor, Metadata} from "@chalupajs/interface"
+import { AbstractPlugin, Constructor, Metadata } from '@chalupajs/interface'
 
 export class ErrorHandlingPlugin extends AbstractPlugin {
 	onBindClass<T>(constructor: Constructor<T>): Constructor<T> {
@@ -16,20 +16,29 @@ export class ErrorHandlingPlugin extends AbstractPlugin {
 	}
 
 	private wrapFunctionsInScope(scope: Constructor) {
-		const handlers: Map<string, Constructor<Error>[]> | null = Reflect.getMetadata(Metadata.METADATA_ERROR_HANDLER_MAP, scope.prototype)
+		const handlers: Map<string, Constructor<Error>[]> | null = Reflect.getMetadata(
+			Metadata.METADATA_ERROR_HANDLER_MAP,
+			scope.prototype
+		)
 		if (!handlers) {
 			return
 		}
 
-		const events: Map<string, string> = Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, scope.prototype) || new Map<string, string>()
-		const methods: Map<string, string> = Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, scope.prototype) || new Map<string, string>()
+		const events: Map<string, string> =
+			Reflect.getMetadata(Metadata.METADATA_EVENT_MAP, scope.prototype) || new Map<string, string>()
+		const methods: Map<string, string> =
+			Reflect.getMetadata(Metadata.METADATA_SERVICE_MAP, scope.prototype) || new Map<string, string>()
 
 		for (const propertyKey of [...events.values(), ...methods.values()]) {
 			this.wrapFunctionWithErrorHandling(scope, propertyKey, handlers)
 		}
 	}
 
-	private wrapFunctionWithErrorHandling(scope: Constructor, internalName: string, errorHandlers: Map<string, Constructor<Error>[]>) {
+	private wrapFunctionWithErrorHandling(
+		scope: Constructor,
+		internalName: string,
+		errorHandlers: Map<string, Constructor<Error>[]>
+	) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
 		const originalFunction = scope.prototype[internalName]
 
