@@ -40,7 +40,7 @@
 	"dependencies": {
 		"inversify": "5.1.1",
 		"js-yaml": "4.0.0",
-		"konvenient": "3.0.0",
+		"konvenient": "3.1.0",
 		"reflect-metadata": "0.1.13",
 		"uuid": "8.3.2"
 	}

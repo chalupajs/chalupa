@@ -8,7 +8,7 @@ specifiers:
   eslint: 7.32.0
   inversify: 5.1.1
   js-yaml: 4.0.0
-  konvenient: 3.0.0
+  konvenient: 3.1.0
   prettier: 2.4.1
   reflect-metadata: 0.1.13
   rimraf: 3.0.2
@@ -20,7 +20,7 @@ specifiers:
 dependencies:
   inversify: 5.1.1
   js-yaml: 4.0.0
-  konvenient: 3.0.0
+  konvenient: 3.1.0
   reflect-metadata: 0.1.13
   uuid: 8.3.2
 
@@ -1723,8 +1723,8 @@ packages:
     resolution: {integrity: sha512-fQzRfAbIBnR0IQvftw9FJveWiHp72Fg20giDrHz6TdfB12UH/uue0D3hm57UB5KgAVuniLMCaS8P1IMj9NR7cA==}
     dev: true
 
-  /konvenient/3.0.0:
-    resolution: {integrity: sha512-axZe4/oopbjLs5QTQ1I9jcnV3kX5wgRyHKayVGP5XFMxJApILlPlujybe9KfbuLosXjU/mQRxPAsgLVlAGYDog==}
+  /konvenient/3.1.0:
+    resolution: {integrity: sha512-P7mP66sEvYcMcpMSf9+L+fI3b13wUCaB4DKpLzS7eOCzairRnK9kaQwo2DkxLA/95vgPUjwN22nET76QmUBNDg==}
     engines: {node: '>=14'}
     dependencies:
       convict: 6.1.0
