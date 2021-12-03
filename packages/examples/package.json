@@ -1,7 +1,7 @@
 {
 	"name": "@chalupajs/examples",
 	"private": true,
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"description": "Service framework",
 	"main": "dist/src/index.js",
 	"types": "dist/src/index.d.ts",
