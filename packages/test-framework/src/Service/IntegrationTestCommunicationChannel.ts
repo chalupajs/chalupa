@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
-import { ICommunicationChannel } from '@chalupajs/interface'
+import { ICommunicationChannel, Injectable } from '@chalupajs/interface'
 
+@Injectable()
 export class IntegrationTestCommunicationChannel implements ICommunicationChannel {
 	broadcast(eventName: string, parameters: any[], _terms: Record<string, any>): void {
 		throw new Error(`
