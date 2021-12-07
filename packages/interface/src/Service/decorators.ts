@@ -18,7 +18,7 @@ export interface ServiceOptions {
 	 * then this can be an array of classes. Otherwise, use the function form, which gives
 	 * access to both the container being built and an instance of the configuration.
 	 */
-	inject: Constructor[] | ((context: IInjectContainer, config?: any) => void)
+	inject: Constructor[] | ((context: IInjectContainer, config?: any) => Promise<void>)
 
 	constants?: Array<[string, any]>
 

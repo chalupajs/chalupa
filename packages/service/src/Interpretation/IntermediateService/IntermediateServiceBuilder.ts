@@ -42,7 +42,7 @@ export async function buildIntermediateService<T = any>(
 
 	const moduleDependencyGraph = new DependencyGraph<Constructor>()
 
-	function moduleBindingProcessor(current: Constructor, parent: Constructor | null) {
+	async function moduleBindingProcessor(current: Constructor, parent: Constructor | null) {
 		if (moduleDependencyGraph.hasNode(current.name)) {
 			if (parent) {
 				moduleDependencyGraph.addDependency(parent.name, current.name)
@@ -62,9 +62,9 @@ export async function buildIntermediateService<T = any>(
 			current
 		) as ModuleOptions
 
-		handleInject(moduleOptions, current)
+		await handleInject(moduleOptions, current)
 
-		handleModules(moduleOptions.modules, current)
+		await handleModules(moduleOptions.modules, current)
 
 		handleConstants(moduleOptions.constants)
 
@@ -96,14 +96,15 @@ export async function buildIntermediateService<T = any>(
 	// Bind the service to the container
 	container.bindClass<T>(constructor)
 
-	const handleInject = function (optionsObject: ServiceOptions | ModuleOptions, parent: Constructor | null) {
+	const handleInject = async function (optionsObject: ServiceOptions | ModuleOptions, parent: Constructor | null) {
 		if (optionsObject.inject) {
 			if (Array.isArray(optionsObject.inject)) {
 				for (const constructor of optionsObject.inject) {
 					container.bindClass<T>(constructor)
 				}
 			} else {
-				optionsObject.inject(contextFactory(parent))
+				// eslint-disable-next-line @typescript-eslint/await-thenable
+				await optionsObject.inject(contextFactory(parent))
 			}
 		}
 	}
@@ -118,13 +119,18 @@ export async function buildIntermediateService<T = any>(
 		})
 	}
 
-	const handleModules = function (modules: Constructor[] | undefined, parent: Constructor | null) {
-		modules?.forEach(current => moduleBindingProcessor(current, parent))
+	const handleModules = async function (modules: Constructor[] | undefined, parent: Constructor | null) {
+		const processors = []
+		for (const current of modules ?? []) {
+			processors.push(moduleBindingProcessor(current, parent))
+		}
+
+		await Promise.all(processors)
 	}
 
-	handleModules(serviceOptions.modules, NO_PARENT)
+	await handleModules(serviceOptions.modules, NO_PARENT)
 
-	handleInject(serviceOptions, NO_PARENT)
+	await handleInject(serviceOptions, NO_PARENT)
 
 	handleConstants(serviceOptions.constants)
 

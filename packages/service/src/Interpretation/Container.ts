@@ -13,8 +13,7 @@ import {
 } from '@chalupajs/interface'
 
 export class Container
-	implements IContainer, IInjectContainer, IFacadeContainer, IPluginContainer, IDynamicValueContext
-{
+	implements IContainer, IInjectContainer, IFacadeContainer, IPluginContainer, IDynamicValueContext {
 	private readonly _plugins: IPlugin[]
 	private readonly _container: InversifyContainer
 	private readonly _moduleBindingProcessor: Function
@@ -203,13 +202,13 @@ export class Container
 		return this
 	}
 
-	bindModule<T>(moduleConstructor: Constructor<T>): IInjectContainer {
+	async bindModule<T>(moduleConstructor: Constructor<T>): Promise<IInjectContainer> {
 		const processedModuleConstructor: Constructor<T> = this._plugins.reduce(
 			(previousConstructor: Constructor<T>, plugin: IPlugin) => plugin.onBindModule(previousConstructor),
 			moduleConstructor
 		)
 
-		this._moduleBindingProcessor(processedModuleConstructor, this._parent)
+		await this._moduleBindingProcessor(processedModuleConstructor, this._parent)
 
 		return this
 	}
