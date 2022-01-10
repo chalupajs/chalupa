@@ -1,5 +1,4 @@
 import { Constructor, IBuilderStrategy, ILogProvider, IPlugin } from '@chalupajs/interface'
-import { ExternalServicePlugin } from '../Plugins/Internal/ExternalServicePlugin'
 import { ErrorHandlingPlugin } from '../Plugins/Internal/ErrorHandlingPlugin'
 import { ConsoleLoggerProvider } from '../Log/Console/ConsoleLoggerProvider'
 import { buildIntermediateService } from './IntermediateService/IntermediateServiceBuilder'
@@ -55,7 +54,7 @@ export class ChalupaBuilder implements IChalupaBuilder {
 	private _logProvider: Constructor<ILogProvider>
 
 	constructor(_logProvider: Constructor<ILogProvider>) {
-		this.plugins = [new ExternalServicePlugin(), new ErrorHandlingPlugin()]
+		this.plugins = [new ErrorHandlingPlugin()]
 		this._logProvider = _logProvider
 	}
 

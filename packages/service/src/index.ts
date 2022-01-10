@@ -3,8 +3,10 @@ import 'reflect-metadata'
 // ----------- Main -----------//
 export { Chalupa, IChalupaBuilder } from './Interpretation/Chalupa'
 
-// ----------- BuilderStrategies -----------//
+// ----------- InMemoryStrategy -----------//
 export { InMemoryStrategy } from './Communication/InMemory/InMemoryStrategy'
+export { ConstructedService } from './Communication/InMemory/ConstructedService'
+export { InMemoryCommunicationChannel } from './Communication/InMemory/InMemoryCommunicationChannel'
 
 // ----------- Logging -----------//
 export { ConsoleLoggerProvider } from './Log/Console/ConsoleLoggerProvider'
@@ -14,3 +16,4 @@ export { IConsoleLog, ConsoleLog } from './Log/Console/ConsoleLog'
 // ----------- Plugin -----------//
 export { ConfigSources } from './Plugins/ConfigSources'
 export { EnvPrefix } from './Plugins/EnvPrefix'
+export { ExternalServicePlugin } from './Plugins/Internal/ExternalServicePlugin'
