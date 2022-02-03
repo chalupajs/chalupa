@@ -38,6 +38,7 @@ export { IPluginContainer } from './Container/IPluginContainer'
 export { IDynamicValueContext, DynamicValueProvider } from './Container/IDynamicValueContext'
 // ----------- External service -----------//
 export {
+	IExternalService,
 	ExternalServiceTemplate,
 	serviceMethodPlaceholder,
 	ExternalServiceCall,

@@ -3,11 +3,17 @@ import { ContainerConstant } from '../constants'
 import { Metadata } from '../metadata/Metadata'
 import { ICommunicationChannel } from './ICommunicationChannel'
 
+export interface IExternalService {
+	request<T>(serviceMethodName: string, parameters: any[], terms: Record<string, any>): Promise<T>
+	emit(eventName: any, props: any[], terms: Record<string, any>): void
+	services(): Promise<string[]>
+}
+
 /**
  * Abstract base for classes representing external services.
  */
 @Injectable()
-export class ExternalServiceTemplate {
+export class ExternalServiceTemplate implements IExternalService {
 	private readonly serviceName!: string
 
 	private communicationChannel: ICommunicationChannel

@@ -11,6 +11,9 @@ import { IntegrationTestBuilderStrategyFactory } from './IntegrationTestBuilderS
 export class IntegrationTestBuilderStrategy implements IBuilderStrategy<IntegrationTestArrangement> {
 	build(intermediateService: IIntermediateService): Promise<IntegrationTestArrangement> {
 		const integrationTestBuilder = new IntegrationTestBuilderStrategyFactory(IntegrationTestCommunicationFacade)
-		return integrationTestBuilder.build(intermediateService)
+
+		const strategy = new (integrationTestBuilder.create())
+
+		return strategy.build(intermediateService)
 	}
 }
