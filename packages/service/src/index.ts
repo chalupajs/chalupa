@@ -7,6 +7,7 @@ export { Chalupa, IChalupaBuilder } from './Interpretation/Chalupa'
 export { InMemoryStrategy } from './Communication/InMemory/InMemoryStrategy'
 export { ConstructedService } from './Communication/InMemory/ConstructedService'
 export { InMemoryCommunicationChannel } from './Communication/InMemory/InMemoryCommunicationChannel'
+export { InMemoryFacade } from './Communication/InMemory/InMemoryFacade'
 
 // ----------- Logging -----------//
 export { ConsoleLoggerProvider } from './Log/Console/ConsoleLoggerProvider'

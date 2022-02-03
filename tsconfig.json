@@ -11,7 +11,8 @@
 			"@chalupajs/db-mongo": ["database/mongo/src"],
 			"@chalupajs/examples": ["examples/src"],
 			"@chalupajs/communication-darcon": ["communication/darcon/src"],
-		    "@chalupajs/test-framework": ["test-framework/src"]
+		    "@chalupajs/test-framework": ["test-framework/src"],
+		    "@chalupajs/chalupacept": ["chalupacept/src"]
 		}
 	}
 }
