@@ -18,3 +18,5 @@ export { IConsoleLog, ConsoleLog } from './Log/Console/ConsoleLog'
 export { ConfigSources } from './Plugins/ConfigSources'
 export { EnvPrefix } from './Plugins/EnvPrefix'
 export { ExternalServicePlugin } from './Plugins/Internal/ExternalServicePlugin'
+
+export * from './Plugins/Internal/MethodAspectPlugin'
