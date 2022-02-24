@@ -1,6 +1,6 @@
 {
 	"name": "@chalupajs/logger-pino",
-	"version": "1.4.0",
+	"version": "1.5.0",
 	"description": "Service framework",
 	"main": "dist/src/index.js",
 	"types": "dist/src/index.d.ts",
@@ -29,15 +29,14 @@
 		"@dwmt/eslint-config": "1.0.0",
 		"eslint": "7.32.0",
 		"prettier": "2.4.1",
-		"@types/pino": "6.3.11",
 		"rimraf": "3.0.2",
 		"typedoc": "0.21.0",
 		"typescript": "4.3.3"
 	},
 	"dependencies": {
 		"@chalupajs/interface": "workspace:*",
-		"pino": "6.13.3",
-		"pino-pretty": "7.0.1",
+		"pino": "7.8.0",
+		"pino-pretty": "7.5.1",
 		"reflect-metadata": "0.1.13"
 	}
 }
