@@ -1,6 +1,6 @@
 {
 	"name": "@chalupajs/chalupacept",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"description": "Integration testing framework for Chalupa",
 	"bin": {
 		"chalupacept": "./dist/src/cli.js"
