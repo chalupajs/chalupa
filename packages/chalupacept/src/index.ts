@@ -13,6 +13,8 @@ export { ITestableServiceConfig, IServiceConfig } from './config/ITestableServic
 export { IIntegrationTestingConfig } from './config/IIntegrationTestingConfig'
 export { ISharedServiceConfig } from './config/ISharedServiceConfig'
 
+export { communicationService } from './test-runner/CommunicationService'
+
 export { defineConfig } from './config/defineConfig'
 export { defineShared } from './config/defineShared'
 export { defineTestable } from './config/defineTestable'
