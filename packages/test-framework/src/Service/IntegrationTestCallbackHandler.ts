@@ -1,7 +1,7 @@
-import {ServiceAppearedCallback, ServiceDisappearedCallback} from "@chalupajs/interface";
+import { ServiceAppearedCallback, ServiceDisappearedCallback } from '@chalupajs/interface'
 
 export interface IntegrationTestCallbackHandler {
-	onServiceAppeared?: ServiceAppearedCallback,
+	onServiceAppeared?: ServiceAppearedCallback
 	onServiceDisappeared?: ServiceDisappearedCallback
 }
 

@@ -1,7 +1,7 @@
-import {AbstractPlugin, Constructor} from "@chalupajs/interface";
+import { AbstractPlugin, Constructor } from '@chalupajs/interface'
 
 export interface ClassLevelOverrides<T = any> {
-	config: Constructor<T>,
+	config: Constructor<T>
 	overrides: Partial<Record<keyof T, unknown>>
 }
 
@@ -50,7 +50,7 @@ export class OverrideConfig extends AbstractPlugin {
 					}
 
 					return overridesForClass.overrides[propertyKey]
-				}
+				},
 			})
 		}
 

@@ -23,10 +23,13 @@ export class IntegrationTestCommunicationFacade extends AbstractCommunicationFac
 	}
 
 	async init() {
-		this._facadeContainer.bindInterface<ICommunicationChannel>(
-			ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE,
-			IntegrationTestCommunicationChannel
-		)
+		if (!this._facadeContainer.isBound(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE)) {
+			this._facadeContainer.bindInterface<ICommunicationChannel>(
+				ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE,
+				IntegrationTestCommunicationChannel
+			)
+		}
+
 		return Promise.resolve()
 	}
 

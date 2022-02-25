@@ -1,15 +1,15 @@
-import { Errors } from './Errors';
 import { Command } from 'commander'
-import { runCommand } from './commands/run'
 import PrettyError from 'pretty-error'
 
 import chalk from 'chalk' // Don't update to 5.0.0! https://github.com/chalk/chalk/issues/527
+import { runCommand } from './commands/run'
+import { Errors } from './Errors'
 
 const pe = new PrettyError()
 
-function errorWrite(str: string) {
+function errorWrite(string_: string) {
 	const preText = chalk.bgRed.bold('Error:')
-	return `${preText} ${str}`
+	return `${preText} ${string_}`
 }
 
 function logCLIError(error: any) {
@@ -24,10 +24,10 @@ async function start() {
 	program.addCommand(runCommand)
 
 	try {
-		// program.parse(process.argv)
+		// Program.parse(process.argv)
 		await program.parseAsync(process.argv)
 	} catch (error: any) {
-		if(error instanceof Errors.CLIError) {
+		if (error instanceof Errors.CLIError) {
 			logCLIError(error)
 		} else {
 			console.log(pe.render(error))

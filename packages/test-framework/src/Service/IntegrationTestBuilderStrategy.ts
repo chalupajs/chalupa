@@ -12,7 +12,7 @@ export class IntegrationTestBuilderStrategy implements IBuilderStrategy<Integrat
 	build(intermediateService: IIntermediateService): Promise<IntegrationTestArrangement> {
 		const integrationTestBuilder = new IntegrationTestBuilderStrategyFactory(IntegrationTestCommunicationFacade)
 
-		const strategy = new (integrationTestBuilder.create())
+		const strategy = new (integrationTestBuilder.create())()
 
 		return strategy.build(intermediateService)
 	}

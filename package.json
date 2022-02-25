@@ -7,7 +7,8 @@
 		"compile": "pnpm run compile --recursive",
 		"clean": "pnpm run clean --recursive",
 		"test": "jest --coverage",
-		"lint": "pnpm recursive run lint --no-bail"
+		"lint": "pnpm recursive run lint --no-bail",
+	  	"lint:fix": "pnpm recursive run lint:fix --no-bail"
 	},
 	"author": "Lajos Kovács <lajoskvcs@icloud.com>",
 	"license": "MIT",
