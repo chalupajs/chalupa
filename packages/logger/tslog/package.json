@@ -1,6 +1,6 @@
 {
 	"name": "@chalupajs/logger-tslog",
-	"version": "1.6.0",
+	"version": "1.70",
 	"description": "Service framework",
 	"main": "dist/src/index.js",
 	"types": "dist/src/index.d.ts",
