@@ -6,7 +6,7 @@ import {
 import { Constructor, IBuilderStrategy, ICommunicationFacade, IExternalService, Service } from '@chalupajs/interface'
 import { Chalupa } from '@chalupajs/service'
 import { ISharedServiceConfig } from '../config/ISharedServiceConfig'
-import { ManagedService } from './Chalupacept'
+import { ManagedService } from './TestRunner'
 
 class ChalupaceptService {}
 

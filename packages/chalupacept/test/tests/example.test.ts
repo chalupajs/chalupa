@@ -1,11 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { PizzaExternalService } from '../services/chalupaServices/Pizza.service'
+import { Case } from '../../src/index'
 
-Feature('@first Example test')
-
-Scenario('Pizza service should return with pong when ping is called', async ({ I }) => {
-	// @ts-ignore
-	const pizzaService = await I.getExternalService(PizzaExternalService)
-	console.log(await pizzaService.ping().send())
+Case('ExampleCase', ({ describe, it, I }) => {
+	describe('Example Test', () => {
+		it('should asd', () => {
+			I.say('asd')
+			I.expect(false).to.be.true
+		})
+	})
 })

@@ -1,10 +1,13 @@
-import { IBuilderStrategy, Constructor } from '@chalupajs/interface'
+// eslint-disable-next-line import/no-unassigned-import
 import 'reflect-metadata'
 
 import path from 'path'
 import fs from 'fs'
+import { IBuilderStrategy, Constructor } from '@chalupajs/interface'
 
-import * as Codecept from 'codeceptjs'
+import glob from 'glob'
+
+import Mocha from 'mocha'
 
 import { Chalupa } from '@chalupajs/service'
 import {
@@ -18,33 +21,35 @@ import { ISharedServiceConfig } from '../config/ISharedServiceConfig'
 import { IIntegrationTestingConfig } from '../config/IIntegrationTestingConfig'
 import { communicationService } from './CommunicationService'
 
+import ExternalServiceHelper from './ExternalServiceHelper'
+
 interface ImportedTestableService {
 	default: ITestableServiceConfig
 }
 
-function mapPageObjects(pageObjects: Array<[string, string]>): Record<string, string> {
-	return pageObjects
-		.map(([pageObjectName, pageObjectPath]) => ({ [pageObjectName]: pageObjectPath }))
-		.reduce(
-			(previousValue: Record<string, string>, currentValue: Record<string, string>) => ({
-				...previousValue,
-				...currentValue,
-			}),
-			{}
-		)
-}
-
-function mapHelpers(helpers: Array<[string, string]>): Record<string, Record<string, string>> {
-	return helpers
-		.map(([helperName, helperPath]) => ({ [helperName]: { require: helperPath } }))
-		.reduce(
-			(previousValue: Record<string, any>, currentValue: Record<string, any>) => ({
-				...previousValue,
-				...currentValue,
-			}),
-			{}
-		)
-}
+// function mapPageObjects(pageObjects: Array<[string, string]>): Record<string, string> {
+// 	return pageObjects
+// 		.map(([pageObjectName, pageObjectPath]) => ({ [pageObjectName]: pageObjectPath }))
+// 		.reduce(
+// 			(previousValue: Record<string, string>, currentValue: Record<string, string>) => ({
+// 				...previousValue,
+// 				...currentValue,
+// 			}),
+// 			{}
+// 		)
+// }
+//
+// function mapHelpers(helpers: Array<[string, string]>): Record<string, Record<string, string>> {
+// 	return helpers
+// 		.map(([helperName, helperPath]) => ({ [helperName]: { require: helperPath } }))
+// 		.reduce(
+// 			(previousValue: Record<string, any>, currentValue: Record<string, any>) => ({
+// 				...previousValue,
+// 				...currentValue,
+// 			}),
+// 			{}
+// 		)
+// }
 
 export interface ManagedService {
 	start(): Promise<void>
@@ -69,7 +74,7 @@ class ServiceLaunchWrapper implements ManagedService {
 	}
 }
 
-export class Chalupacept {
+export class TestRunner {
 	config: IIntegrationTestingConfig
 	cwd: string
 
@@ -81,40 +86,40 @@ export class Chalupacept {
 	async getChalupaFiles(
 		dir: string,
 		filterFunction: (f: string) => boolean,
-		tupleMaker: (imported: any, filePath: string) => [string, string]
-	): Promise<Array<[string, string]>> {
-		const classFiles: Array<[string, string]> = []
+		tupleMaker: (imported: Function) => [string, Function]
+	): Promise<Array<[string, Function]>> {
+		const classFiles: Array<[string, Function]> = []
 		const directory = path.resolve(dir)
 		if (fs.existsSync(directory)) {
 			const filesInDirectory = fs.readdirSync(directory)
-			const filteredFiles = filesInDirectory.filter(filterFunction)
+			const filteredFiles = filesInDirectory.filter(element => filterFunction(element))
 			for (const file of filteredFiles) {
 				const filePath = path.resolve(directory, file)
-				const importedClass: Record<string, Function> = await import(filePath)
-				classFiles.push(tupleMaker(importedClass.default, filePath))
+				// eslint-disable-next-line no-await-in-loop
+				const importedClass: Record<string, Function> = (await import(filePath)) as Record<string, Function>
+				classFiles.push(tupleMaker(importedClass.default))
 			}
 		}
 
 		return classFiles
 	}
 
-	async getHelpers(): Promise<Array<[string, string]>> {
+	async getHelpers(): Promise<Array<[string, Function]>> {
 		const helpers = await this.getChalupaFiles(
 			this.config?.helpersFolder ?? path.join(this.cwd, 'helpers'),
 			f => f.endsWith('.helper.ts'),
-			(imported: any, filePath: string) => [imported.name, filePath]
+			(imported: Function) => [imported.name, imported]
 		)
-
-		helpers.push(['ExternalServiceHelper', path.resolve(__dirname, 'ExternalServiceHelper.ts')])
+		helpers.push(['ExternalServiceHelper', ExternalServiceHelper])
 
 		return helpers
 	}
 
-	async getPageObjects(): Promise<Array<[string, string]>> {
+	async getPageObjects(): Promise<Array<[string, Function]>> {
 		return this.getChalupaFiles(
 			this.config?.pagesFolder ?? path.join(this.cwd, 'pages'),
 			f => f.endsWith('.page.ts'),
-			(imported: any, filePath: string) => [imported.constructor.name, filePath]
+			(imported: Function) => [imported.name, imported]
 		)
 	}
 
@@ -140,6 +145,7 @@ export class Chalupacept {
 				.readdirSync(servicesFolderPath)
 				.filter(f => f !== 'shared.testable.ts' && f.endsWith('.testable.ts'))
 			for (const testableServiceFile of testableServiceFiles) {
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,no-await-in-loop
 				const testableService: ImportedTestableService = await import(
 					path.join(servicesFolderPath, testableServiceFile)
 				)
@@ -179,11 +185,11 @@ export class Chalupacept {
 	async run() {
 		communicationService.setFacade(this.config.communication)
 
-		const helpers = await this.getHelpers()
-		const pageObjects = await this.getPageObjects()
+		// const helpers = await this.getHelpers()
+		// const pageObjects = await this.getPageObjects()
 
 		const testsFolderPath = path.resolve(this.cwd, this.config?.testsFolder ?? 'tests')
-		const outputFolderPath = path.resolve(this.cwd, this.config?.outputFolder ?? 'output')
+		// const outputFolderPath = path.resolve(this.cwd, this.config?.outputFolder ?? 'output')
 
 		// @ts-ignore
 		const sharedConfig = await this.getSharedConfig()
@@ -194,33 +200,31 @@ export class Chalupacept {
 
 		const services = await this.configureServicesFromTestables(testables, sharedConfig)
 
-		const codeceptJSConfig: Record<string, any> = {
-			tests: path.join(testsFolderPath, '**', '*.test.ts'),
-			output: outputFolderPath,
-			include: mapPageObjects(pageObjects),
-			helpers: mapHelpers(helpers),
-			async bootstrap() {
-				await Promise.all([communicationService.start()].concat(services.map(s => s.start())))
-			},
-			async teardown() {
-				await Promise.all([communicationService.stop()].concat(services.map(s => s.stop())))
-			},
-		}
+		// @ts-ignore
+		// const codeceptJSConfig: Record<string, any> = {
+		// 	include: mapPageObjects(pageObjects),
+		// 	helpers: mapHelpers(helpers)
+		// }
 
-		const config = Codecept.config.create(codeceptJSConfig)
-		const options = {}
-		const codecept = new Codecept.Codecept(config, options)
+		glob(path.join(testsFolderPath, '**', '*.test.ts'), {}, (_error, files) => {
+			const mocha = new Mocha({})
+			mocha.globalSetup(async () => {
+				await Promise.all([communicationService.start(), ...services.map(s => s.start())])
+			})
+			mocha.globalTeardown(async () => {
+				await Promise.all([communicationService.stop(), ...services.map(s => s.stop())])
+			})
+			mocha.enableGlobalSetup(true)
+			mocha.enableGlobalTeardown(true)
+			for (const file of files) {
+				mocha.addFile(file)
+			}
 
-		try {
-			// @ts-ignore
-			codecept.init(path.join(__dirname, '..'))
-			await codecept.bootstrap()
-			codecept.loadTests()
-			await codecept.run()
-		} catch (error) {
-			console.log(error)
-		} finally {
-			await codecept.teardown()
-		}
+			try {
+				mocha.run()
+			} catch (error) {
+				console.log(error)
+			}
+		})
 	}
 }

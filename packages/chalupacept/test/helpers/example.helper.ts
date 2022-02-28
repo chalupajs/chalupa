@@ -1,18 +1,16 @@
-import Helper from '@codeceptjs/helper'
+import { Helper } from '../../src/index'
 
-class ExampleHelper extends Helper {
-	// before/after hooks
+export default class ExampleHelper extends Helper {
+	// Before/after hooks
 	_before() {
-		// remove if not used
+		// Remove if not used
 	}
 
 	_after() {
-		// remove if not used
+		// Remove if not used
 	}
 
 	ping(): string {
 		return 'pong'
 	}
 }
-
-export = ExampleHelper

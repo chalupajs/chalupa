@@ -1,11 +1,9 @@
 // eslint-disable-next-line import/no-unassigned-import
 import 'reflect-metadata'
 
-import externalServiceHelper from './test-runner/ExternalServiceHelper'
+export { IExternalServiceHelper } from './test-runner/ExternalServiceHelper'
 
-export const ExternalServiceHelper = externalServiceHelper
-
-export { Chalupacept } from './test-runner/Chalupacept'
+export { TestRunner } from './test-runner/TestRunner'
 export * from './constants'
 export { Errors as ChalupaceptErrors } from './Errors'
 export { ensureConfiguration, readConfig } from './test-runner/configuration'
@@ -13,7 +11,13 @@ export { ITestableServiceConfig, IServiceConfig } from './config/ITestableServic
 export { IIntegrationTestingConfig } from './config/IIntegrationTestingConfig'
 export { ISharedServiceConfig } from './config/ISharedServiceConfig'
 
+export { Case } from './test-runner/Case'
+
+export { Helper } from './test-runner/Helper'
+
 export { communicationService } from './test-runner/CommunicationService'
+
+export { Chalupacept } from './test-runner/interface'
 
 export { defineConfig } from './config/defineConfig'
 export { defineShared } from './config/defineShared'

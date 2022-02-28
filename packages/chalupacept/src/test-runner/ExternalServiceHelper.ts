@@ -1,13 +1,13 @@
-// @ts-ignore
-import Helper from '@codeceptjs/helper'
-
 import { Constructor, IExternalService } from '@chalupajs/interface'
 import { communicationService } from './CommunicationService'
+import { Helper } from './Helper'
 
-class ExternalServiceHelper extends Helper {
+export interface IExternalServiceHelper {
+	getExternalService<T extends IExternalService>(serviceConstructor: Constructor<T>): Promise<T>
+}
+
+export default class ExternalServiceHelper extends Helper implements IExternalServiceHelper {
 	getExternalService<T extends IExternalService>(serviceConstructor: Constructor<T>): Promise<T> {
 		return communicationService.getExternalService<T>(serviceConstructor)
 	}
 }
-
-export = ExternalServiceHelper

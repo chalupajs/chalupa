@@ -1,7 +1,7 @@
 // eslint-disable-next-line unicorn/import-style
 import * as path from 'path'
 import { Command } from 'commander'
-import { Chalupacept, ensureConfiguration, readConfig } from '../index'
+import { TestRunner, ensureConfiguration, readConfig } from '../index'
 
 export const runCommand = new Command('run')
 runCommand.description('run a Chalupacept configuration')
@@ -13,6 +13,6 @@ async function run(_path: string) {
 	const configPath = path.resolve(dir)
 	await ensureConfiguration(configPath)
 	const chalupaceptConfiguration = await readConfig(configPath)
-	const chalupacept = new Chalupacept(dir, chalupaceptConfiguration)
-	await chalupacept.run()
+	const testRunner: TestRunner = new TestRunner(dir, chalupaceptConfiguration)
+	await testRunner.run()
 }

@@ -1,3 +1,6 @@
 module.exports = {
-	extends: '@dwmt'
+	extends: '@dwmt',
+	rules: {
+		'unicorn/no-array-reduce': false,
+	}
 }

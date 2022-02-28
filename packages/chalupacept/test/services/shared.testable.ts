@@ -1,5 +1,5 @@
-import { IntegrationTestArrangement } from './../../../test-framework/src/Service/IntegrationTestArrangement';
-import { defineShared } from "../../src/config/defineShared";
+import { IntegrationTestArrangement } from '@chalupajs/test-framework'
+import { defineShared } from '../../src/index'
 
 export default defineShared({
 	config(arrangement: IntegrationTestArrangement) {
@@ -7,5 +7,5 @@ export default defineShared({
 	},
 	plugins() {
 		return []
-	}
+	},
 })
