@@ -1,12 +1,12 @@
 /*
  * 15. Rebinding
  *
- * 
+ *
  * As seen in the previous example, multiple calls to bindInterface with the same
  * type key will not overwrite the binding for that key, but actually extend it into
  * a multibinding/multi-inject. If we want to replace or overwrite a previously added
- * binding, then we have to use the rebind family of methods. 
- * 
+ * binding, then we have to use the rebind family of methods.
+ *
  * Topic: Dependency Injection
  * Showcased features:
  *   * bindInterface.
@@ -85,7 +85,7 @@ class RebindConfig {
     //   REBIND_ENV
     //
     // environment variable to 'local', for example.
-	inject(context) {
+	async inject(context) {
 		context.bindInterface(Types.IRebindable, OrdinaryImplementation)
 
         if (context.immediate(RebindConfig).shouldReplaceImplementation()) {

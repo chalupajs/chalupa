@@ -1,6 +1,15 @@
-import { Logger, TLogLevelName } from 'tslog'
-import { ILogger, ILogProvider, LogConfig, Inject, Injectable } from '@chalupajs/interface'
+import { Logger } from 'tslog'
+import { ILogger, ILogProvider, LogConfig, Inject, Injectable, LogLevel } from '@chalupajs/interface'
 import { TSLogger } from './TSLogger'
+
+const LOG_LEVEL_MAP: Record<LogLevel, number> = {
+	'trace': 1,
+	'debug': 2,
+	'info': 3,
+	'warn': 4,
+	'error': 5,
+	'fatal': 6
+}
 
 @Injectable()
 export class TSLogProvider implements ILogProvider {
@@ -13,7 +22,7 @@ export class TSLogProvider implements ILogProvider {
 	createRootLogger(name: string): ILogger {
 		const loggerInstance = new Logger({
 			name,
-			minLevel: this.config.level as TLogLevelName,
+			minLevel: LOG_LEVEL_MAP[this.config.level],
 			type: this.config.pretty ? 'pretty' : 'json',
 		})
 

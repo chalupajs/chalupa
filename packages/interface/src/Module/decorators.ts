@@ -13,7 +13,7 @@ export interface ModuleOptions {
 	 * then this can be an array of classes. Otherwise, use the function form, which gives
 	 * access to both the container being built and an instance of the configuration (if specified).
 	 */
-	inject?: Constructor[] | ((context: IInjectContainer, config?: any) => Promise<void>)
+	inject?: Constructor[] | ((context: IInjectContainer, config?: any) => Promise<void>) | ((context: IInjectContainer, config?: any) => void)
 
 	constants?: Array<[string, any]>
 
@@ -26,16 +26,16 @@ export interface ModuleOptions {
  * @param options Additional options to setup the module.
  */
 export function Module<T = any>(options: ModuleOptions = {}) {
-	return function (constructor: Constructor) {
+	return function (constructor: Constructor<T>) {
 		guardAlreadyDecorated(constructor)
 
 		// Automatically make the decorated constructor injectable.
-		const injectableConstructor = Injectable()(constructor) as Constructor<T>
+		Injectable()(constructor) as Constructor<T>
 
-		Reflect.defineMetadata(Metadata.METADATA_MODULE_OPTIONS, options, injectableConstructor)
+		Reflect.defineMetadata(Metadata.METADATA_MODULE_OPTIONS, options, constructor)
 		Reflect.defineMetadata(Metadata.METADATA_MODULE_INJECTED, true, constructor)
 
-		return injectableConstructor
+		return constructor
 	}
 }
 

@@ -1,8 +1,11 @@
 import * as konvenient from 'konvenient'
-import { METADATA_KEY as InversifyMetadata } from 'inversify'
+
 import { Constructor } from './types'
 import { Injectable } from './Container/decorators'
 import { Metadata } from './metadata/Metadata'
+
+const LEGACY_PARAM_TYPES_METADATA_KEY = 'inversify:paramtypes'
+const CLASS_IS_INJECTABLE_FLAG_REFLECT_KEY = '@inversifyjs/core/classIsInjectableFlagReflectKey'
 
 export const isConfiguration = function (constructor: Constructor): boolean {
 	return Reflect.hasMetadata(konvenient.KONVENIENT_CONFIGURATION_CLASS, constructor)
@@ -26,6 +29,11 @@ export const reconfigureToEnvPrefix = function <T> (envPrefix: string | undefine
 
 // eslint-disable-next-line prettier/prettier
 export const ensureInjectable = function <T> (constructor: Constructor<T>) {
-	const isConstructorDecorated = Reflect.hasOwnMetadata(InversifyMetadata.PARAM_TYPES, constructor)
-	return (isConstructorDecorated ? constructor : Injectable()(constructor)) as Constructor<T>
+	const isConstructorDecorated =
+		Reflect.hasOwnMetadata(CLASS_IS_INJECTABLE_FLAG_REFLECT_KEY, constructor) ||
+		Reflect.hasOwnMetadata(LEGACY_PARAM_TYPES_METADATA_KEY, constructor)
+	if (!isConstructorDecorated) {
+		Injectable()(constructor)
+	}
+	return constructor
 }

@@ -1370,12 +1370,12 @@ Whoa, now, that's a lot, so let's break it down!
 Our dependency on the `Cache` service is now completely apparent. However, the `getItem` call still feels a bit unsafe.
 
 ~~~~TypeScript
-import { ExternalServiceMethod, IExternalServiceCall, serviceMethodPlaceholder } from '@chalupajs/interface'
+import { ExternalServiceMethod, IExternalServiceCall } from '@chalupajs/interface'
 
 @ExternalService()
 class Cache extends ExternalServiceTemplate {
 	@ExternalServiceMethod()
-	getItem: (key: string) => IExternalServiceCall<any> = serviceMethodPlaceholder
+	declare getItem: (key: string) => IExternalServiceCall<any>
 }
 ~~~~
 
@@ -1415,15 +1415,15 @@ a command object, making it possible to customize how the request is made, and t
 fired.
 
 Of course, we can also declare events in a fashion similar to requests. Just use the `@ExternalServiceEvent` decorator
-and its friends, `IExternalServiceEmit` and `serviceEventPlaceholder`.
+and `IExternalServiceEmit`.
 
 ~~~~TypeScript
-import { ExternalServiceEvent, IExternalServiceEmit, serviceEventPlaceholder } from '@chalupajs/interface'
+import { ExternalServiceEvent, IExternalServiceEmit } from '@chalupajs/interface'
 
 @ExternalService()
 class PizzaAggregator extends ExternalServiceTemplate {
 	@ExternalServiceEvent()
-	pizzaServed: (flavor: string, customer: string) => IExternalServiceEmit = serviceEventPlaceholder
+	declare pizzaServed: (flavor: string, customer: string) => IExternalServiceEmit
 }
 ~~~~
 

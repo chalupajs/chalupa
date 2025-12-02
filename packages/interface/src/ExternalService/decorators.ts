@@ -2,10 +2,11 @@ import { Constructor } from '../types'
 import { Errors } from '../error'
 import { Injectable } from '../Container/decorators'
 import { Metadata } from '../metadata/Metadata'
-import { ExternalServiceCall, ExternalServiceEmit } from './ExternalServiceTemplate'
+import { ExternalServiceCall, ExternalServiceEmit, ExternalServiceTemplate } from './ExternalServiceTemplate'
+import { injectFromBase } from 'inversify'
 
-const externalServiceMethodMetadataKey = 'Catamaran_Metadata_ExternalServiceMethod'
-const externalServiceEventMetadataKey = 'Catamaran_Metadata_ExternalServiceEvent'
+export const externalServiceMethodMetadataKey = 'Catamaran_Metadata_ExternalServiceMethod'
+export const externalServiceEventMetadataKey = 'Catamaran_Metadata_ExternalServiceEvent'
 
 /**
  * Options for the `ExternalService` decorator.
@@ -23,19 +24,25 @@ export interface ExternalServiceOptions {
  * @param options Additional settings, specifying how to wrap the class.
  */
 export function ExternalService<T = any>(options: Partial<ExternalServiceOptions> = {}) {
-	return function (constructor: Constructor) {
+	return function (constructor: Constructor<T>) {
 		guardAlreadyDecorated(constructor)
-
-		// Automatically make the decorated constructor injectable.
-		const injectableConstructor = Injectable()(constructor) as Constructor<T>
 
 		options.name = options.name ?? constructor.name
 
-		storeMetadata(options, injectableConstructor, constructor)
+		storeMetadata(options, constructor)
 
-		retargetExternalCommunication(injectableConstructor, options.name)
+		retargetExternalCommunication(constructor, options.name)
+		console.log('prototype rewritten')
+		console.log(constructor.prototype)
 
-		return injectableConstructor
+		// Automatically make the decorated constructor injectable.
+		Injectable()(constructor)
+		injectFromBase({
+		  extendConstructorArguments: true,
+				extendProperties: true
+		})(constructor)
+
+		return constructor
 	}
 }
 
@@ -56,7 +63,29 @@ export interface ExternalServiceMethodOptions {
  * @param options Additional settings for the implementation.
  */
 export function ExternalServiceMethod(options: Partial<ExternalServiceMethodOptions> = {}) {
-	return Reflect.metadata(externalServiceMethodMetadataKey, options)
+	return function (target: any, propertyKey: string) {
+		Object.defineProperty(target, propertyKey, {
+	      get() {
+	        const self = this as ExternalServiceTemplate;
+	        const methodName = options.name ?? propertyKey;
+	        return (...parameters: any[]) =>
+	          new ExternalServiceCall(
+	          	// @ts-ignore
+	          	self.communicationChannel,
+	          	// @ts-ignore
+	          	self.serviceName,
+	            methodName,
+	            parameters,
+	          );
+	      },
+	      set() {
+	        // Cannot set.
+	      },
+	      configurable: true,
+	    });
+		Reflect.defineMetadata(externalServiceMethodMetadataKey, options, target, propertyKey)
+	}
+
 }
 
 /**
@@ -76,7 +105,31 @@ export interface ExternalServiceEventOptions {
  * @param options Additional settings for the implementation.
  */
 export function ExternalServiceEvent(options: Partial<ExternalServiceEventOptions> = {}) {
-	return Reflect.metadata(externalServiceEventMetadataKey, options)
+	return function (target: any, propertyKey: string) {
+		Object.defineProperty(target, propertyKey, {
+			get() {
+				const self = this as ExternalServiceTemplate;
+    			const methodName = options.name ?? propertyKey;
+				return function (...parameters: any[]) {
+					return new ExternalServiceEmit<any>(
+						// Objects annotated with @ExternalService will always
+						// have communicationChannel injected into them, thus this is safe.
+						// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+						// @ts-ignore
+						self.communicationChannel,
+						// @ts-ignore
+						self.serviceName,
+						methodName,
+						parameters
+					)
+				}
+			},
+			set() {
+				// Cannot set.
+			},
+		})
+		Reflect.defineMetadata(externalServiceEventMetadataKey, options, target, propertyKey)
+	}
 }
 
 function guardAlreadyDecorated(constructor: Constructor) {
@@ -87,16 +140,15 @@ function guardAlreadyDecorated(constructor: Constructor) {
 
 function storeMetadata(
 	options: Partial<ExternalServiceOptions>,
-	injectableConstructor: Constructor,
 	constructor: Constructor
 ) {
 	// Mark the constructor as already decorated.
 	Reflect.defineMetadata(Metadata.METADATA_EXTERNAL_SERVICE_INJECTED, true, constructor)
-	Reflect.defineMetadata(Metadata.METADATA_EXTERNAL_SERVICE_OPTIONS, options, injectableConstructor)
-	;(injectableConstructor.prototype as Record<string, unknown>).serviceName = options.name
+	Reflect.defineMetadata(Metadata.METADATA_EXTERNAL_SERVICE_OPTIONS, options, constructor)
+	;(constructor.prototype as Record<string, unknown>).serviceName = options.name
 }
 
-function retargetExternalCommunication(constructor: Constructor, serviceName: string) {
+function retargetExternalCommunication(constructor: Constructor, _serviceName: string) {
 	// We need to create an instance to retrieve the method
 	// decorators.
 	const exampleInstance = new constructor({}) as Record<string, unknown>
@@ -107,24 +159,31 @@ function retargetExternalCommunication(constructor: Constructor, serviceName: st
 	// appropriate service method (for calls) or event (for emits).
 	// The latter is determined by the name of the external service class
 	// (or its name option) and the key or the name option of the function property.
+
+	const methods: { key: string, options: ExternalServiceMethodOptions }[] = []
+	const events: { key: string, options: ExternalServiceEventOptions }[] = []
 	for (const key of Object.keys(exampleInstance)) {
 		const methodOptions = Reflect.getMetadata(externalServiceMethodMetadataKey, exampleInstance, key) as
 			| ExternalServiceMethodOptions
 			| undefined
 		if (methodOptions) {
-			retargetExternalMethod(methodOptions, key, constructor, serviceName)
+			methods.push({ key, options: methodOptions })
+			// retargetExternalMethod(methodOptions, key, constructor, serviceName)
 		}
 
 		const eventOptions = Reflect.getMetadata(externalServiceEventMetadataKey, exampleInstance, key) as
 			| ExternalServiceEventOptions
 			| undefined
 		if (eventOptions) {
-			retargetExternalEmit(eventOptions, key, constructor, serviceName)
+			events.push({ key, options: eventOptions })
+			// retargetExternalEmit(eventOptions, key, constructor, serviceName)
 		}
 	}
+	Reflect.defineMetadata(Metadata.METADATA_EXTERNAP_SERVICE_METHODS, methods, constructor)
+	Reflect.defineMetadata(Metadata.METADATA_EXTERNAP_SERVICE_EVENTS, events, constructor)
 }
 
-function retargetExternalMethod(
+export function retargetExternalMethod(
 	options: ExternalServiceMethodOptions,
 	key: string,
 	constructor: Constructor,
@@ -153,7 +212,7 @@ function retargetExternalMethod(
 	})
 }
 
-function retargetExternalEmit(
+export function retargetExternalEmit(
 	options: ExternalServiceEventOptions,
 	key: string,
 	constructor: Constructor,

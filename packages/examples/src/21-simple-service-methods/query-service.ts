@@ -6,7 +6,7 @@ import { ILogger, LoggerFactory, PostInit, Service, ExternalService, ExternalSer
 class PizzaExternalService extends ExternalServiceTemplate {}
 
 @Service({
-    inject: [PizzaExternalService]  
+    inject: [PizzaExternalService]
 })
 export class QueryService {
     private readonly logger: ILogger

@@ -91,7 +91,7 @@ export class Container
 			func
 		)
 		this._container
-			.rebind<T>(accessor)
+			.rebindSync<T>(accessor)
 			.toDynamicValue(() => processedFunc(this))
 			.onActivation((_context, value) =>
 				this._plugins.reduce(
@@ -142,7 +142,7 @@ export class Container
 			constructor
 		)
 		this._container
-			.rebind<T>(processedConstructor)
+			.rebindSync<T>(processedConstructor)
 			.toSelf()
 			.onActivation((_context, value) =>
 				this._plugins.reduce(
@@ -159,7 +159,7 @@ export class Container
 			constant
 		)
 		this._container
-			.rebind<T>(accessor)
+			.rebindSync<T>(accessor)
 			.toConstantValue(processedConstant)
 			.onActivation((_context, value) =>
 				this._plugins.reduce(
@@ -177,7 +177,7 @@ export class Container
 			constructor
 		)
 		this._container
-			.rebind<T>(accessor)
+			.rebindSync<T>(accessor)
 			.to(processedConstructor)
 			.onActivation((_context, value) =>
 				this._plugins.reduce(

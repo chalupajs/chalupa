@@ -18,7 +18,7 @@ export interface ServiceOptions {
 	 * then this can be an array of classes. Otherwise, use the function form, which gives
 	 * access to both the container being built and an instance of the configuration.
 	 */
-	inject: Constructor[] | ((context: IInjectContainer, config?: any) => Promise<void>)
+	inject: Constructor[] | ((context: IInjectContainer, config?: any) => Promise<void>) | ((context: IInjectContainer, config?: any) => void)
 
 	constants?: Array<[string, any]>
 
@@ -50,14 +50,26 @@ export function Service<T = any>(options: Partial<ServiceOptions> = {}) {
 		guardAlreadyDecorated(constructor)
 
 		// Automatically make the decorated constructor injectable.
-		const injectableConstructor = Injectable()(constructor) as Constructor<T>
+		Injectable()(constructor)
+
 		options.name = options.name ?? constructor.name
 		options.serviceDirectory = options.serviceDirectory ?? process.cwd()
 
-		Reflect.defineMetadata(Metadata.SERVICE_OPTIONS, options, injectableConstructor)
-		Reflect.defineMetadata(Metadata.SERVICE_INJECTED, true, constructor)
+		try {
+			Reflect.defineMetadata(Metadata.SERVICE_INJECTED, true, constructor)
+		} catch (error: unknown) {
+			console.log('Failed to define service injected metadata on constructor')
+			throw error
+		}
 
-		return injectableConstructor
+		try {
+			Reflect.defineMetadata(Metadata.SERVICE_OPTIONS, options, constructor)
+
+		} catch (error: unknown) {
+			console.log('Failed to define service options on injectable Constructor')
+			throw error
+		}
+		return constructor
 	}
 }
 

@@ -1,12 +1,12 @@
 /*
  * 12. Configuration-dependent Binding
  *
- * 
+ *
  * Previously, we only created bindings statically: our inject() function had linear
  * control flow in it, and no runtime decisions were made on what to bind to the different
  * type keys. In this example, we explore configuration-dependent dynamic bindings: we
  * are going to decide which implementation to use, based on a configuration property.
- * 
+ *
  * Topic: Dependency Injection
  * Showcased features:
  *   * immediate.
@@ -78,7 +78,7 @@ const Types = {
     // since we want to decide what implementation to bind, based
     // on a configuration property, we somehow have to obtain an
     // instance of FileStoreConfig.
-    // 
+    //
     // We do so with the immediate() method. This method, when called,
     // creates a class binding to the specified class (FileStoreConfig,
     // in our case) and immediately instantiates it (hence the name).
@@ -97,13 +97,13 @@ const Types = {
     //
     // Once the implementation is selected, the now well-known bindInterface
     // method is used to bind it to the Types.IFileStore key.
-	inject(context) {
+	async inject(context) {
         const fileStoreConfig = context.immediate(FileStoreConfig)
 
         const fileStoreImpl: Constructor<IFileStore> = fileStoreConfig.isLocalEnv()
             ? FsFileStore
             : S3FileStore
-    
+
         context.bindInterface(Types.IFileStore, fileStoreImpl)
 	}
 })

@@ -1,5 +1,6 @@
 import path from 'path'
-import { Catamaran, IntegrationTestBuilderStrategy, ConfigSources } from '@chalupajs/service'
+import { Chalupa, ConfigSources } from '@chalupajs/service'
+import { IntegrationTestBuilderStrategy } from '@chalupajs/test-framework'
 import { Configuration, Configurable, Inject, Service } from '@chalupajs/interface'
 
 @Configuration()
@@ -11,7 +12,7 @@ class PizzaConfig {
 }
 
 @Service({
-	config: PizzaConfig
+	inject: [PizzaConfig]
 })
 class PizzaService {
 	constructor(@Inject(PizzaConfig) config: PizzaConfig) {
@@ -20,8 +21,9 @@ class PizzaService {
 }
 
 async function start() {
-	Catamaran.use(ConfigSources.from([path.join(__dirname, 'local.yml')]))
-	const service = await Catamaran.createServiceWithStrategy(PizzaService, IntegrationTestBuilderStrategy)
+	const builder = Chalupa.builder()
+	builder.use(ConfigSources.from([path.join(__dirname, 'local.yml')]))
+	const service = await builder.createServiceWithStrategy(PizzaService, IntegrationTestBuilderStrategy)
 	const systemUnderTest = await service.start()
 
 	systemUnderTest.getServiceOrModule(PizzaService)

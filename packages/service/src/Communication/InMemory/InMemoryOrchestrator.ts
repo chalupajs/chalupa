@@ -85,7 +85,7 @@ class InMemoryOrchestrator implements IInMemoryOrchestrator {
 
 	private _messageBus: TinyEmitter
 	private _services: Map<string, IMemoryService>
-	private _keepAlive?: NodeJS.Timer
+	private _keepAlive?: NodeJS.Timeout
 
 	constructor() {
 		this._messageBus = new TinyEmitter()

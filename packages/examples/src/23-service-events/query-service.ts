@@ -1,4 +1,4 @@
-import { ILogger, LoggerFactory, PostInit, Service, ExternalService, ExternalServiceTemplate, ExternalServiceEvent, serviceEventPlaceholder, IExternalServiceEmit } from '@chalupajs/interface'
+import { ILogger, LoggerFactory, PostInit, Service, ExternalService, ExternalServiceTemplate, ExternalServiceEvent, IExternalServiceEmit } from '@chalupajs/interface'
 import { Order } from './pizza-service'
 
 @ExternalService({
@@ -6,11 +6,11 @@ import { Order } from './pizza-service'
 })
 class PizzaExternalService extends ExternalServiceTemplate {
     @ExternalServiceEvent()
-    orderReceived: (order: Order) => IExternalServiceEmit = serviceEventPlaceholder
+    declare orderReceived: (order: Order) => IExternalServiceEmit
 }
 
 @Service({
-    inject: [PizzaExternalService]  
+    inject: [PizzaExternalService]
 })
 export class QueryService {
     private readonly logger: ILogger

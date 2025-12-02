@@ -43,6 +43,7 @@ export class InMemoryFacade extends AbstractCommunicationFacade {
 			ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE,
 			InMemoryCommunicationChannel
 		)
+
 		return Promise.resolve()
 	}
 

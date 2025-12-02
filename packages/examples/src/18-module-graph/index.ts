@@ -1,7 +1,7 @@
 /*
  * 18. Module Graph
  *
- * 
+ *
  * Modules can bind/import other modules. These binding relationships for a directed acyclic graph,
  * in which the nodes correspond to modules and the edges are formed according to the bindings
  * between the modules. In this example, we will have three modules: A, B and C. Both B and C
@@ -11,20 +11,20 @@
  *      service
  *      /     \
  *     /       \
- *    B         C  
+ *    B         C
  *     \       /
  *      \     /
  *       \   /
  *        \ /
  *         A
- * 
+ *
  * Even though A is bound twice (both by B and C), it will only get imported and instantiated once,
  * as modules are singletons.
- * 
+ *
  * The module graph also plays a role in the service lifecycle. The various ServiceInit and
  * ServiceDestroy lifecycle methods of the modules are called with respect to the dependency
  * relations of the module graph.
- * 
+ *
  * Topic: Modules
  * Showcased features:
  *   * @Module and modules
@@ -37,7 +37,7 @@ import { ILogger, PreServiceInit, PreServiceDestroy, PostServiceDestroy, PostSer
 import { Chalupa, InMemoryStrategy } from '@chalupajs/service'
 
 @Module({
-    inject(context) {
+    async inject(context) {
         context.getLogger('ModuleA.inject').info('inject')
     }
 })
@@ -71,7 +71,7 @@ class ModuleA {
 
 @Module({
     modules: [ModuleA],
-    inject(context) {
+    async inject(context) {
         context.getLogger('ModuleB.inject').info('inject')
     }
 })
@@ -105,7 +105,7 @@ class ModuleB {
 
 @Module({
     modules: [ModuleA],
-    inject(context) {
+    async inject(context) {
         context.getLogger('ModuleC.inject').info('inject')
     }
 })
@@ -139,7 +139,7 @@ class ModuleC {
 
 @Service({
 	modules: [ModuleB, ModuleC],
-    inject(context) {
+    async inject(context) {
         context.getLogger('MultiModuleService.inject').info('inject')
     }
 })

@@ -5,7 +5,6 @@ import {
 	IExternalServiceCall,
 	Service,
 	ServiceMethod,
-	serviceMethodPlaceholder,
 } from "@chalupajs/interface";
 
 @ExternalService({
@@ -13,7 +12,7 @@ import {
 })
 export class PizzaExternalService extends ExternalServiceTemplate {
 	@ExternalServiceMethod()
-	ping: () => IExternalServiceCall<string> = serviceMethodPlaceholder;
+	declare ping: () => IExternalServiceCall<string>;
 }
 
 @Service({

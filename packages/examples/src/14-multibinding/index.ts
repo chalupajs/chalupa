@@ -1,13 +1,13 @@
 /*
  * 14. Multibinding
  *
- * 
+ *
  * So far, given a constant or type key, we've only bound a single value
  * or implementation to it. In this example, we introduce multibindings:
  * binding multiple implementations of the same interface to the same type
  * key. Then, we can inject all of these implementation at once, when
- * using the appropriate type key.  
- * 
+ * using the appropriate type key.
+ *
  * Topic: Dependency Injection
  * Showcased features:
  *   * @MultiInject.
@@ -41,7 +41,7 @@ class KingPadliDailyOfferingScraper implements IDailyOfferingScraper {
 
 @Injectable()
 class SaladBoxDailyOfferingScraper implements IDailyOfferingScraper {
-	scrapeOffering(): DailyOffering { 
+	scrapeOffering(): DailyOffering {
         return {
             restaurant: 'Salad Box',
             items: ['King Wrap']
@@ -57,7 +57,7 @@ const Types = {
 }
 
 @Service({
-	inject(context) {
+	async inject(context) {
 		// With two calls to bindInterface, we bind the both the KingPadli and
 		// the SaladBox implementation to the same type key, Types.IDailyOfferingScraper.
 		// Such bindings will not overwrite, but actually extend each other.
