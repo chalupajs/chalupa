@@ -27,17 +27,17 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@dwmt/eslint-config": "1.0.0",
-		"eslint": "7.32.0",
-		"prettier": "2.4.1",
-		"@types/uuid": "8.3.1",
-		"rimraf": "3.0.2",
-		"typedoc": "0.21.0",
-		"typescript": "4.3.3"
+		"@types/uuid": "11.0.0",
+		"eslint": "9.39.1",
+		"prettier": "3.7.3",
+		"rimraf": "6.1.2",
+		"typedoc": "0.28.15",
+		"typescript": "5.9.3"
 	},
 	"dependencies": {
-		"reflect-metadata": "0.1.13",
-		"uuid": "8.3.2",
 		"@chalupajs/interface": "workspace:*",
-		"darcon": "1.5.56"
+		"darcon": "2.0.11",
+		"reflect-metadata": "0.2.2",
+		"uuid": "13.0.0"
 	}
 }

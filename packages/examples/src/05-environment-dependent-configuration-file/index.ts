@@ -1,10 +1,10 @@
 /*
  * 05. Environment-dependent Configuration File
  *
- * 
+ *
  * We have two configuration files, prod.json and staging.json. Our application will
  * load the appropriate one based on the value of the NODE_ENV environment variable.
- * 
+ *
  * Topic: Configuration
  * Showcased features:
  *   * @Configuration and @Configurable.
@@ -41,7 +41,7 @@ async function start() {
     // If NODE_ENV is set, then we use its value to load the appropriate
 	// configuration file. If it's unset, though, then we default to
 	// the production configuration.
-	const configurationFilename = `${process.env['NODE_ENV'] || 'prod'}.yml`
+	const configurationFilename = `${process.env['NODE_ENV'] || 'prod'}.json`
 	const configurationFiles = [path.join(__dirname, configurationFilename)]
 
 	const service = await Chalupa

@@ -7,7 +7,7 @@ import { Constructor } from '../types'
  * @param injectable A string key or a constructor type used to determine the injected instance.
  */
 export function Inject(injectable: string | symbol | Constructor) {
-	return function (target: Record<string, unknown>, propertyKey: string, parameterIndex: number) {
+	return function (target: object, propertyKey: string | symbol | undefined, parameterIndex: number) {
 		inject(injectable)(target, propertyKey, parameterIndex)
 	}
 }
@@ -19,7 +19,8 @@ export function Inject(injectable: string | symbol | Constructor) {
  */
 export function Injectable() {
 	return function (target: Constructor): Constructor {
-		return injectable()(target) as Constructor
+		injectable()(target)
+		return target
 	}
 }
 
@@ -29,7 +30,7 @@ export function Injectable() {
  * @param injectable A string key or a constructor type used to determine the multi-injected instances.
  */
 export function MultiInject(injectable: string | symbol | Constructor) {
-	return function (target: Record<string, unknown>, propertyKey: string, parameterIndex: number) {
+	return function (target: object, propertyKey: string | symbol | undefined, parameterIndex: number) {
 		multiInject(injectable)(target, propertyKey, parameterIndex)
 	}
 }

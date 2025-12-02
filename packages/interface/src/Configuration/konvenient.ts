@@ -8,7 +8,8 @@ export const Configuration = function (
 	config?: Partial<ConfigurationOptions>
 ): <T>(constructor: new () => T) => new () => T {
 	return function (target: any) {
-		return KonvinientConfiguration(config)(Injectable()(target))
+		Injectable()(target)
+		return KonvinientConfiguration(config)(target)
 	}
 }
 

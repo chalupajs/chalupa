@@ -1,7 +1,9 @@
 import { Inject, Injectable } from '../Container/decorators'
 import { ContainerConstant } from '../constants'
 import { Metadata } from '../metadata/Metadata'
+import { Constructor } from '../types'
 import { ICommunicationChannel } from './ICommunicationChannel'
+import { type ExternalServiceOptions } from './decorators'
 
 export interface IExternalService {
 	request<T>(serviceMethodName: string, parameters: any[], terms: Record<string, any>): Promise<T>
@@ -16,12 +18,23 @@ export interface IExternalService {
 export class ExternalServiceTemplate implements IExternalService {
 	private readonly serviceName!: string
 
-	private communicationChannel: ICommunicationChannel
-
 	constructor(
-		@Inject(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE) communicationChannel: ICommunicationChannel
+		@Inject(ContainerConstant.COMMUNICATION_CHANNEL_INTERFACE) private readonly communicationChannel: ICommunicationChannel
 	) {
 		this.communicationChannel = communicationChannel
+
+		const derivedConstructor = this.constructor as Constructor
+		const externalServiceOptions = Reflect.getMetadata(
+			Metadata.METADATA_EXTERNAL_SERVICE_OPTIONS,
+			derivedConstructor
+		) as ExternalServiceOptions | undefined
+
+		if (externalServiceOptions?.name) {
+			this.serviceName = externalServiceOptions.name
+		} else {
+			this.serviceName = derivedConstructor.name
+		}
+
 	}
 
 	/**

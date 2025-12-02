@@ -1,12 +1,12 @@
 /*
  * 09. Class Binding
  *
- * 
+ *
  * Previously, we only injected configuration classes and LoggerFactories. In what follows
  * we create multiple classes and decorate them with @Injectable decorator to make
  * the dependency injectable. Then, we tell Chalupa to manage them in the context using
- * the context.bindClass() method. 
- * 
+ * the context.bindClass() method.
+ *
  * Topic: Dependency Injection
  * Showcased features:
  *   * @Injectable.
@@ -36,7 +36,7 @@ class DeliveryGuy {}
 class PizzaHouse {
     // Injecting a concrete class is dead simple: just use an ordinary
     // TypeScript constructor parameter and Chalupa will sort out the rest.
-    constructor(loggerFactory: LoggerFactory, oven: PizzaOven, deliveryGuy: DeliveryGuy) {        
+    constructor(loggerFactory: LoggerFactory, oven: PizzaOven, deliveryGuy: DeliveryGuy) {
         const logger = loggerFactory.getLogger(PizzaHouse)
 
         logger.info(`Oven: ${oven}`)
@@ -57,7 +57,7 @@ class PizzaHouse {
     // The below inject function is equivalent to the following shorthand notation:
     //
     //   @Service({
-    //     inject: [PizzaHouse, DeliveryGuy, PizzaOven]   
+    //     inject: [PizzaHouse, DeliveryGuy, PizzaOven]
     //   })
     //
     // If you're only using the bindClass() method, then the array form is a much shorter
@@ -65,8 +65,8 @@ class PizzaHouse {
     // simultaneously.
     //
     // Keep in mind, that generally no instantiation happens in the inject function. It's just
-    // a description of the classes Chalupa needs to manage. 
-    inject(context) {
+    // a description of the classes Chalupa needs to manage.
+    async inject(context) {
         context
             .bindClass(PizzaHouse)
             .bindClass(DeliveryGuy)

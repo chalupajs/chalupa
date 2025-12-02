@@ -43,7 +43,7 @@ function getConnection(): IConnection {
 	// then the supplied provider function is executed to retrieve the bound value.
 	// The provider function has a single optional parameter, the dynamic context,
 	// making it possible to manipulate container bindings (for example, getting instances).
-	inject(context) {
+	async inject(context) {
 		context
 			.bindDynamicValue(Types.IConnection, () => getConnection())
 	}

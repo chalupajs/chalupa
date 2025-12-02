@@ -1,11 +1,11 @@
 /*
  * 10. Interface Binding
  *
- * 
+ *
  * In most cases, we want to depend on interfaces and not concrete implementations.
  * Chalupa supports this principle by allowing you to bind implementations in the context
  * and then inject them based on the interface they implement.
- * 
+ *
  * Topic: Dependency Injection
  * Showcased features:
  *   * @Injectable, @Inject.
@@ -41,8 +41,8 @@ const Types = {
     // (identifying the interface) and the actual class that we're binding to
     // this key.
     // In this case, you can only use the function form of inject, the array shorthand
-    // is not available. 
-    inject(context) {
+    // is not available.
+    async inject(context) {
         context.bindInterface(Types.IPizzaRepository, MongoPizzaRepository)
     }
 })
@@ -53,7 +53,7 @@ class PizzaService {
     // As you can see, we have to use the @Inject decorator, parameterized with the
     // same type key we supplied to the bindInterface() call. That's how me make the
     // connection between the binding and this parameter (the dependency site). Then,
-    // we can freely use the interface as the type of the parameter. 
+    // we can freely use the interface as the type of the parameter.
 	constructor(loggerFactory: LoggerFactory, @Inject(Types.IPizzaRepository) pizzas: IPizzaRepository) {
 		const logger = loggerFactory.getLogger(PizzaService)
 

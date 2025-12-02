@@ -18,7 +18,8 @@
 		"lint": "echo TODO",
 		"lint:fix": "echo TODO",
 		"test": "echo TODO",
-		"prepublishOnly": "npm run clean && npm run compile"
+		"prepublishOnly": "npm run clean && npm run compile",
+		"try": "node ./src/try.mjs"
 	},
 	"repository": {
 		"type": "git",
@@ -26,12 +27,15 @@
 	},
 	"license": "MIT",
 	"devDependencies": {
-		"@types/node": "16.10.5",
-		"rimraf": "3.0.2",
-		"ts-node": "10.2.1",
-		"typedoc": "0.21.0",
-		"typescript": "4.3.3",
-		"why-is-node-running": "^2.2.0"
+		"@babel/plugin-transform-class-properties": "^7.27.1",
+		"@inquirer/prompts": "^8.0.1",
+		"@types/node": "24.10.1",
+		"rimraf": "6.1.2",
+		"ts-node": "10.9.2",
+		"typedoc": "0.28.15",
+		"typescript": "5.9.3",
+		"why-is-node-running": "^3.2.2",
+		"citty": "^0.1.6"
 	},
 	"dependencies": {
 		"@chalupajs/communication-darcon": "workspace:*",
@@ -40,6 +44,6 @@
 		"@chalupajs/logger-tslog": "workspace:*",
 		"@chalupajs/service": "workspace:*",
 		"@chalupajs/test-framework": "workspace:*",
-		"reflect-metadata": "0.1.13"
+		"reflect-metadata": "0.2.2"
 	}
 }

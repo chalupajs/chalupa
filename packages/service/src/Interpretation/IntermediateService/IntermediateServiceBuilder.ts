@@ -103,8 +103,10 @@ export async function buildIntermediateService<T = any>(
 					container.bindClass<T>(constructor)
 				}
 			} else {
-				// eslint-disable-next-line @typescript-eslint/await-thenable
-				await optionsObject.inject(contextFactory(parent))
+				const possiblePromise = optionsObject.inject(contextFactory(parent))
+				if (possiblePromise instanceof Promise) {
+					await possiblePromise
+				}
 			}
 		}
 	}

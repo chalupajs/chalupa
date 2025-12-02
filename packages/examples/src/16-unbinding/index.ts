@@ -1,12 +1,12 @@
 /*
  * 16. Unbinding
  *
- * 
+ *
  * The bind family of methods allows us to create and extend bindings. With the
  * rebind family, we can replace pre-existing bindings with new ones. Now, using
  * unbind(), we can remove bindings without immediately specifying a new bound
  * value (as in the case of rebindings).
- * 
+ *
  * Topic: Dependency Injection
  * Showcased features:
  *   * bindInterface.
@@ -41,7 +41,7 @@ class KingPadliDailyOfferingScraper implements IDailyOfferingScraper {
 
 @Injectable()
 class SaladBoxDailyOfferingScraper implements IDailyOfferingScraper {
-	scrapeOffering(): DailyOffering { 
+	scrapeOffering(): DailyOffering {
         return {
             restaurant: 'Salad Box',
             items: ['King Wrap']
@@ -63,7 +63,7 @@ const Types = {
     // remove the multibinding we created with the two bindInterface() calls.
     // Therefore, once we leave the if branch, there will be no binding for the
     // Types.IDailyOfferingScraper key.
-	inject(context) {
+	async inject(context) {
 		context
 			.bindInterface(Types.IDailyOfferingScraper, KingPadliDailyOfferingScraper)
 			.bindInterface(Types.IDailyOfferingScraper, SaladBoxDailyOfferingScraper)

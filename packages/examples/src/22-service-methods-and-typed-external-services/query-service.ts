@@ -1,15 +1,15 @@
-import { ILogger, LoggerFactory, PostInit, Service, ExternalService, ExternalServiceTemplate, ExternalServiceMethod, serviceMethodPlaceholder, IExternalServiceCall } from '@chalupajs/interface'
+import { ILogger, LoggerFactory, PostInit, Service, ExternalService, ExternalServiceTemplate, ExternalServiceMethod, IExternalServiceCall } from '@chalupajs/interface'
 
 @ExternalService({
     name: 'PizzaService'
 })
 class PizzaExternalService extends ExternalServiceTemplate {
     @ExternalServiceMethod()
-    getNumberOfOrdersSince: (since: number) => IExternalServiceCall<number> = serviceMethodPlaceholder
+    declare getNumberOfOrdersSince: (since: number) => IExternalServiceCall<number>
 }
 
 @Service({
-    inject: [PizzaExternalService]  
+    inject: [PizzaExternalService]
 })
 export class QueryService {
     private readonly logger: ILogger
@@ -22,7 +22,7 @@ export class QueryService {
 
     @PostInit()
     async postInit() {
-        const orders = await this.pizzaService.getNumberOfOrdersSince(420).send()
+    const orders = await this.pizzaService.getNumberOfOrdersSince(420).send()
 
         this.logger.info(`Order count ${orders}`)
     }

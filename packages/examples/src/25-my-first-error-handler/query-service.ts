@@ -1,15 +1,15 @@
-import { ILogger, LoggerFactory, PostInit, Service, ExternalService, ExternalServiceTemplate, ExternalServiceMethod, serviceMethodPlaceholder, IExternalServiceCall } from '@chalupajs/interface'
+import { ILogger, LoggerFactory, PostInit, Service, ExternalService, ExternalServiceTemplate, ExternalServiceMethod, IExternalServiceCall } from '@chalupajs/interface'
 
 @ExternalService({
     name: 'PizzaService'
 })
 class PizzaExternalService extends ExternalServiceTemplate {
     @ExternalServiceMethod()
-    orderPizza: (flavor: string) => IExternalServiceCall<string> = serviceMethodPlaceholder
+    declare orderPizza: (flavor: string) => IExternalServiceCall<string>
 }
 
 @Service({
-    inject: [PizzaExternalService]  
+    inject: [PizzaExternalService]
 })
 export class QueryService {
     private readonly logger: ILogger

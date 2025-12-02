@@ -27,18 +27,18 @@
 	"author": "",
 	"devDependencies": {
 		"@dwmt/eslint-config": "1.0.0",
-		"@types/node": "16.10.3",
-		"eslint": "7.32.0",
-		"prettier": "2.4.1",
-		"rimraf": "3.0.2",
-		"typedoc": "0.21.0",
-		"typescript": "4.3.3"
+		"@types/node": "24.10.1",
+		"eslint": "9.39.1",
+		"prettier": "3.7.3",
+		"rimraf": "6.1.2",
+		"typedoc": "0.28.15",
+		"typescript": "5.9.3"
 	},
 	"engines": {
 		"node": ">=16"
 	},
 	"dependencies": {
 		"@chalupajs/interface": "workspace:*",
-		"reflect-metadata": "0.1.13"
+		"reflect-metadata": "0.2.2"
 	}
 }

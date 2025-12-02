@@ -1,13 +1,13 @@
 /*
  * 11. Constant Binding
  *
- * 
+ *
  * In the case of class and interface bindings, instantiation is handled by
  * Chalupa, and we're only telling it which classes to create. However, in some
  * situations, we want to handle instantiations ourselves or want to bind literal
  * values (such as strings or numbers). These are the exact use cases for the
- * bindConstant() method.  
- * 
+ * bindConstant() method.
+ *
  * Topic: Dependency Injection
  * Showcased features:
  *   * @Inject.
@@ -25,7 +25,7 @@ interface IDateTimeSource {
 
 // This class will be instantiated by us and not Chalupa.
 // Hence, in this case, we do not need to use the @Injectable()
-// decorator. 
+// decorator.
 class BuiltInDateTimeSource implements IDateTimeSource {
     now(): number {
         return Date.now()
@@ -38,7 +38,7 @@ const Types = {
 
 // The same way we have to use type keys to relate
 // interface bindings and dependency sites, we have to
-// create keys for constant/literal values as well. 
+// create keys for constant/literal values as well.
 const Constants = {
     TodaysPizzaChef: 'TodaysPizzaChef'
 }
@@ -48,7 +48,7 @@ const Constants = {
     // a key that is going to identify the binding. When we wish to inject
     // the constant, you have to use the same key in the @Inject decorator.
     // Then, the second parameter is the actual value, bound to the key.
-    // 
+    //
     // The first binding, TodaysPizzaChef is the most frequent use case for
     // constants bindings: supplying a literal value into the context.
     // Then, we instantiate an implementation of the IDateTimeSource by hand
@@ -62,9 +62,9 @@ const Constants = {
     //     constants: [
     //       [Constants.TodaysPizzaChef, 'Giovanni'],
     //       [Types.IDateTimeSource, new BuiltInDateTimeSource()]
-    //     ] 
+    //     ]
     //   })
-	inject(context) {
+	async inject(context) {
 		context
             .bindConstant(Constants.TodaysPizzaChef, 'Giovanni')
             .bindConstant(Types.IDateTimeSource, new BuiltInDateTimeSource())

@@ -1,13 +1,13 @@
 /*
  * 02. Simple Configuration
  *
- * 
+ *
  * We create a new configuration class, PizzaConfig, and then inject it
  * into a newly created service.
- * 
+ *
  * Once the service is instantiated, it logs a configuration property to
  * the console.
- * 
+ *
  * Topic: Configuration
  * Showcased features:
  *   * @Configuration and @Configurable.
@@ -47,10 +47,12 @@ class PizzaConfig {
 	inject: [PizzaConfig]
 })
 class PizzaService {
+	config: PizzaConfig
 	constructor(loggerFactory: LoggerFactory, config: PizzaConfig) {
+		this.config = config
 		const logger = loggerFactory.getLogger(PizzaService)
 
-		logger.info(config.dataDirectory)
+		logger.info(this.config.dataDirectory)
 	}
 }
 

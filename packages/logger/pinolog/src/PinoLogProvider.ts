@@ -14,7 +14,9 @@ export class PinoLogProvider implements ILogProvider {
 		const loggerInstance = pino({
 			name,
 			level: this.config.level,
-			prettyPrint: this.config.pretty,
+			...(this.config.pretty ? { transport: {
+				target: 'pino-pretty'
+			} } : {}),
 		})
 
 		return new PinoLogger(loggerInstance)

@@ -2,7 +2,7 @@ import 'reflect-metadata'
 // Types
 export { Constructor } from './types'
 
-export { Container as InversifyContainer, METADATA_KEY as InversifyMetadata } from 'inversify'
+export { Container as InversifyContainer } from 'inversify'
 
 export { ContainerConstant } from './constants'
 
@@ -81,6 +81,7 @@ export { ILogProvider } from './Log/ILogProvider'
 export { LogFunction } from './Log/LogFunction'
 export { ILogger } from './Log/ILogger'
 export { LogConfig } from './Log/Configuration'
+export { LogLevel } from './Log/Configuration'
 
 export { Errors } from './error'
 

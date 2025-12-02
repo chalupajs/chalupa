@@ -37,6 +37,8 @@ namespace Metadata {
 	// ExternalService
 	export const METADATA_EXTERNAL_SERVICE_INJECTED = 'Catamaran_Symbol_MetadataExternalServiceInjected'
 	export const METADATA_EXTERNAL_SERVICE_OPTIONS = 'Catamaran_Symbol_MetadataExternalServiceOptions'
+	export const METADATA_EXTERNAP_SERVICE_METHODS = 'Chalupa:Symbol:MetadataExternalServiceMethods'
+	export const METADATA_EXTERNAP_SERVICE_EVENTS = 'Chalupa:Symbol:MetadataExternalServiceEvents'
 	export const METADATA_EXTERNAL_SERVICE = 'Catamaran_Symbol_MetadataExternalService'
 
 	// ErrorHandler
